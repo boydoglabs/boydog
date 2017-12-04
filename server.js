@@ -9,7 +9,9 @@ var fs = require('fs'),
 	express = require('express'),
 	ejs = require('ejs'),
 	_ = require('lodash'),
-	app = express();
+	app = express(),
+	server = require('http').createServer(app),
+	io = require('socket.io')(server);
 
 //Express configuration
 app.set('views', __dirname + '/views');
@@ -92,13 +94,17 @@ var foo = {
 	"favoriteFruit": "apple"
 };
 
-//Pages
+//Functions
+/*var setDog = _.debounce(function(attr, val) {
+	io.emit('set-dog', { attr: attr, val: val });
+}, 1000);*/
+
+//API get
 app.get('/', function(req, res) {
 	
 	return res.render("index");
 });
 
-//API
 app.post('/get', function(req, res) {
 	var attr = req.body.attr;
 	
@@ -109,20 +115,44 @@ app.post('/get', function(req, res) {
 	return res.json({ msg: msg });
 });
 
-app.post('/set', function(req, res) {
+//API post
+/*app.post('/set', function(req, res) {
 	var attr = req.body.attr,
 		val = req.body.val;
-	
-	console.log("set");
-	console.log(_.get(foo, attr));
 	
 	_.set(foo, attr, val);
 	console.log(_.get(foo, attr));
 	
+	setDog(attr, val);
+	
 	return res.json({ msg: req.body.val });
+});*/
+
+//Socket.io
+io.on('connection', function(socket) {
+	socket.emit('news', { hello: 'world' });
+
+	socket.on('set-boy', function(data) {
+		_.set(foo, data.attr, data.val);
+		
+		_.delay(function() {
+			socket.emit('set-dog', { attr: data.attr, val: data.val });
+			console.log("set-boy", data);
+			
+			
+		}, 500);
+		
+		
+	});
+
+	socket.on('join', function(data) {
+		console.log("join", data);
+	});
+	
+	console.log("connection");
 });
 
 
 //Run
-app.listen(process.env.PORT);
+server.listen(process.env.PORT);
 console.log("Started at " + process.env.PORT);
