@@ -66,7 +66,7 @@
 		
 		<script>
 			$(function() {
-				console.log("rdy");
+				console.log("Ready");
 				
 				$('[fws-link]').each(function(i, el) {
 					
@@ -74,13 +74,21 @@
 					
 					console.log(i, attr);
 					
+					//Get initial values
 					$.post("/get", { attr: attr }).done(function(json) {
 						console.log(attr, json.msg);
 						$(el).val(json.msg);
 					});
 					
+					//Functions for updating values
+					$(el).keyup(function(field) {
+						var val = field.currentTarget.value;
+						
+						$.post("/set", { attr: attr, val: val }).done(function(json) {
+							//
+						});
+					});
 				});
-				
 			})
 		</script>
 	</body>

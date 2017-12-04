@@ -100,7 +100,6 @@ app.get('/', function(req, res) {
 
 //API
 app.post('/get', function(req, res) {
-	
 	var attr = req.body.attr;
 	
 	console.log(attr);
@@ -108,6 +107,19 @@ app.post('/get', function(req, res) {
 	var msg = _.get(foo, attr);
 	
 	return res.json({ msg: msg });
+});
+
+app.post('/set', function(req, res) {
+	var attr = req.body.attr,
+		val = req.body.val;
+	
+	console.log("set");
+	console.log(_.get(foo, attr));
+	
+	_.set(foo, attr, val);
+	console.log(_.get(foo, attr));
+	
+	return res.json({ msg: req.body.val });
 });
 
 
