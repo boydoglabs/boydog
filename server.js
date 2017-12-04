@@ -5,12 +5,11 @@ const dbPath = './db/';
 
 //Vars
 var fs = require('fs'),
-	path = require('path'), 
+	path = require('path'),
 	express = require('express'),
 	ejs = require('ejs'),
-	app = express(),
-	mkdirp = require('mkdirp'),
-	_ = require('lodash');
+	json2Fson = require('json2Fson'),
+	app = express();
 
 //Express configuration
 app.set('views', __dirname + '/views');
@@ -22,6 +21,8 @@ app.use(require('cookie-parser')("frame-ws"));
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('body-parser').json());
 app.use(require('express-session')({ secret: 'd22667deca36f3e333fa87f9fd8e0218', resave: true, saveUninitialized: true }));
+
+json2Fson.options({dbPath: "./db/"});
 
 var foo = {
 	"_id": "5a20977f783619b3d7b8991a",
@@ -74,53 +75,13 @@ var foo = {
 	"favoriteFruit": "apple"
 };
 
-//Functions
-var _jsonToFson = function(json, keyPath, cb) {
-	var msg = true;
-	
-	_.forOwn(json, function(v, k) {
-		console.log(k, _.isObject(v));
-		
-		if (_.isObject(v)) {
-			//Create dir
-			
-			var dir = path.join(dbPath, keyPath, k);
-			console.log(dir);
-			
-			if (!fs.existsSync(dir)) {
-				mkdirp(dir);
-				console.log("dir created")
-			}
-		} else {
-			//Create file
-			
-			
-		}
-		
-		
-		
-		
-		
-	})
-	
-	return cb(msg);
-}
-
-var _fsonToJson = function(path, cb) {
-	var json;
-	
-	//Get json
-	
-	return cb(json);
-}
-
 //Pages
 app.get('/', function(req, res) {
-	_jsonToFson(foo, 'foo', function(msg) {
-		
-		
-		return res.json(msg);
-	});
+	//json2Fson({ 'foo': foo });
+	
+	json2Fson.convert({ 'foo': foo });
+	
+	return res.json("ok");
 });
 
 //Run

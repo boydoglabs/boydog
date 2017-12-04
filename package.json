@@ -16,8 +16,7 @@
     "ejs": "^2.5.7",
     "express": "^4.16.1",
     "express-session": "^1.15.6",
-    "lodash": "^4.17.4",
-    "mkdirp": "^0.5.1",
+    "json2fson": "^1.0.1",
     "validator": "^9.1.1"
   }
 }
