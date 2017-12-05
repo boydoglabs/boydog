@@ -115,19 +115,6 @@ app.post('/get', function(req, res) {
 	return res.json({ msg: msg });
 });
 
-//API post
-/*app.post('/set', function(req, res) {
-	var attr = req.body.attr,
-		val = req.body.val;
-	
-	_.set(foo, attr, val);
-	console.log(_.get(foo, attr));
-	
-	setDog(attr, val);
-	
-	return res.json({ msg: req.body.val });
-});*/
-
 //Socket.io
 io.on('connection', function(socket) {
 	socket.emit('news', { hello: 'world' });
