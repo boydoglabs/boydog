@@ -133,13 +133,11 @@ io.on('connection', function(socket) {
 	socket.emit('news', { hello: 'world' });
 
 	socket.on('set-boy', function(data) {
-		socket.emit('set-dog', { attr: data.attr, val: data.val });
+		socket.broadcast.emit('set-dog', { attr: data.attr, val: data.val });
 		
 		_.set(foo, data.attr, data.val);
 		
 		console.log("set-boy", data);
-		
-		
 	});
 
 	socket.on('join', function(data) {
