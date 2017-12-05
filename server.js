@@ -97,7 +97,7 @@ var foo = {
 //Functions
 /*var setDog = _.debounce(function(attr, val) {
 	io.emit('set-dog', { attr: attr, val: val });
-}, 1000);*/
+}, 100);*/
 
 //API get
 app.get('/', function(req, res) {
@@ -133,14 +133,11 @@ io.on('connection', function(socket) {
 	socket.emit('news', { hello: 'world' });
 
 	socket.on('set-boy', function(data) {
+		socket.emit('set-dog', { attr: data.attr, val: data.val });
+		
 		_.set(foo, data.attr, data.val);
 		
-		_.delay(function() {
-			socket.emit('set-dog', { attr: data.attr, val: data.val });
-			console.log("set-boy", data);
-			
-			
-		}, 500);
+		console.log("set-boy", data);
 		
 		
 	});
