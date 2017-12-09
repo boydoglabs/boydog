@@ -16,7 +16,7 @@
     "ejs": "^2.5.7",
     "express": "^4.16.1",
     "express-session": "^1.15.6",
-    "json2fson": "^1.0.1",
+    "json2fson": "^1.0.8",
     "socket.io": "^2.0.4",
     "validator": "^9.1.1"
   }

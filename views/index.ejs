@@ -13,8 +13,6 @@
 					<input type="text" placeholder="name" set-dog="users[1].name">
 					<input type="text" placeholder="age" set-dog="users[1].age">
 					<input type="text" placeholder="email" set-dog="users[1].email">
-					
-					
 					<label for="ageRangeField">Age Range</label>
 					<select id="ageRangeField">
 					  <option value="0-13">0-13</option>
@@ -23,7 +21,9 @@
 					  <option value="24+">24+</option>
 					</select>
 					<label for="commentField">Comment</label>
-					<textarea placeholder="Hi CJ …" id="commentField"></textarea>
+					<textarea placeholder="about" id="commentField" set-dog="about"></textarea>
+					<label for="jsonField">JSON</label>
+					<textarea placeholder="about" id="commentField" set-dog="." dog-set-opt="stringify"></textarea>
 					<div class="float-right">
 					  <input type="checkbox" id="confirmField">
 					  <label class="label-inline" for="confirmField">Send a copy to yourself</label>
@@ -33,6 +33,7 @@
 				</form>
 			</div>
 			<div class="column">
+				<input type="text" set-dog="tasks">
 				<table>
 				  <thead>
 					<tr>
@@ -42,18 +43,12 @@
 					  <th>Location</th>
 					</tr>
 				  </thead>
-				  <tbody>
+				  <tbody dog-set-flood="tasks as i">
 					<tr>
-					  <td>Stephen Curry</td>
-					  <td>27</td>
-					  <td>1,91</td>
-					  <td>Akron, OH</td>
-					</tr>
-					<tr>
-					  <td>Klay Thompson</td>
-					  <td>25</td>
-					  <td>2,01</td>
-					  <td>Los Angeles, CA</td>
+					  <td><input type="text" set-dog="tasks[|i|].toDo"></td>
+					  <td><input type="text" set-dog="tasks[|i|].progress"></td>
+					  <td><input type="text" set-dog="tasks[|i|].doer"></td>
+					  <td><input type="text" set-dog="tasks[|i|].done"></td>
 					</tr>
 				  </tbody>
 				</table>
@@ -78,8 +73,17 @@
 					
 					//Get initial values
 					$.post("/get", { attr: attr }).done(function(json) {
-						console.log(attr, json.msg);
-						$(el).val(json.msg);
+						var options = $(el).attr('dog-set-opt') || "";
+						
+						console.log(attr, json.msg, options);
+						
+						var msg = json.msg;
+						
+						if (options.indexOf("stringify") >= 0) {
+							msg = JSON.stringify(msg);
+						}
+						
+						$(el).val(msg);
 					});
 					
 					//Functions for updating values
