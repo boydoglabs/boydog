@@ -79,9 +79,7 @@
 						
 						var msg = json.msg;
 						
-						if (options.indexOf("stringify") >= 0) {
-							msg = JSON.stringify(msg);
-						}
+						if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
 						
 						$(el).val(msg);
 					});
@@ -107,11 +105,21 @@
 				});
 				
 				socket.on('set-dog', function(data) {
-					$("[set-dog='" + data.attr + "']").val(data.val);
+					console.log("set-dog socket", data);
 					
-					console.log("set-dog", data);
-				});
+					var el = $("[set-dog='" + data.attr + "']");
+					
+					console.log("eltoset", el)
+					
+					
+					var options = $(el).attr('dog-set-opt') || "";
 				
+					var msg = data.val;
+					if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+					
+					el.val(msg);
+					
+				});
 			})
 		</script>
 	</body>
