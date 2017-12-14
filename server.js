@@ -31,7 +31,21 @@ var foo = {
 	"balance": "$1,300.59",
 	"picture": "http://placehold.it/32x32",
 	"age": 27,
-	"eyeColor": "brown",
+	"features": {
+		"body": {
+			"up": {
+				"eyes": [{
+					"color": "green"
+				},{
+					"color": "blue"
+				}]
+			}
+		},
+		"mind": {
+			"iq": 120,
+			"stamina": 90
+		}
+	},
 	"name": "Hyde Malone",
 	"gender": "male",
 	"company": "OMATOM",
@@ -142,7 +156,26 @@ io.on('connection', function(socket) {
 		socket.broadcast.emit('set-dog', { attr: data.attr, val: data.val }); //Propagate the changing field (must happen immediately)
 		_.set(foo, data.attr, data.val);  //Set the changing field (must happend just before the broadcast)
 		
-		//Backpropagate to set the other fields
+		//Backpropagate related fields
+		
+		var path = _.toPath(data.attr);
+		//path.pop();
+		var relatedPaths = [path[0]];
+		var str = path[0];
+		
+		for (i = 1; i < path.length - 1; i++) {
+			console.log(path[i]);
+			str += '["' + path[i] + '"]';
+			relatedPaths.push(str);
+		}
+		for (i = relatedPaths.length - 1; i >= 0; i--) {
+			console.log("debug relatedPaths", relatedPaths[i], "is", _.get(foo, relatedPaths[i]));
+			socket.broadcast.emit('set-dog', { attr: relatedPaths[i], val: _.get(foo, relatedPaths[i]) }); //Propagate related fields other clients
+			socket.emit('set-dog', { attr: relatedPaths[i], val: _.get(foo, relatedPaths[i]) }); //Propagate related fields to myself
+		}
+		
+		
+		
 		
 		//Propagate the main container
 		console.log("propagate main container")

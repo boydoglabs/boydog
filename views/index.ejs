@@ -13,6 +13,10 @@
 					<input type="text" placeholder="name" set-dog="users[1].name">
 					<input type="text" placeholder="age" set-dog="users[1].age">
 					<input type="text" placeholder="email" set-dog="users[1].email">
+					<input type="text" placeholder="deep feature" set-dog='features["body"]["up"]' dog-set-opt="stringify">
+					<input type="text" placeholder="deep feature" set-dog="features.body.up.eyes" dog-set-opt="stringify">
+					<input type="text" placeholder="deep feature" set-dog="features.body.up.eyes[0].color">
+					<input type="text" placeholder="deep feature" set-dog="features.body.up.eyes[1].color">
 					<label for="ageRangeField">Age Range</label>
 					<select id="ageRangeField">
 					  <option value="0-13">0-13</option>
@@ -33,7 +37,7 @@
 				</form>
 			</div>
 			<div class="column">
-				<input type="text" set-dog="tasks">
+				<input type="text" set-dog="tasks" dog-set-opt="stringify">
 				<table>
 				  <thead>
 					<tr>
@@ -43,8 +47,8 @@
 					  <th>Location</th>
 					</tr>
 				  </thead>
-				  <tbody dog-set-flood="tasks as i">
-					<tr>
+				  <tbody>
+					<tr dog-each="tasks">
 					  <td><input type="text" set-dog="tasks[|i|].toDo"></td>
 					  <td><input type="text" set-dog="tasks[|i|].progress"></td>
 					  <td><input type="text" set-dog="tasks[|i|].doer"></td>
@@ -64,6 +68,43 @@
 			$(function() {
 				console.log("Ready");
 				
+				//Init
+				jQuery.fn.htmlClean = function() {
+					this.contents().filter(function() {
+						if (this.nodeType != 3) {
+							$(this).htmlClean();
+							return false;
+						}
+						else {
+							this.textContent = $.trim(this.textContent);
+							return !/\S/.test(this.nodeValue);
+						}
+					}).remove();
+					
+					return this;
+				}
+				$('html').htmlClean(); //Clean html for whitespaces and line-breaks
+				
+				//Generate dog-repeat's
+				$('[dog-each]').each(function(k, el) {
+					var parent = $(el).parent();
+					var blueprint = $(el).html();
+					
+					console.log("is repeat", $(el));
+					
+					parent.attr('dog-track', $(el).attr('dog-repeat'));
+					
+					for (i = 0; i < 3; i++) {
+						var newEl = $(el).clone();
+						
+						newEl.removeAttr('dog-each');
+						newEl.attr('dog-id', i);
+						console.log('bp', newEl)
+						
+						parent.append(newEl);
+					}
+				});
+				
 				var socket = io.connect('http://localhost:3090');
 				
 				$('[set-dog]').each(function(i, el) {
@@ -79,7 +120,29 @@
 						
 						var msg = json.msg;
 						
-						if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+						/*if (options.indexOf("repeat") >= 0) {
+							
+							var parent = $(el).parent();
+							
+							console.log("is repeat");
+							
+							parent.empty();
+							
+							for (i = 0; i < 3; i++) {
+								var blueprint = $(el).clone();
+								
+								console.log('bp', blueprint)
+								
+								parent.append(blueprint);
+							}
+							
+							
+							return;
+						}*/
+						
+						if (options.indexOf("stringify") >= 0) {
+							msg = JSON.stringify(msg);
+						}
 						
 						$(el).val(msg);
 					});
