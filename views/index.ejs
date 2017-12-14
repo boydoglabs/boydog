@@ -85,24 +85,29 @@
 				}
 				$('html').htmlClean(); //Clean html for whitespaces and line-breaks
 				
-				//Generate dog-repeat's
+				//Generate dog-each element
 				$('[dog-each]').each(function(k, el) {
 					var parent = $(el).parent();
 					var blueprint = $(el).html();
 					
-					console.log("is repeat", $(el));
 					
-					parent.attr('dog-track', $(el).attr('dog-repeat'));
+					console.log("is repeat", $(el));
 					
 					for (i = 0; i < 3; i++) {
 						var newEl = $(el).clone();
 						
 						newEl.removeAttr('dog-each');
 						newEl.attr('dog-id', i);
-						console.log('bp', newEl)
+						console.log('bp', newEl);
+						console.log('|i| replacement', $(newEl));
+						
+						$(newEl).html($(newEl).html().replace('|i|', i));
+						console.log('|i| replacement', $(newEl));
 						
 						parent.append(newEl);
 					}
+					
+					$(el).css({ display: "none" });
 				});
 				
 				var socket = io.connect('http://localhost:3090');
