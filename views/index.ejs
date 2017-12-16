@@ -49,10 +49,10 @@
 				  </thead>
 				  <tbody>
 					<tr dog-each="tasks">
-					  <td><input type="text" set-dog="tasks[|i|].toDo"></td>
-					  <td><input type="text" set-dog="tasks[|i|].progress"></td>
-					  <td><input type="text" set-dog="tasks[|i|].doer"></td>
-					  <td><input type="text" set-dog="tasks[|i|].done"></td>
+					  <td><input type="text" set-dog="tasks[{{ i }}].toDo"></td>
+					  <td><input type="text" set-dog="tasks[{{ i }}].progress"></td>
+					  <td><input type="text" set-dog="tasks[{{ i }}].doer"></td>
+					  <td><input type="text" set-dog="tasks[{{ i }}].done"></td>
 					</tr>
 				  </tbody>
 				</table>
@@ -64,9 +64,12 @@
 		</div>
 		
 		<script src="/socket.io.js"></script>
+		<script src="/mustache.js"></script>
 		<script>
 			$(function() {
 				console.log("Ready");
+				
+				
 				
 				//Init
 				jQuery.fn.htmlClean = function() {
@@ -101,7 +104,9 @@
 						console.log('bp', newEl);
 						console.log('|i| replacement', $(newEl));
 						
-						$(newEl).html($(newEl).html().replace('|i|', i));
+						$(newEl).html(Mustache.render($(newEl).html(), { i: i }));
+						
+						//$(newEl).html($(newEl).html().replace('/\|i\|/g', i)); //Old replacement scheme
 						console.log('|i| replacement', $(newEl));
 						
 						parent.append(newEl);
