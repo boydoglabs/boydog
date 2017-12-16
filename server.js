@@ -126,7 +126,7 @@ var foo = {
 
 //Functions
 /*var setDog = _.debounce(function(attr, val) {
-	io.emit('set-dog', { attr: attr, val: val });
+	io.emit('dog-val', { attr: attr, val: val });
 }, 100);*/
 
 //API get
@@ -153,7 +153,7 @@ io.on('connection', function(socket) {
 	socket.emit('news', { hello: 'world' });
 
 	socket.on('set-boy', function(data) {
-		socket.broadcast.emit('set-dog', { attr: data.attr, val: data.val }); //Propagate the changing field (must happen immediately)
+		socket.broadcast.emit('dog-val', { attr: data.attr, val: data.val }); //Propagate the changing field (must happen immediately)
 		_.set(foo, data.attr, data.val);  //Set the changing field (must happend just before the broadcast)
 		
 		//Backpropagate related fields
@@ -170,8 +170,8 @@ io.on('connection', function(socket) {
 		}
 		for (i = relatedPaths.length - 1; i >= 0; i--) {
 			console.log("debug relatedPaths", relatedPaths[i], "is", _.get(foo, relatedPaths[i]));
-			socket.broadcast.emit('set-dog', { attr: relatedPaths[i], val: _.get(foo, relatedPaths[i]) }); //Propagate related fields other clients
-			socket.emit('set-dog', { attr: relatedPaths[i], val: _.get(foo, relatedPaths[i]) }); //Propagate related fields to myself
+			socket.broadcast.emit('dog-val', { attr: relatedPaths[i], val: _.get(foo, relatedPaths[i]) }); //Propagate related fields other clients
+			socket.emit('dog-val', { attr: relatedPaths[i], val: _.get(foo, relatedPaths[i]) }); //Propagate related fields to myself
 		}
 		
 		
@@ -179,8 +179,8 @@ io.on('connection', function(socket) {
 		
 		//Propagate the main container
 		console.log("propagate main container")
-		socket.broadcast.emit('set-dog', { attr: '.', val: foo }); //Propagate related fields other clients
-		socket.emit('set-dog', { attr: '.', val: foo }); //Propagate related fields to myself
+		socket.broadcast.emit('dog-val', { attr: '.', val: foo }); //Propagate related fields other clients
+		socket.emit('dog-val', { attr: '.', val: foo }); //Propagate related fields to myself
 		
 		console.log("set-boy", data);
 	});

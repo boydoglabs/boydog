@@ -175,8 +175,8 @@
 					console.log("connect");
 				});
 				
-				socket.on('set-dog', function(data) {
-					console.log("set-dog socket", data);
+				socket.on('dog-val', function(data) {
+					console.log("dog-val socket", data);
 					
 					var el = $("[dog-val='" + data.attr + "']");
 					
