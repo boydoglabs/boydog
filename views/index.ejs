@@ -10,13 +10,13 @@
 			<div class="column">
 				<form>
 				  <fieldset>
-					<input type="text" placeholder="name" set-dog="users[1].name">
-					<input type="text" placeholder="age" set-dog="users[1].age">
-					<input type="text" placeholder="email" set-dog="users[1].email">
-					<input type="text" placeholder="deep feature" set-dog='features["body"]["up"]' dog-set-opt="stringify">
-					<input type="text" placeholder="deep feature" set-dog="features.body.up.eyes" dog-set-opt="stringify">
-					<input type="text" placeholder="deep feature" set-dog="features.body.up.eyes[0].color">
-					<input type="text" placeholder="deep feature" set-dog="features.body.up.eyes[1].color">
+					<input type="text" placeholder="name" dog-val="users[1].name">
+					<input type="text" placeholder="age" dog-val="users[1].age">
+					<input type="text" placeholder="email" dog-val="users[1].email">
+					<input type="text" placeholder="deep feature" dog-val='features["body"]["up"]' dog-set-opt="stringify">
+					<input type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-set-opt="stringify">
+					<input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[0].color">
+					<input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[1].color">
 					<label for="ageRangeField">Age Range</label>
 					<select id="ageRangeField">
 					  <option value="0-13">0-13</option>
@@ -25,9 +25,9 @@
 					  <option value="24+">24+</option>
 					</select>
 					<label for="commentField">Comment</label>
-					<textarea placeholder="about" id="commentField" set-dog="about"></textarea>
+					<textarea placeholder="about" id="commentField" dog-val="about"></textarea>
 					<label for="jsonField">JSON</label>
-					<textarea placeholder="about" id="commentField" set-dog="." dog-set-opt="stringify"></textarea>
+					<textarea placeholder="about" id="commentField" dog-val="." dog-set-opt="stringify"></textarea>
 					<div class="float-right">
 					  <input type="checkbox" id="confirmField">
 					  <label class="label-inline" for="confirmField">Send a copy to yourself</label>
@@ -37,7 +37,7 @@
 				</form>
 			</div>
 			<div class="column">
-				<input type="text" set-dog="tasks" dog-set-opt="stringify">
+				<input type="text" dog-val="tasks" dog-set-opt="stringify">
 				<table>
 				  <thead>
 					<tr>
@@ -49,10 +49,10 @@
 				  </thead>
 				  <tbody>
 					<tr dog-each="tasks">
-					  <td><input type="text" set-dog="tasks[{{ i }}].toDo"></td>
-					  <td><input type="text" set-dog="tasks[{{ i }}].progress"></td>
-					  <td><input type="text" set-dog="tasks[{{ i }}].doer"></td>
-					  <td><input type="text" set-dog="tasks[{{ i }}].done"></td>
+					  <td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
+					  <td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
+					  <td><input type="text" dog-val="tasks[{{ i }}].doer"></td>
+					  <td><input type="text" dog-val="tasks[{{ i }}].done"></td>
 					</tr>
 				  </tbody>
 				</table>
@@ -115,8 +115,8 @@
 				
 				var socket = io.connect('http://localhost:3090');
 				
-				$('[set-dog]').each(function(i, el) {
-					var attr = $(el).attr('set-dog');
+				$('[dog-val]').each(function(i, el) {
+					var attr = $(el).attr('dog-val');
 					
 					console.log(i, attr);
 					
@@ -178,7 +178,7 @@
 				socket.on('set-dog', function(data) {
 					console.log("set-dog socket", data);
 					
-					var el = $("[set-dog='" + data.attr + "']");
+					var el = $("[dog-val='" + data.attr + "']");
 					
 					console.log("eltoset", el)
 					
