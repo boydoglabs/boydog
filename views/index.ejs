@@ -50,7 +50,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr dog-each="tasks">
+						<tr dog-each="tasks" dog-options="reverse">
 							<td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
 							<td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
 							<td><input type="text" dog-val="tasks[{{ i }}].doer"></td>
@@ -91,11 +91,13 @@
 			$('[dog-each]').each(function(k, el) {
 				var parent = $(el).parent();
 				var blueprint = $(el).html();
+				var options = $(el).attr('dog-options') || "";
 
+				
 
 				console.log("is repeat", $(el));
 
-				for (i = 0; i < 3; i++) {
+				for (i = 0; i < 4; i++) {
 					var newEl = $(el).clone();
 
 					newEl.removeAttr('dog-each');
@@ -109,8 +111,13 @@
 
 					//$(newEl).html($(newEl).html().replace('/\|i\|/g', i)); //Old replacement scheme
 					console.log('|i| replacement', $(newEl));
-
-					parent.append(newEl);
+					
+					if (options.indexOf("reverse") >= 0) {
+						parent.prepend(newEl);
+					} else {
+						parent.append(newEl);
+					}
+					
 				}
 
 				$(el).css({

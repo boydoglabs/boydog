@@ -24,7 +24,7 @@ app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('body-parser').json());
 app.use(require('express-session')({ secret: 'd22667deca36f3e333fa87f9fd8e0218', resave: true, saveUninitialized: true }));
 
-var foo = {
+var boyData = {
 	"index": 0,
 	"guid": "2bb9ad64-8b39-4a62-bbf6-b30c7fb16010",
 	"isActive": false,
@@ -124,10 +124,23 @@ var foo = {
 	"favoriteFruit": "apple"
 };
 
-//Functions
-/*var setDog = _.debounce(function(attr, val) {
-	io.emit('dog-val', { attr: attr, val: val });
-}, 100);*/
+var boyLogic = {
+	"friends": {
+		"add": function() {
+			console.log("boyLogic friends add");
+		}
+	}
+}
+
+//Temporal add item to dog-each
+var tempAdd = function() {
+	boyData.users.push({
+		"toDo": "NEW EL",
+		"progress": 3,
+		"doer": "NEW@mail.com",
+		"done": false
+	});
+}
 
 //API get
 app.get('/', function(req, res) {
@@ -141,9 +154,9 @@ app.post('/get', function(req, res) {
 	
 	console.log(attr);
 	
-	if (attr === ".") return res.json({ msg: foo });
+	if (attr === ".") return res.json({ msg: boyData });
 	
-	var msg = _.get(foo, attr);
+	var msg = _.get(boyData, attr);
 	
 	return res.json({ msg: msg });
 });
@@ -154,7 +167,7 @@ io.on('connection', function(socket) {
 
 	socket.on('set-boy', function(data) {
 		socket.broadcast.emit('dog-val', { attr: data.attr, val: data.val }); //Propagate the changing field (must happen immediately)
-		_.set(foo, data.attr, data.val);  //Set the changing field (must happend just before the broadcast)
+		_.set(boyData, data.attr, data.val);  //Set the changing field (must happend just before the broadcast)
 		
 		//Backpropagate related fields
 		
@@ -169,9 +182,9 @@ io.on('connection', function(socket) {
 			relatedPaths.push(str);
 		}
 		for (i = relatedPaths.length - 1; i >= 0; i--) {
-			console.log("debug relatedPaths", relatedPaths[i], "is", _.get(foo, relatedPaths[i]));
-			socket.broadcast.emit('dog-val', { attr: relatedPaths[i], val: _.get(foo, relatedPaths[i]) }); //Propagate related fields other clients
-			socket.emit('dog-val', { attr: relatedPaths[i], val: _.get(foo, relatedPaths[i]) }); //Propagate related fields to myself
+			console.log("debug relatedPaths", relatedPaths[i], "is", _.get(boyData, relatedPaths[i]));
+			socket.broadcast.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields other clients
+			socket.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields to myself
 		}
 		
 		
@@ -179,8 +192,8 @@ io.on('connection', function(socket) {
 		
 		//Propagate the main container
 		console.log("propagate main container")
-		socket.broadcast.emit('dog-val', { attr: '.', val: foo }); //Propagate related fields other clients
-		socket.emit('dog-val', { attr: '.', val: foo }); //Propagate related fields to myself
+		socket.broadcast.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields other clients
+		socket.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields to myself
 		
 		console.log("set-boy", data);
 	});
