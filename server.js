@@ -169,7 +169,6 @@ io.on('connection', function(socket) {
       _.set(boyData, data.attr, data.set);  //Set the changing field (must happend just before the broadcast)
       
       //Backpropagate related fields
-      
       var path = _.toPath(data.attr);
       //path.pop();
       var relatedPaths = [path[0]];
