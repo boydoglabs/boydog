@@ -152,10 +152,7 @@ app.get('/', function(req, res) {
 app.post('/get', function(req, res) {
   var attr = req.body.attr;
   
-  console.log(attr);
-  
   if (attr === ".") return res.json({ msg: boyData });
-  
   var msg = _.get(boyData, attr);
   
   return res.json({ msg: msg });
@@ -175,30 +172,25 @@ io.on('connection', function(socket) {
       var str = path[0];
       
       for (i = 1; i < path.length - 1; i++) {
-        console.log(path[i]);
         str += '["' + path[i] + '"]';
         relatedPaths.push(str);
       }
       for (i = relatedPaths.length - 1; i >= 0; i--) {
-        console.log("debug relatedPaths", relatedPaths[i], "is", _.get(boyData, relatedPaths[i]));
         socket.broadcast.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields other clients
         socket.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields to myself
       }
       
       //Propagate the main container
-      console.log("propagate main container")
       socket.broadcast.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields other clients
       socket.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields to myself
-      
-      console.log("boy-val", data);
     } else if (!_.isUndefined(data.get) && data.get === true) { //If data.set === 0 then GET
       console.log('should GET')
     } else {
       console.log('undefined boy-val')
     }
   });
-
-  console.log("connection");
+  
+  console.log("io on connection");
 });
 
 
