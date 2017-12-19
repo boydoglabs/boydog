@@ -165,8 +165,12 @@ app.post('/get', function(req, res) {
 io.on('connection', function(socket) {
   socket.emit('news', { hello: 'world' });
 
-  socket.on('set-boy', function(data) {
+  socket.on('boy-val', function(data) {
     socket.broadcast.emit('dog-val', { attr: data.attr, val: data.val }); //Propagate the changing field (must happen immediately)
+    
+    
+    
+    
     _.set(boyData, data.attr, data.val);  //Set the changing field (must happend just before the broadcast)
     
     //Backpropagate related fields
@@ -188,14 +192,12 @@ io.on('connection', function(socket) {
     }
     
     
-    
-    
     //Propagate the main container
     console.log("propagate main container")
     socket.broadcast.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields other clients
     socket.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields to myself
     
-    console.log("set-boy", data);
+    console.log("boy-val", data);
   });
 
   socket.on('join', function(data) {
