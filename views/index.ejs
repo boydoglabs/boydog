@@ -40,6 +40,7 @@
       </div>
       <div class="column">
         <input type="text" dog-val="tasks" dog-set-opt="stringify">
+        <input type="text" placeholder="qty" dog-val="tasks" dog-set-opt="length">
         <table>
           <thead>
             <tr>
@@ -50,7 +51,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dog-each="tasks" dog-options="reverse">
+            <tr dog-each="tasks" dog-options="">
               <td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
               <td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
               <td><input type="text" dog-val="tasks[{{ i }}].doer"></td>
@@ -91,7 +92,7 @@
         var blueprint = $(el).html();
         var options = $(el).attr('dog-options') || "";
         
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < 3; i++) {
           var newEl = $(el).clone();
           
           newEl.removeAttr('dog-each');
@@ -143,6 +144,8 @@
           
           if (options.indexOf("stringify") >= 0) {
             msg = JSON.stringify(msg);
+          } else if (options.indexOf("length") >= 0) {
+            msg = msg.length;
           }
           
           $(el).val(msg);
