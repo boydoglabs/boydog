@@ -64,7 +64,7 @@
       </div>
     </div>
   </div>
-
+  
   <script src="/socket.io.js"></script>
   <script src="/mustache.js"></script>
   <script>
@@ -80,11 +80,11 @@
             return !/\S/.test(this.nodeValue);
           }
         }).remove();
-
+        
         return this;
       }
       $('html').htmlClean(); //Clean html for whitespaces and line-breaks
-
+      
       //Generate dog-each element
       $('[dog-each]').each(function(k, el) {
         var parent = $(el).parent();
@@ -93,13 +93,13 @@
         
         for (i = 0; i < 4; i++) {
           var newEl = $(el).clone();
-
+          
           newEl.removeAttr('dog-each');
           newEl.attr('dog-id', i);
           $(newEl).html(Mustache.render($(newEl).html(), {
             i: i
           }));
-
+          
           //$(newEl).html($(newEl).html().replace('/\|i\|/g', i)); //Old replacement scheme
           
           if (options.indexOf("reverse") >= 0) {
