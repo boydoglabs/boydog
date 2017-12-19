@@ -163,8 +163,6 @@ app.post('/get', function(req, res) {
 
 //Socket.io
 io.on('connection', function(socket) {
-  socket.emit('news', { hello: 'world' });
-
   socket.on('boy-val', function(data) {
     if (!_.isUndefined(data.set)) {
       socket.broadcast.emit('dog-val', { attr: data.attr, val: data.set }); //Propagate the changing field (must happen immediately)
