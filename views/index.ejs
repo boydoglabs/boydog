@@ -1,214 +1,219 @@
 <html>
 
 <head>
-	<title>A Simple HTML Document</title>
-	<link rel="stylesheet" href="/milligram.css">
-	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <title>A Simple HTML Document</title>
+  <link rel="stylesheet" href="/milligram.css">
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 </head>
 
 <body>
-	<div class="container">
-		<div class="row">
-			<div class="column">
-				<form>
-					<fieldset>
-						<input type="text" placeholder="name" dog-val="users[1].name">
-						<input type="text" placeholder="age" dog-val="users[1].age">
-						<input type="text" placeholder="email" dog-val="users[1].email">
-						<input type="text" placeholder="deep feature" dog-val='features["body"]["up"]' dog-set-opt="stringify">
-						<input type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-set-opt="stringify">
-						<input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[0].color">
-						<input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[1].color">
-						<label for="ageRangeField">Age Range</label>
-						<select id="ageRangeField">
-					  <option value="0-13">0-13</option>
-					  <option value="14-17">14-17</option>
-					  <option value="18-23">18-23</option>
-					  <option value="24+">24+</option>
-					</select>
-						<label for="commentField">Comment</label>
-						<textarea placeholder="about" id="commentField" dog-val="about"></textarea>
-						<label for="jsonField">JSON</label>
-						<textarea placeholder="about" id="commentField" dog-val="." dog-set-opt="stringify"></textarea>
-						<div class="float-right">
-							<input type="checkbox" id="confirmField">
-							<label class="label-inline" for="confirmField">Send a copy to yourself</label>
-						</div>
-						<input class="button-primary" type="submit" value="Send">
-					</fieldset>
-				</form>
-			</div>
-			<div class="column">
-				<input type="text" dog-val="tasks" dog-set-opt="stringify">
-				<table>
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Age</th>
-							<th>Height</th>
-							<th>Location</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr dog-each="tasks" dog-options="reverse">
-							<td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
-							<td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
-							<td><input type="text" dog-val="tasks[{{ i }}].doer"></td>
-							<td><input type="text" dog-val="tasks[{{ i }}].done"></td>
-						</tr>
-					</tbody>
-				</table>
-				<a class="button" href="#">Add item</a>
-				<button class="button button-outline">Other function A</button>
-				<input class="button button-clear" type="submit" value="Other function B">
-			</div>
-		</div>
-	</div>
+  <div class="container">
+    <div class="row">
+      <div class="column">
+        <form>
+          <fieldset>
+            <input type="text" placeholder="name" dog-val="users[1].name">
+            <input type="text" placeholder="age" dog-val="users[1].age">
+            <input type="text" placeholder="email" dog-val="users[1].email">
+            <input type="text" placeholder="deep feature" dog-val='features["body"]["up"]' dog-set-opt="stringify">
+            <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-set-opt="stringify">
+            <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[0].color">
+            <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[1].color">
+            <label for="ageRangeField">Age Range</label>
+            <select id="ageRangeField">
+            <option value="0-13">0-13</option>
+            <option value="14-17">14-17</option>
+            <option value="18-23">18-23</option>
+            <option value="24+">24+</option>
+          </select>
+            <label for="commentField">Comment</label>
+            <textarea placeholder="about" id="commentField" dog-val="about"></textarea>
+            <label for="jsonField">JSON</label>
+            <textarea placeholder="about" id="commentField" dog-val="." dog-set-opt="stringify"></textarea>
+            <div class="float-right">
+              <input type="checkbox" id="confirmField">
+              <label class="label-inline" for="confirmField">Send a copy to yourself</label>
+            </div>
+            <input class="button-primary" type="submit" value="Send">
+          </fieldset>
+        </form>
+      </div>
+      <div class="column">
+        <input type="text" dog-val="tasks" dog-set-opt="stringify">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Height</th>
+              <th>Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr dog-each="tasks" dog-options="reverse">
+              <td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
+              <td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
+              <td><input type="text" dog-val="tasks[{{ i }}].doer"></td>
+              <td><input type="text" dog-val="tasks[{{ i }}].done"></td>
+            </tr>
+          </tbody>
+        </table>
+        <a class="button" href="#">Add item</a>
+        <button class="button button-outline">Other function A</button>
+        <input class="button button-clear" type="submit" value="Other function B">
+      </div>
+    </div>
+  </div>
 
-	<script src="/socket.io.js"></script>
-	<script src="/mustache.js"></script>
-	<script>
-		$(function() {
-			console.log("Ready");
+  <script src="/socket.io.js"></script>
+  <script src="/mustache.js"></script>
+  <script>
+    $(function() {
+      console.log("Ready");
 
-			//Init
-			jQuery.fn.htmlClean = function() {
-				this.contents().filter(function() {
-					if (this.nodeType != 3) {
-						$(this).htmlClean();
-						return false;
-					} else {
-						this.textContent = $.trim(this.textContent);
-						return !/\S/.test(this.nodeValue);
-					}
-				}).remove();
+      //Init
+      jQuery.fn.htmlClean = function() {
+        this.contents().filter(function() {
+          if (this.nodeType != 3) {
+            $(this).htmlClean();
+            return false;
+          } else {
+            this.textContent = $.trim(this.textContent);
+            return !/\S/.test(this.nodeValue);
+          }
+        }).remove();
 
-				return this;
-			}
-			$('html').htmlClean(); //Clean html for whitespaces and line-breaks
+        return this;
+      }
+      $('html').htmlClean(); //Clean html for whitespaces and line-breaks
 
-			//Generate dog-each element
-			$('[dog-each]').each(function(k, el) {
-				var parent = $(el).parent();
-				var blueprint = $(el).html();
-				var options = $(el).attr('dog-options') || "";
+      //Generate dog-each element
+      $('[dog-each]').each(function(k, el) {
+        var parent = $(el).parent();
+        var blueprint = $(el).html();
+        var options = $(el).attr('dog-options') || "";
 
-				
+        
 
-				console.log("is repeat", $(el));
+        console.log("is repeat", $(el));
 
-				for (i = 0; i < 4; i++) {
-					var newEl = $(el).clone();
+        for (i = 0; i < 4; i++) {
+          var newEl = $(el).clone();
 
-					newEl.removeAttr('dog-each');
-					newEl.attr('dog-id', i);
-					console.log('bp', newEl);
-					console.log('|i| replacement', $(newEl));
+          newEl.removeAttr('dog-each');
+          newEl.attr('dog-id', i);
+          console.log('bp', newEl);
+          console.log('|i| replacement', $(newEl));
 
-					$(newEl).html(Mustache.render($(newEl).html(), {
-						i: i
-					}));
+          $(newEl).html(Mustache.render($(newEl).html(), {
+            i: i
+          }));
 
-					//$(newEl).html($(newEl).html().replace('/\|i\|/g', i)); //Old replacement scheme
-					console.log('|i| replacement', $(newEl));
-					
-					if (options.indexOf("reverse") >= 0) {
-						parent.prepend(newEl);
-					} else {
-						parent.append(newEl);
-					}
-					
-				}
+          //$(newEl).html($(newEl).html().replace('/\|i\|/g', i)); //Old replacement scheme
+          console.log('|i| replacement', $(newEl));
+          
+          if (options.indexOf("reverse") >= 0) {
+            parent.prepend(newEl);
+          } else {
+            parent.append(newEl);
+          }
+          
+        }
 
-				$(el).css({
-					display: "none"
-				});
-			});
+        $(el).css({
+          display: "none"
+        });
+      });
 
-			var socket = io.connect('http://localhost:3090');
+      var socket = io.connect('http://localhost:3090');
 
-			$('[dog-val]').each(function(i, el) {
-				var attr = $(el).attr('dog-val');
+      $('[dog-val]').each(function(i, el) {
+        var attr = $(el).attr('dog-val');
 
-				console.log(i, attr);
+        console.log(i, attr);
 
-				//Get initial values
-				$.post("/get", {
-					attr: attr
-				}).done(function(json) {
-					var options = $(el).attr('dog-set-opt') || "";
+        //Get initial values
+        $.post("/get", {
+          attr: attr
+        }).done(function(json) {
+          var options = $(el).attr('dog-set-opt') || "";
 
-					console.log(attr, json.msg, options);
+          console.log(attr, json.msg, options);
 
-					var msg = json.msg;
+          var msg = json.msg;
 
-					/*if (options.indexOf("repeat") >= 0) {
-						
-						var parent = $(el).parent();
-						
-						console.log("is repeat");
-						
-						parent.empty();
-						
-						for (i = 0; i < 3; i++) {
-							var blueprint = $(el).clone();
-							
-							console.log('bp', blueprint)
-							
-							parent.append(blueprint);
-						}
-						
-						
-						return;
-					}*/
+          /*if (options.indexOf("repeat") >= 0) {
+            
+            var parent = $(el).parent();
+            
+            console.log("is repeat");
+            
+            parent.empty();
+            
+            for (i = 0; i < 3; i++) {
+              var blueprint = $(el).clone();
+              
+              console.log('bp', blueprint)
+              
+              parent.append(blueprint);
+            }
+            
+            
+            return;
+          }*/
 
-					if (options.indexOf("stringify") >= 0) {
-						msg = JSON.stringify(msg);
-					}
+          if (options.indexOf("stringify") >= 0) {
+            msg = JSON.stringify(msg);
+          }
 
-					$(el).val(msg);
-				});
+          $(el).val(msg);
+        });
 
-				//Functions for updating values
-				$(el).keyup(function(field) {
-					var val = field.currentTarget.value;
+        //Functions for updating values
+        $(el).keyup(function(field) {
+          var val = field.currentTarget.value;
+          var eachId = $(this).closest('[dog-id]').attr('dog-id');
 
-					console.log("should set-boy", attr, val);
+          console.log("should set-boy", attr, val, $(this), eachId);
+          if (eachId) {
+            //
+          }
+          
 
-					socket.emit('set-boy', {
-						attr: attr,
-						val: val
-					});
+          socket.emit('set-boy', {
+            attr: attr,
+            val: val
+          });
 
-					/*$.post("/set", { attr: attr, val: val }).done(function(json) {
-						//
-					});*/
+          /*$.post("/set", { attr: attr, val: val }).done(function(json) {
+            //
+          });*/
 
-				});
-			});
+        });
+      });
 
-			//Socket functions
-			socket.on('connect', function(data) {
-				console.log("connect");
-			});
+      //Socket functions
+      socket.on('connect', function(data) {
+        console.log("connect");
+      });
 
-			socket.on('dog-val', function(data) {
-				console.log("dog-val socket", data);
+      socket.on('dog-val', function(data) {
+        console.log("dog-val socket", data);
 
-				var el = $("[dog-val='" + data.attr + "']");
+        var el = $("[dog-val='" + data.attr + "']");
 
-				console.log("eltoset", el)
+        console.log("eltoset", el)
 
-				var options = $(el).attr('dog-set-opt') || "";
+        var options = $(el).attr('dog-set-opt') || "";
 
-				var msg = data.val;
-				if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+        var msg = data.val;
+        if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
 
-				el.val(msg);
+        el.val(msg);
 
-			});
-		})
-	</script>
+      });
+    })
+  </script>
 </body>
 
 </html>
