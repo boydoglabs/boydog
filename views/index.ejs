@@ -68,6 +68,7 @@
   
   <script src="/socket.io.js"></script>
   <script src="/mustache.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
   <script>
     $(function() {
       //Init
@@ -141,7 +142,9 @@
           if (options.indexOf("stringify") >= 0) {
             msg = JSON.stringify(msg);
           } else if (options.indexOf("length") >= 0) {
-            msg = msg.length;
+            msg = JSON.stringify(msg.length);
+          } else if (options.indexOf("keysAsArray") >= 0) {
+            msg = JSON.stringify(_.range(msg.length));
           }
           
           $(el).val(msg);
