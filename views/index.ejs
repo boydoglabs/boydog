@@ -29,7 +29,7 @@
             <label for="commentField">Comment</label>
             <textarea placeholder="about" id="commentField" dog-val="about"></textarea>
             <label for="jsonField">JSON</label>
-            <textarea placeholder="about" id="commentField" dog-val="." dog-set-opt="stringify"></textarea>
+            <textarea placeholder="about" id="commentField" dog-val="." dog-options="stringify"></textarea>
             <div class="float-right">
               <input type="checkbox" id="confirmField">
               <label class="label-inline" for="confirmField">Send a copy to yourself</label>
@@ -39,8 +39,8 @@
         </form>
       </div>
       <div class="column">
-        <input type="text" dog-val="tasks" dog-set-opt="stringify">
-        <input type="text" placeholder="qty" dog-val="tasks" dog-set-opt="length">
+        <input type="text" dog-val="tasks" dog-options="stringify">
+        <input type="text" placeholder="qty" dog-val="tasks" dog-options="length">
         <table>
           <thead>
             <tr>
@@ -126,7 +126,7 @@
         $.post("/get", {
           attr: attr
         }).done(function(json) {
-          var options = $(el).attr('dog-set-opt') || "";
+          var options = $(el).attr('dog-options') || "";
           
           var msg = json.msg;
           
@@ -179,7 +179,7 @@
       
       socket.on('dog-val', function(data) {
         var el = $("[dog-val='" + data.attr + "']");
-        var options = $(el).attr('dog-set-opt') || "";
+        var options = $(el).attr('dog-options') || "";
         var msg = data.val;
         
         if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
