@@ -140,7 +140,7 @@ var boyMask = {
     },
     "_set": function(data) {
       console.log("name _set");
-      
+
       return data.toUpperCase();
     }
   },
@@ -194,10 +194,6 @@ app.post('/get', function(req, res) {
 //Socket.io
 io.on('connection', function(socket) {
   
-  var propagateField = function() {
-    
-  }
-  
   socket.on('boy-val', function(data) {
     if (!_.isUndefined(data.set)) {
       //Execute boy set logic
@@ -206,31 +202,17 @@ io.on('connection', function(socket) {
       
       
       //Execute boy set logic
-      var a = _.get(boyMask, data.attr);
-      console.log("a", a)
-      if (_.isUndefined(a)) {
-        console.log("no setmask");
-        
-        _.set(boyData, data.attr, data.set);  //Set the changing field (must happend just before the broadcast)
+      var mask = _.get(boyMask, data.attr);
+      console.log("a", mask)
+      if (_.isUndefined(mask)) {
+        _.set(boyData, data.attr, data.set);  //Set the value without mask
       } else {
-        console.log("HAS SET MASK");
-        
-        
-        
-        /*var valToProp = _.get(boyData, data.attr);
-        console.log(valToProp);
-        
-        valToProp = a["_get"](valToProp);*/
-        
         var valToSet = data.set;
         
-        valToSet = a["_set"](valToSet);
+        valToSet = mask["_set"](valToSet);
         
         _.set(boyData, data.attr, valToSet);  //Set the changing field (must happend just before the broadcast)
       }
-      
-      
-      
       
       //Propagate to other users
       socket.broadcast.emit('dog-val', { attr: data.attr, val: data.set }); //Propagate the changing field (must happen immediately)
