@@ -138,8 +138,10 @@ var boyMask = {
       
       return data.toUpperCase();
     },
-    "_set": function() {
+    "_set": function(data) {
       console.log("name _set");
+      
+      return data.toUpperCase();
     }
   },
   "age": {
@@ -148,8 +150,10 @@ var boyMask = {
       
       return data * -1;
     },
-    "_set": function() {
+    "_set": function(data) {
       console.log("age _set");
+      
+      return data;
     }
   },
   "addTask": {
@@ -199,11 +203,38 @@ io.on('connection', function(socket) {
       //Execute boy set logic
       console.log(data);
       
-      boyMask[data.attr]["_set"]();
+      
+      
+      //Execute boy set logic
+      var a = _.get(boyMask, data.attr);
+      console.log("a", a)
+      if (_.isUndefined(a)) {
+        console.log("no setmask");
+        
+        _.set(boyData, data.attr, data.set);  //Set the changing field (must happend just before the broadcast)
+      } else {
+        console.log("HAS SET MASK");
+        
+        
+        
+        /*var valToProp = _.get(boyData, data.attr);
+        console.log(valToProp);
+        
+        valToProp = a["_get"](valToProp);*/
+        
+        var valToSet = data.set;
+        
+        valToSet = a["_set"](valToSet);
+        
+        _.set(boyData, data.attr, valToSet);  //Set the changing field (must happend just before the broadcast)
+      }
+      
+      
+      
       
       //Propagate to other users
       socket.broadcast.emit('dog-val', { attr: data.attr, val: data.set }); //Propagate the changing field (must happen immediately)
-      _.set(boyData, data.attr, data.set);  //Set the changing field (must happend just before the broadcast)
+      
       
       //Backpropagate related fields
       var path = _.toPath(data.attr);
