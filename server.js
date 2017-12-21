@@ -30,7 +30,7 @@ var boyData = {
   "isActive": false,
   "balance": "$1,300.59",
   "picture": "http://placehold.it/32x32",
-  "age": 27,
+  "age": -27,
   "features": {
     "body": {
       "up": {
@@ -148,10 +148,14 @@ var boyMask = {
     "_get": function(data) {
       console.log("age _get");
       
-      return data * -1;
+      return data;
     },
     "_set": function(data) {
       console.log("age _set");
+      
+      if (data > 0) {
+        data = data * -1;
+      }
       
       return data;
     }
@@ -196,27 +200,19 @@ io.on('connection', function(socket) {
   
   socket.on('boy-val', function(data) {
     if (!_.isUndefined(data.set)) {
-      //Execute boy set logic
-      console.log(data);
-      
-      
+      console.log('should SET', data);
       
       //Execute boy set logic
       var mask = _.get(boyMask, data.attr);
-      console.log("a", mask)
       if (_.isUndefined(mask)) {
         _.set(boyData, data.attr, data.set);  //Set the value without mask
       } else {
-        var valToSet = data.set;
-        
-        valToSet = mask["_set"](valToSet);
-        
-        _.set(boyData, data.attr, valToSet);  //Set the changing field (must happend just before the broadcast)
+        data.set = mask["_set"](data.set); //Redefine data.set here because it is used afterwards, do not optimize into the the next line
+        _.set(boyData, data.attr, data.set);  //Set the value with a mask
       }
       
       //Propagate to other users
       socket.broadcast.emit('dog-val', { attr: data.attr, val: data.set }); //Propagate the changing field (must happen immediately)
-      
       
       //Backpropagate related fields
       var path = _.toPath(data.attr);
@@ -239,27 +235,12 @@ io.on('connection', function(socket) {
       console.log('should GET', data);
       
       //Execute boy get logic
-      var a = _.get(boyMask, data.attr);
-      console.log("a", a)
-      if (_.isUndefined(a)) {
-        console.log("no mask");
-        
-        socket.emit('dog-val', { attr: data.attr, val: _.get(boyData, data.attr) }); //Propagate the changing field (must happen immediately)
+      var mask = _.get(boyMask, data.attr);
+      if (_.isUndefined(mask)) {
+        socket.emit('dog-val', { attr: data.attr, val: _.get(boyData, data.attr) }); //Get the value without mask
       } else {
-        console.log("HAS MASK");
-        
-        var valToProp = _.get(boyData, data.attr);
-        console.log(valToProp);
-        
-        valToProp = a["_get"](valToProp);
-        
-        socket.emit('dog-val', { attr: data.attr, val: valToProp }); //Propagate the changing field (must happen immediately)
+        socket.emit('dog-val', { attr: data.attr, val: mask["_get"](_.get(boyData, data.attr)) }); //Get the value using mask
       }
-      
-      
-      
-      //Execute boy get logic
-      //boyMask[data.attr]["_get"]();
     } else {
       console.log('undefined boy-val')
     }
