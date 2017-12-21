@@ -12,6 +12,8 @@
       <div class="column">
         <form>
           <fieldset>
+            global name: <input type="text" dog-val="name">
+            global age: <input type="number" dog-val="age">
             <input type="text" placeholder="name" dog-val="users[1].name">
             <input type="text" placeholder="age" dog-val="users[1].age">
             <input type="text" placeholder="email" dog-val="users[1].email">
@@ -19,7 +21,6 @@
             <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-options="stringify">
             <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[0].color">
             <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[1].color">
-            global age: <input type="number" dog-val="age">
             <label for="ageRangeField">Age Range</label>
             <select id="ageRangeField">
               <option value="0-13">0-13</option>

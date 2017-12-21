@@ -125,24 +125,31 @@ var boyData = {
   "favoriteFruit": "apple"
 };
 
-var boyLogic = {
+var boyMask = {
   "_get": function() {
     console.log("all _get");
   },
   "_set": function() {
     console.log("all _set");
   },
+  "name": {
+    "_get": function(data) {
+      console.log("name _get");
+      
+      return data.toUpperCase();
+    },
+    "_set": function() {
+      console.log("name _set");
+    }
+  },
   "age": {
-    "_get": function() {
+    "_get": function(data) {
       console.log("age _get");
+      
+      return data * -1;
     },
     "_set": function() {
       console.log("age _set");
-    }
-  },
-  "tasks": {
-    "add": function() {
-      console.log("boyLogic friends add");
     }
   },
   "addTask": {
@@ -182,14 +189,19 @@ app.post('/get', function(req, res) {
 
 //Socket.io
 io.on('connection', function(socket) {
+  
+  var propagateField = function() {
+    
+  }
+  
   socket.on('boy-val', function(data) {
     if (!_.isUndefined(data.set)) {
       //Execute boy set logic
       console.log(data);
       
-      boyLogic[data.attr]["_set"]();
+      boyMask[data.attr]["_set"]();
       
-      //Propagate the chaning field
+      //Propagate to other users
       socket.broadcast.emit('dog-val', { attr: data.attr, val: data.set }); //Propagate the changing field (must happen immediately)
       _.set(boyData, data.attr, data.set);  //Set the changing field (must happend just before the broadcast)
       
@@ -214,14 +226,27 @@ io.on('connection', function(socket) {
       console.log('should GET', data);
       
       //Execute boy get logic
-      var a = _.get(boyLogic, data.attr);
+      var a = _.get(boyMask, data.attr);
       console.log("a", a)
-      if (_.isUndefined(a)) return;
+      if (_.isUndefined(a)) {
+        console.log("no mask");
+        
+        socket.emit('dog-val', { attr: data.attr, val: _.get(boyData, data.attr) }); //Propagate the changing field (must happen immediately)
+      } else {
+        console.log("HAS MASK");
+        
+        var valToProp = _.get(boyData, data.attr);
+        console.log(valToProp);
+        
+        valToProp = a["_get"](valToProp);
+        
+        socket.emit('dog-val', { attr: data.attr, val: valToProp }); //Propagate the changing field (must happen immediately)
+      }
       
       
       
       //Execute boy get logic
-      //boyLogic[data.attr]["_get"]();
+      //boyMask[data.attr]["_get"]();
     } else {
       console.log('undefined boy-val')
     }
