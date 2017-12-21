@@ -126,12 +126,18 @@ var boyData = {
 };
 
 var boyLogic = {
+  "_get": function() {
+    console.log("all _get");
+  },
+  "_set": function() {
+    console.log("all _set");
+  },
   "age": {
     "_get": function() {
-      console.log("console _get");
+      console.log("age _get");
     },
     "_set": function() {
-      console.log("console _set");
+      console.log("age _set");
     }
   },
   "tasks": {
@@ -165,7 +171,6 @@ app.get('/', function(req, res) {
   return res.render("index");
 });
 
-
 app.post('/get', function(req, res) {
   var attr = req.body.attr;
   
@@ -179,12 +184,17 @@ app.post('/get', function(req, res) {
 io.on('connection', function(socket) {
   socket.on('boy-val', function(data) {
     if (!_.isUndefined(data.set)) {
+      //Execute boy set logic
+      console.log(data);
+      
+      boyLogic[data.attr]["_set"]();
+      
+      //Propagate the chaning field
       socket.broadcast.emit('dog-val', { attr: data.attr, val: data.set }); //Propagate the changing field (must happen immediately)
       _.set(boyData, data.attr, data.set);  //Set the changing field (must happend just before the broadcast)
       
       //Backpropagate related fields
       var path = _.toPath(data.attr);
-      //path.pop();
       var relatedPaths = [path[0]];
       var str = path[0];
       
@@ -201,7 +211,17 @@ io.on('connection', function(socket) {
       socket.broadcast.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields other clients
       socket.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields to myself
     } else if (!_.isUndefined(data.get) && data.get === true) { //If data.set === 0 then GET
-      console.log('should GET')
+      console.log('should GET', data);
+      
+      //Execute boy get logic
+      var a = _.get(boyLogic, data.attr);
+      console.log("a", a)
+      if (_.isUndefined(a)) return;
+      
+      
+      
+      //Execute boy get logic
+      //boyLogic[data.attr]["_get"]();
     } else {
       console.log('undefined boy-val')
     }
