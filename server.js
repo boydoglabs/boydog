@@ -154,16 +154,22 @@ var boydog = function(server) {
     }
   }
   
+  var socket;
+  
   var read = function(attr) {
     var mask = _.get(boyLogic, attr);
     var val;
     
     if (_.isUndefined(mask)) {
       val = _.get(boyData, attr);
-      socket.emit('dog-val', { attr: attr, val: val }); //Get the value without mask
+      try {
+        socket.emit('dog-val', { attr: attr, val: val }); //Get the value without mask
+      } catch(e) { } //Don't care if value is not emitted to users
     } else {
       val = mask["_r"](_.get(boyData, attr));
-      socket.emit('dog-val', { attr: attr, val: val }); //Get the value using mask
+      try {
+        socket.emit('dog-val', { attr: attr, val: val }); //Get the value using mask
+      } catch(e) { } //Don't care if value is not emitted to users
     }
     
     return val;
@@ -174,8 +180,6 @@ var boydog = function(server) {
     
     return 1;
   }
-  
-  var socket;
   
   //Socket.io
   io.on('connection', function(_socket) {
@@ -240,6 +244,7 @@ var boydog = function(server) {
   return {
     boyData: boyData,
     boyLogic: boyLogic,
+    socket: socket,
     read: read,
     write: write
   }
