@@ -156,8 +156,14 @@ var boydog = function(server) {
     }
   }
   
-  var boySet = function(attr, val) {
+  var read = function(attr) {
+    
+    return _.get(boyData, attr, (_.get(boyLogic, attr))["_r"]());
+  }
+  var write = function(attr, val) {
     _.set(boyData, attr, (_.get(boyLogic, attr))["_w"](val));
+    
+    return 1;
   }
   
   //Socket.io
@@ -220,7 +226,8 @@ var boydog = function(server) {
   return {
     boyData: boyData,
     boyLogic: boyLogic,
-    boySet: boySet
+    read: read,
+    write: write
   }
 }
 
@@ -271,9 +278,9 @@ app.get('/', function(req, res) {
 //Debug
 app.get('/debug', function(req, res) {
   
-  boydog.boySet('age', 999);
+  var r = boydog.read('age');
   
-  return res.json({ "ok": 1 });
+  return res.json({ r: r });
 });
 
 app.post('/get', function(req, res) {
