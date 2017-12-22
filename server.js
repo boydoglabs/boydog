@@ -125,7 +125,7 @@ var boyData = {
   "favoriteFruit": "apple"
 };
 
-var boyMask = {
+var boyLogic = {
   "_get": function() {
     console.log("all _get");
   },
@@ -203,7 +203,7 @@ io.on('connection', function(socket) {
       console.log('should SET', data);
       
       //Execute boy set logic
-      var mask = _.get(boyMask, data.attr);
+      var mask = _.get(boyLogic, data.attr);
       if (_.isUndefined(mask)) {
         _.set(boyData, data.attr, data.set);  //Set the value without mask
       } else {
@@ -235,7 +235,7 @@ io.on('connection', function(socket) {
       console.log('should GET', data);
       
       //Execute boy get logic
-      var mask = _.get(boyMask, data.attr);
+      var mask = _.get(boyLogic, data.attr);
       if (_.isUndefined(mask)) {
         socket.emit('dog-val', { attr: data.attr, val: _.get(boyData, data.attr) }); //Get the value without mask
       } else {
