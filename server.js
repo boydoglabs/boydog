@@ -1,4 +1,19 @@
+'use strict';
+
 require('dotenv').config();
+
+//Module dummy definition
+var boydog = function() {
+  'use strict';
+  
+  console.log("constructor");
+  
+  return {
+    init: function() {
+      console.log("init");
+    }
+  }
+}
 
 //Constants
 const dbPath = './db/';
@@ -10,8 +25,11 @@ var fs = require('fs'),
   ejs = require('ejs'),
   _ = require('lodash'),
   app = express(),
+  boydog = boydog(),
   server = require('http').createServer(app),
   io = require('socket.io')(server);
+
+boydog.init();
 
 //Express configuration
 app.set('views', __dirname + '/views');
@@ -248,7 +266,6 @@ io.on('connection', function(socket) {
   
   console.log("io on connection");
 });
-
 
 //Run
 server.listen(process.env.PORT);
