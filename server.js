@@ -6,8 +6,6 @@ require('dotenv').config();
 var boydog = function(server) {
   'use strict';
   
-  console.log("BD server", server)
-  
   var io = require('socket.io')(server);
   
   var boyData = {
@@ -157,17 +155,31 @@ var boydog = function(server) {
   }
   
   var read = function(attr) {
+    var mask = _.get(boyLogic, attr);
+    var val;
     
-    return _.get(boyData, attr, (_.get(boyLogic, attr))["_r"]());
-  }
+    if (_.isUndefined(mask)) {
+      val = _.get(boyData, attr);
+      socket.emit('dog-val', { attr: attr, val: val }); //Get the value without mask
+    } else {
+      val = mask["_r"](_.get(boyData, attr));
+      socket.emit('dog-val', { attr: attr, val: val }); //Get the value using mask
+    }
+    
+    return val;
+  };
+  
   var write = function(attr, val) {
     _.set(boyData, attr, (_.get(boyLogic, attr))["_w"](val));
     
     return 1;
   }
   
+  var socket;
+  
   //Socket.io
-  io.on('connection', function(socket) {
+  io.on('connection', function(_socket) {
+    socket = _socket;
     
     socket.on('boy-val', function(data) {
       if (!_.isUndefined(data.set)) {
@@ -206,13 +218,15 @@ var boydog = function(server) {
       } else if (!_.isUndefined(data.get) && data.get === true) { //If data.set === 0 then GET
         console.log('should GET', data);
         
-        //Execute boy get logic
+        /*//Execute boy get logic
         var mask = _.get(boyLogic, data.attr);
         if (_.isUndefined(mask)) {
           socket.emit('dog-val', { attr: data.attr, val: _.get(boyData, data.attr) }); //Get the value without mask
         } else {
           socket.emit('dog-val', { attr: data.attr, val: mask["_r"](_.get(boyData, data.attr)) }); //Get the value using mask
-        }
+        }*/
+        
+        read(data.attr);
       } else {
         console.log('undefined boy-val')
       }
@@ -278,7 +292,7 @@ app.get('/', function(req, res) {
 //Debug
 app.get('/debug', function(req, res) {
   
-  var r = boydog.read('age');
+  var r = boydog.read('picture');
   
   return res.json({ r: r });
 });
