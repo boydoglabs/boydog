@@ -112,32 +112,32 @@ var boydog = function(server) {
   };
 
   var boyLogic = {
-    "_get": function() {
-      console.log("all _get");
+    "_r": function() {
+      console.log("all _r");
     },
-    "_set": function() {
-      console.log("all _set");
+    "_w": function() {
+      console.log("all _w");
     },
     "name": {
-      "_get": function(data) {
-        console.log("name _get");
+      "_r": function(data) {
+        console.log("name _r");
         
         return data.toUpperCase();
       },
-      "_set": function(data) {
-        console.log("name _set");
-
+      "_w": function(data) {
+        console.log("name _w");
+        
         return data.toUpperCase();
       }
     },
     "age": {
-      "_get": function(data) {
-        console.log("age _get");
+      "_r": function(data) {
+        console.log("age _r");
         
         return data;
       },
-      "_set": function(data) {
-        console.log("age _set", data);
+      "_w": function(data) {
+        console.log("age _w", data);
         
         if (data > 0) {
           data = data * -1;
@@ -147,17 +147,17 @@ var boydog = function(server) {
       }
     },
     "addTask": {
-      "_get": function() {
-        console.log("console _get");
+      "_r": function() {
+        console.log("console _r");
       },
-      "_set": function() {
-        console.log("console _set");
+      "_w": function() {
+        console.log("console _w");
       }
     }
   }
   
   var boySet = function(attr, val) {
-    _.set(boyData, attr, (_.get(boyLogic, attr))["_set"](val));
+    _.set(boyData, attr, (_.get(boyLogic, attr))["_w"](val));
   }
   
   //Socket.io
@@ -172,7 +172,7 @@ var boydog = function(server) {
         if (_.isUndefined(mask)) {
           _.set(boyData, data.attr, data.set);  //Set the value without mask
         } else {
-          data.set = mask["_set"](data.set); //Redefine data.set here because it is used afterwards, do not optimize into the the next line
+          data.set = mask["_w"](data.set); //Redefine data.set here because it is used afterwards, do not optimize into the the next line
           _.set(boyData, data.attr, data.set);  //Set the value with a mask
         }
         
@@ -205,7 +205,7 @@ var boydog = function(server) {
         if (_.isUndefined(mask)) {
           socket.emit('dog-val', { attr: data.attr, val: _.get(boyData, data.attr) }); //Get the value without mask
         } else {
-          socket.emit('dog-val', { attr: data.attr, val: mask["_get"](_.get(boyData, data.attr)) }); //Get the value using mask
+          socket.emit('dog-val', { attr: data.attr, val: mask["_r"](_.get(boyData, data.attr)) }); //Get the value using mask
         }
       } else {
         console.log('undefined boy-val')
@@ -273,9 +273,7 @@ app.get('/debug', function(req, res) {
   
   boydog.boySet('age', 999);
   
-  var data = boydog.boyData;
-  
-  return res.json(data);
+  return res.json({ "ok": 1 });
 });
 
 app.post('/get', function(req, res) {
