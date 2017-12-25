@@ -26,16 +26,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.6170955"
-     inkscape:cx="1053.3602"
-     inkscape:cy="831.58221"
+     inkscape:zoom="0.57172961"
+     inkscape:cx="1631.2182"
+     inkscape:cy="407.73821"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1623"
-     inkscape:window-height="1159"
-     inkscape:window-x="762"
-     inkscape:window-y="181"
+     inkscape:window-height="1112"
+     inkscape:window-x="453"
+     inkscape:window-y="1412"
      inkscape:window-maximized="0"
      inkscape:snap-global="false" />
   <metadata
@@ -57,14 +57,14 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.58333302px;line-height:1.25;font-family:'Yu Gothic UI';-inkscape-font-specification:'Yu Gothic UI';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="240.86276"
-       y="154.08426"
+       x="240.0529"
+       y="149.51434"
        id="text4487"><tspan
          sodipodi:role="line"
          id="tspan4485"
-         x="240.86276"
-         y="154.08426"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Impact;-inkscape-font-specification:Impact;stroke-width:0.26458332">boy.dog</tspan></text>
+         x="240.0529"
+         y="149.51434"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:monofur;-inkscape-font-specification:monofur;stroke-width:0.26458332">boy.dog</tspan></text>
     <image
        y="67.016602"
        x="237.42297"
@@ -394,5 +394,98 @@ eRw6ZqaMGDbkHdISDxrnJoU1IGTqUTLjcHrRMmNg+lCuxDB1aISLxrvN7s2Yct+YUecTvQM0Rb7L
        preserveAspectRatio="none"
        height="61.219795"
        width="81.626396" />
+    <g
+       id="g4527"
+       transform="translate(0.0246878,-0.4847707)">
+      <circle
+         r="0.32723278"
+         cy="147.34352"
+         cx="247.37822"
+         id="path4519"
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.72399998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <circle
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.72399998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="circle4521"
+         cx="248.54471"
+         cy="147.32904"
+         r="0.32723278" />
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.64999998;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 249.90149,146.92914 c 0,0 -0.61138,-0.10806 -1.16783,-0.67331 -0.55645,-0.56525 -0.60333,-0.95379 -0.60333,-0.95379"
+       id="path4523"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="czc" />
+    <g
+       id="g4527-9"
+       transform="translate(21.163285,-0.64913997)">
+      <circle
+         r="0.32723278"
+         cy="147.34352"
+         cx="247.37822"
+         id="path4519-0"
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.72399998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <circle
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.72399998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="circle4521-9"
+         cx="248.54471"
+         cy="147.32904"
+         r="0.32723278" />
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.64999998;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 267.79339,145.25394 c -0.1365,-0.0465 -0.69064,-0.15643 -1.02467,0.30839"
+       id="path4523-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path4567"
+       d="m 270.50289,145.27439 c 0.1365,-0.0465 0.69064,-0.15643 1.02467,0.30839"
+       style="fill:none;stroke:#000000;stroke-width:0.64999998;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <g
+       id="g4527-9-3"
+       transform="translate(21.535183,0.25127666)">
+      <circle
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.72399998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="circle4521-9-5"
+         cx="247.61414"
+         cy="147.44153"
+         r="0.32723278" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.72996449px;line-height:1.25;font-family:'Yu Gothic UI';-inkscape-font-specification:'Yu Gothic UI';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.06824911"
+       x="240.7827"
+       y="154.39203"
+       id="text4487-5"><tspan
+         sodipodi:role="line"
+         id="tspan4485-7"
+         x="240.7827"
+         y="154.39203"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:monofur;-inkscape-font-specification:monofur;stroke-width:0.06824911">real-time socket framework</tspan></text>
+    <text
+       id="text4610"
+       y="164.11711"
+       x="240.0529"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.58333302px;line-height:1.25;font-family:'Yu Gothic UI';-inkscape-font-specification:'Yu Gothic UI';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Poiret One';-inkscape-font-specification:'Poiret One';stroke-width:0.26458332"
+         y="164.11711"
+         x="240.0529"
+         id="tspan4608"
+         sodipodi:role="line">boy.dog</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.58333302px;line-height:1.25;font-family:'Yu Gothic UI';-inkscape-font-specification:'Yu Gothic UI';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="240.0529"
+       y="179.38875"
+       id="text4614"><tspan
+         sodipodi:role="line"
+         id="tspan4612"
+         x="240.0529"
+         y="179.38875"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Poiret One';-inkscape-font-specification:'Poiret One';stroke-width:0.26458332">https://www.behance.net/gallery/6032321/Flex-Display-free-fonts</tspan></text>
   </g>
 </svg>

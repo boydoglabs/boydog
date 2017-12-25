@@ -222,14 +222,6 @@ var boydog = function(server) {
       } else if (!_.isUndefined(data.get) && data.get === true) { //If data.set === 0 then GET
         console.log('should GET', data);
         
-        /*//Execute boy get logic
-        var mask = _.get(boyLogic, data.attr);
-        if (_.isUndefined(mask)) {
-          socket.emit('dog-val', { attr: data.attr, val: _.get(boyData, data.attr) }); //Get the value without mask
-        } else {
-          socket.emit('dog-val', { attr: data.attr, val: mask["_r"](_.get(boyData, data.attr)) }); //Get the value using mask
-        }*/
-        
         read(data.attr);
       } else {
         console.log('undefined boy-val')
@@ -298,8 +290,9 @@ app.get('/', function(req, res) {
 app.get('/debug', function(req, res) {
   
   var r = boydog.read('picture');
+  var w = boydog.write('age', 999);
   
-  return res.json({ r: r });
+  return res.json({ r: r, w: w });
 });
 
 app.post('/get', function(req, res) {
