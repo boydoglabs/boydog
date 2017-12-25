@@ -285,6 +285,24 @@ app.get('/', function(req, res) {
   
   return res.render("index");
 });
+app.get('/landing', function(req, res) {
+  
+  console.log(boydog.boyData);
+  
+  return res.render("landing");
+});
+app.get('/elements', function(req, res) {
+  
+  console.log(boydog.boyData);
+  
+  return res.render("elements");
+});
+app.get('/generic', function(req, res) {
+  
+  console.log(boydog.boyData);
+  
+  return res.render("generic");
+});
 
 //Debug
 app.get('/debug', function(req, res) {
