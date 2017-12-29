@@ -211,7 +211,18 @@ var boydog = function(server) {
   };
   
   var write = function(attr, val) {
-    _.set(boyData, attr, (_.get(boyLogic, attr))["_w"](val));
+    //_.set(boyData, attr, (_.get(boyLogic, attr))["_w"](val));
+    var mask = _.get(boyLogic, attr);
+    
+    if (_.isUndefined(mask)) {
+      _.set(boyData, attr, val);  //Set the value without mask
+    } else {
+      if (!_.isUndefined(mask["_w"])) {
+        val = mask["_w"](val); //Redefine data.set here because it is used afterwards, do not optimize into the the next line
+      }
+      
+      _.set(boyData, attr, val);  //Set the value with a mask
+    }
     
     return 1;
   }
@@ -225,13 +236,8 @@ var boydog = function(server) {
         console.log('should SET', data);
         
         //Execute boy set logic
-        var mask = _.get(boyLogic, data.attr);
-        if (_.isUndefined(mask)) {
-          _.set(boyData, data.attr, data.set);  //Set the value without mask
-        } else {
-          data.set = mask["_w"](data.set); //Redefine data.set here because it is used afterwards, do not optimize into the the next line
-          _.set(boyData, data.attr, data.set);  //Set the value with a mask
-        }
+        write(data.attr, data.set);
+        console.log("PROPAGATE MAIN FIELD", data.attr, data.set)
         
         //Propagate to other users
         socket.broadcast.emit('dog-val', { attr: data.attr, val: data.set }); //Propagate the changing field (must happen immediately)
