@@ -239,12 +239,11 @@ var boydog = function(server) {
   }
   
   //Socket.io
-  io.on('connection', function(_socket) {
+  io.on('connection', function(socket) {
     
-    //console.log("connection", "current socket", typeof socket)
-    //socket = _socket;
+    console.log("connection", "current socket", socket)
     
-    _socket.on('boy-val', function(data) {
+    socket.on('boy-val', function(data) {
       if (!_.isUndefined(data.set)) {
         write(data.attr, data.set);
       } else if (!_.isUndefined(data.get)) {
