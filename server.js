@@ -211,7 +211,6 @@ var boydog = function(server) {
   };
   
   var write = function(attr, val) {
-    //_.set(boyData, attr, (_.get(boyLogic, attr))["_w"](val));
     var mask = _.get(boyLogic, attr);
     
     if (_.isUndefined(mask)) {
@@ -223,6 +222,12 @@ var boydog = function(server) {
       
       _.set(boyData, attr, val);  //Set the value with a mask
     }
+    
+    try {
+        //Propagate to other users
+        
+        socket.emit('dog-val', { attr: attr, val: val }); //Propagate the changing field to all clients *must happen as soon as possible*
+    } catch(e) { } //Don't care if value is not emitted to users
     
     return 1;
   }
@@ -239,9 +244,6 @@ var boydog = function(server) {
         write(data.attr, data.set);
         console.log("PROPAGATE MAIN FIELD", data.attr, data.set)
         
-        //Propagate to other users
-        socket.broadcast.emit('dog-val', { attr: data.attr, val: data.set }); //Propagate the changing field (must happen immediately)
-        
         //Backpropagate related fields
         var path = _.toPath(data.attr);
         var relatedPaths = [path[0]];
@@ -254,6 +256,9 @@ var boydog = function(server) {
         }
         for (i = relatedPaths.length - 1; i >= 0; i--) {
           socket.broadcast.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields other clients
+          
+          console.log("propagate for", relatedPaths[i])
+          
           socket.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields to myself
         }
         
