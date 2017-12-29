@@ -216,7 +216,7 @@ var boydog = function(server) {
         socket.emit('dog-val', { attr: attr, val: val }); //Propagate the changing field to all clients *must happen as soon as possible*
     } catch(e) { } //Don't care if value is not emitted to users
     
-    //Backpropagate of related fields to all clients
+    //Backpropagation of related fields to all clients
     var path = _.toPath(attr);
     var relatedPaths = [path[0]];
     var str = path[0];
@@ -232,27 +232,30 @@ var boydog = function(server) {
       socket.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields to myself
     }
     
+    //Propagation of the main container
+    socket.broadcast.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields other clients
+    socket.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields to myself
+    
     return 1;
   }
   
   //Socket.io
   io.on('connection', function(_socket) {
+    
+    console.log("connection", "current socket", typeof socket)
+    
     socket = _socket;
     
     socket.on('boy-val', function(data) {
       if (!_.isUndefined(data.set)) {
-        //Execute boy set logic
         write(data.attr, data.set);
-        
-        //Propagate the main container
-        socket.broadcast.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields other clients
-        socket.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields to myself
-      } else if (!_.isUndefined(data.get)) { //If data.set === 0 then GET
+      } else if (!_.isUndefined(data.get)) {
         read(data.attr);
       } else {
         console.log('undefined boy-val')
       }
     });
+    
   });
   
   return {
@@ -302,27 +305,15 @@ var tempAdd = function() {
 
 //API get
 app.get('/', function(req, res) {
-  
-  console.log(boydog.boyData);
-  
   return res.render("index");
 });
 app.get('/landing', function(req, res) {
-  
-  console.log(boydog.boyData);
-  
   return res.render("landing");
 });
 app.get('/elements', function(req, res) {
-  
-  console.log(boydog.boyData);
-  
   return res.render("elements");
 });
 app.get('/generic', function(req, res) {
-  
-  console.log(boydog.boyData);
-  
   return res.render("generic");
 });
 
