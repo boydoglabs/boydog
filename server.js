@@ -223,11 +223,26 @@ var boydog = function(server) {
       _.set(boyData, attr, val);  //Set the value with a mask
     }
     
+    //Propagation of current field to all clients
     try {
-        //Propagate to other users
-        
         socket.emit('dog-val', { attr: attr, val: val }); //Propagate the changing field to all clients *must happen as soon as possible*
     } catch(e) { } //Don't care if value is not emitted to users
+    
+    //Backpropagate of related fields to all clients
+    var path = _.toPath(attr);
+    var relatedPaths = [path[0]];
+    var str = path[0];
+    var i;
+    
+    for (i = 1; i < path.length - 1; i++) {
+      str += '["' + path[i] + '"]';
+      relatedPaths.push(str);
+    }
+    for (i = relatedPaths.length - 1; i >= 0; i--) {
+      //socket.broadcast.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields other clients
+      //console.log("propagate for", relatedPaths[i])
+      socket.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields to myself
+    }
     
     return 1;
   }
@@ -235,6 +250,8 @@ var boydog = function(server) {
   //Socket.io
   io.on('connection', function(_socket) {
     socket = _socket;
+    
+    console.log("connection exec")
     
     socket.on('boy-val', function(data) {
       if (!_.isUndefined(data.set)) {
@@ -244,29 +261,13 @@ var boydog = function(server) {
         write(data.attr, data.set);
         console.log("PROPAGATE MAIN FIELD", data.attr, data.set)
         
-        //Backpropagate related fields
-        var path = _.toPath(data.attr);
-        var relatedPaths = [path[0]];
-        var str = path[0];
-        var i;
         
-        for (i = 1; i < path.length - 1; i++) {
-          str += '["' + path[i] + '"]';
-          relatedPaths.push(str);
-        }
-        for (i = relatedPaths.length - 1; i >= 0; i--) {
-          socket.broadcast.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields other clients
-          
-          console.log("propagate for", relatedPaths[i])
-          
-          socket.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields to myself
-        }
         
         //Propagate the main container
         socket.broadcast.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields other clients
         socket.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields to myself
       } else if (!_.isUndefined(data.get) && data.get === true) { //If data.set === 0 then GET
-        console.log('should GET', data);
+        //console.log('should GET', data);
         
         read(data.attr);
       } else {
