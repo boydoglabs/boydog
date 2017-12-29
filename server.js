@@ -140,6 +140,8 @@ var boydog = function(server) {
             },
             "_w": function(data) {
               console.log("writing feet", data);
+              
+              return data;
             }
           }
         }
