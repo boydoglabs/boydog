@@ -23,6 +23,9 @@ var boydog = function(server) {
           },{
             "color": "blue"
           }]
+        },
+        "down": {
+          "feet": 2
         }
       },
       "mind": {
@@ -116,6 +119,32 @@ var boydog = function(server) {
     "_w": function() {
       console.log("all _w");
     },
+    "features": {
+      "body": {
+        "up": {
+          "color": {
+            "_r": function(data) {
+              console.log("reading body, up, color", data);
+            },
+            "_w": function(data) {
+              console.log("writing body, up, color", data);
+            }
+          }
+        },
+        "down": {
+          "feet": {
+            "_r": function(data) {
+              console.log("read feet", data);
+              
+              return data;
+            },
+            "_w": function(data) {
+              console.log("writing feet", data);
+            }
+          }
+        }
+      }
+    },
     "name": {
       "_r": function(data) {
         console.log("name _r");
@@ -166,7 +195,11 @@ var boydog = function(server) {
         socket.emit('dog-val', { attr: attr, val: val }); //Get the value without mask
       } catch(e) { } //Don't care if value is not emitted to users
     } else {
-      val = mask["_r"](_.get(boyData, attr));
+      if (_.isUndefined(mask["_r"])) {
+        val = _.get(boyData, attr);
+      } else {
+        val = mask["_r"](_.get(boyData, attr));
+      }
       try {
         socket.emit('dog-val', { attr: attr, val: val }); //Get the value using mask
       } catch(e) { } //Don't care if value is not emitted to users
