@@ -275,8 +275,6 @@ var boydog = function(server) {
       if (_.isUndefined(data.path)) return;
       
       boyLogic[data.path]["_a"]();
-      
-      console.log("run", data.path);
     });
   });
   

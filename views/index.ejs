@@ -146,9 +146,7 @@
           }
         }
         
-        $(el).css({
-          display: "none"
-        });
+        $(el).css({ display: "none" });
       });
       
       $('[dog-val]').each(function(i, el) {
@@ -185,10 +183,7 @@
           $(el).val(msg);
         });*/
         
-        socket.emit('boy-val', {
-          attr: attr,
-          get: true
-        });
+        socket.emit('boy-val', { attr: attr, get: true });
         
         //Functions for updating values
         $(el).keyup(function(field) {
@@ -199,10 +194,7 @@
             //
           }
           
-          socket.emit('boy-val', {
-            attr: attr,
-            set: val
-          });
+          socket.emit('boy-val', { attr: attr, set: val });
           
           //TODO: Implement fallback POST set version
           /*$.post("/set", { attr: attr, val: val }).done(function(json) {
@@ -215,13 +207,8 @@
         var path = $(el).attr('dog-run');
         
         $(el).off().on('click', function() {
-          socket.emit('boy-run', {
-            path: path
-          });
-          console.log("run")
-        })
-        
-        console.log("run", el);
+          socket.emit('boy-run', { path: path });
+        });
       });
       
       //To set a value
