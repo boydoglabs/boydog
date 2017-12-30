@@ -225,7 +225,7 @@ var boydog = function(server) {
     var i;
     
     for (i = 1; i < path.length - 1; i++) {
-      str += '["' + path[i] + '"]';
+      str += "['" + path[i] + "']";
       relatedPaths.push(str);
     }
     for (i = relatedPaths.length - 1; i >= 0; i--) {
