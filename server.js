@@ -176,8 +176,6 @@ var boydog = function(server) {
   //var socket;
   
   var read = function(attr) {
-    
-    
     var mask = _.get(boyLogic, attr);
     var val;
     
@@ -279,9 +277,7 @@ var fs = require('fs'),
   app = express(),
   server = require('http').createServer(app),
   boydog = boydog(server);
-  
-  boydog.settings
-  
+
 //Express configuration
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
