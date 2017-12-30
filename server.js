@@ -176,24 +176,28 @@ var boydog = function(server) {
   //var socket;
   
   var read = function(attr) {
+    
+    
     var mask = _.get(boyLogic, attr);
     var val;
     
+    console.log("r attr", attr, "mm", mask)
+    
     if (_.isUndefined(mask)) {
       val = _.get(boyData, attr);
-      try {
-        io.emit('dog-val', { attr: attr, val: val }); //Get the value without mask
-      } catch(e) { } //Don't care if value is not emitted to users
     } else {
       if (_.isUndefined(mask["_r"])) {
         val = _.get(boyData, attr);
       } else {
         val = mask["_r"](_.get(boyData, attr));
       }
-      try {
-        io.emit('dog-val', { attr: attr, val: val }); //Get the value using mask
-      } catch(e) { } //Don't care if value is not emitted to users
     }
+    
+    console.log("emit", attr, val)
+    
+    try {
+      io.emit('dog-val', { attr: attr, val: val }); //Get the value using mask
+    } catch(e) { } //Don't care if value is not emitted to users
     
     return val;
   };
@@ -227,12 +231,13 @@ var boydog = function(server) {
       relatedPaths.push(str);
     }
     for (i = relatedPaths.length - 1; i >= 0; i--) {
-      //socket.broadcast.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields other clients
+      //socket.broadcast.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields other clients (used for sockets)
+      console.log("bprop to", relatedPaths[i])
       io.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields to myself
     }
     
     //Propagation of the main container
-    //io.broadcast.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields other clients
+    //io.broadcast.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields other clients (used for sockets)
     io.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields to myself
     
     return 1;
@@ -240,11 +245,11 @@ var boydog = function(server) {
   
   //Socket.io
   io.on('connection', function(socket) {
-    
-    console.log("connection", "current socket", socket)
+    console.log("connection")
     
     socket.on('boy-val', function(data) {
       if (!_.isUndefined(data.set)) {
+        
         write(data.attr, data.set);
       } else if (!_.isUndefined(data.get)) {
         read(data.attr);
@@ -252,7 +257,6 @@ var boydog = function(server) {
         console.log('undefined boy-val')
       }
     });
-    
   });
   
   return {
