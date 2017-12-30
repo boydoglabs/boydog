@@ -63,10 +63,11 @@
           </tbody>
         </table>
         taskname: <input type="text" dog-val="newTaskName">
+        <a class="button" href="javascript:void(0);" dog-run="addTask">addTask</a>
+        <br/>
+        
         apples: <input type="text" dog-val="appleQuantity">
         <a class="button" href="javascript:void(0);" dog-run="increaseApples">Increase apples</a>
-        <button class="button button-outline">Other function A</button>
-        <input class="button button-clear" type="submit" value="Other function B">
       </div>
     </div>
   </div>
@@ -104,7 +105,7 @@
             
             $(el).attr(attrName, attr);
           });
-        }
+        };
         
         normalizePaths('dog-val');
         normalizePaths('dog-run');

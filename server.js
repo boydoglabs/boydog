@@ -246,6 +246,17 @@ var boydog = function(server) {
     return 1;
   }
   
+  var run = function(path) {
+    var mask = _.get(boyLogic, path);
+      
+    if (_.isUndefined(mask)) return;
+    
+    if (!_.isUndefined(mask["_a"])) {
+      
+      return mask["_a"]();
+    }
+  }
+  
   //Socket.io
   io.on('connection', function(socket) {
     console.log("connection")
@@ -262,9 +273,7 @@ var boydog = function(server) {
     });
     
     socket.on('boy-run', function(data) {
-      if (_.isUndefined(data.path)) return;
-      
-      boyLogic[data.path]["_a"]();
+      run(data.path);
     });
   });
   
@@ -272,7 +281,8 @@ var boydog = function(server) {
     boyData: boyData,
     boyLogic: boyLogic,
     read: read,
-    write: write
+    write: write,
+    run: run
   }
 }
 
