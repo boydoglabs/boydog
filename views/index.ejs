@@ -43,7 +43,7 @@
       </div>
       <div class="column">
         <input type="text" dog-val="tasks" dog-options="stringify">
-        add task: <input type="text" placeholder="qty" dog-val="addTask">
+        add task: <input type="text" placeholder="qty" dog-val="taskQuantity">
         <input id="taskItems" type="text" placeholder="qty" dog-val="tasks" dog-options="length">
         <table>
           <thead>
@@ -63,7 +63,8 @@
             </tr>
           </tbody>
         </table>
-        <a class="button" href="#">Add item</a>
+        taskname: <input type="text" dog-val="newTaskName">
+        <a class="button" dog-run="createNewTask.abc.foo['abc']">Add item</a>
         <button class="button button-outline">Other function A</button>
         <input class="button button-clear" type="submit" value="Other function B">
       </div>
@@ -77,6 +78,7 @@
     $(function() {
       //Init
       jQuery.fn.htmlClean = function() {
+        //Clean whitespaces
         this.contents().filter(function() {
           if (this.nodeType != 3) {
             $(this).htmlClean();
@@ -86,6 +88,26 @@
             return !/\S/.test(this.nodeValue);
           }
         }).remove();
+        
+        //Normalize attribute paths (i.e.: address.gps.lat = address['gps']['lat'])
+        function normalizePaths(attrName) {
+          $('[' + attrName + ']').each(function(i, el) {
+            var attr = $(el).attr(attrName);
+
+            var attr = _.toPath(attr);
+          
+            if (attr.length > 1) {
+              attr = attr.shift() + "['" + attr.join("']['") + "']";
+            } else {
+              attr = attr.shift();
+            }
+            
+            $(el).attr(attrName, attr);
+          });
+        }
+        
+        normalizePaths('dog-val');
+        normalizePaths('dog-run');
         
         return this;
       }
@@ -130,15 +152,9 @@
       
       $('[dog-val]').each(function(i, el) {
         var attr = $(el).attr('dog-val');
-        var path = _.toPath(attr);
+        /*attr = normalizePath(attr);
         
-        if (path.length > 1) {
-          attr = path.shift() + "['" + path.join("']['") + "']";
-        } else {
-          attr = path.shift();
-        }
-        
-        $(el).attr('dog-val', attr);
+        $(el).attr('dog-val', attr);*/
         
         /*//Get initial values (use the POST version only as a fallback)
         $.post("/get", {
@@ -197,11 +213,17 @@
         });
       });
       
+      
+      
+      $('[dog-run]').each(function(i, el) {
+        var attr = $(el).attr('dog-run');
+        /*attr = normalizePath(attr);*/
+        
+        console.log("run", el, attr);
+      });
+      
       //To set a value
       socket.on('dog-val', function(data) {
-      
-        console.log("update", data)
-      
         var el = $('[dog-val="' + data.attr + '"]');
         var options = $(el).attr('dog-options') || "";
         var msg = data.val;
