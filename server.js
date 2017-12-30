@@ -74,7 +74,7 @@ var boydog = function(server) {
       "doer": "qwe@mail.com",
       "done": true
     }],
-    "taskQuantity": 7,
+    "appleQuantity": 7,
     "newTaskName": "new task",
     "address": "462 Llama Court, Sattley, American Samoa, 8570",
     "about": "Exercitation enim elit incididunt exercitation velit veniam aliqua ullamco sit est. In incididunt ad esse officia aliqua. Non cupidatat voluptate amet nostrud incididunt aliqua non sint id reprehenderit amet cillum sit. Cupidatat exercitation laborum commodo elit duis irure irure occaecat sit cillum voluptate nostrud. Laboris adipisicing exercitation dolore adipisicing. Adipisicing aliquip mollit Lorem aute amet aute magna id consequat nulla Lorem. Reprehenderit consectetur labore velit magna.\r\nLabore nostrud cupidatat Lorem elit non commodo eu. Occaecat nulla elit consequat culpa ea dolor culpa anim minim consectetur officia non. Ea ullamco sunt labore minim sint excepteur qui id excepteur officia sunt elit ad Lorem.\r\nOccaecat excepteur ipsum deserunt ut cupidatat reprehenderit aute et voluptate tempor. Anim labore consequat aliquip commodo mollit aliqua mollit ullamco duis est aute occaecat. Ut sit est officia consectetur pariatur qui ut officia pariatur in cupidatat et aliquip. Amet reprehenderit anim duis nostrud culpa tempor in enim id ex quis quis cupidatat non. Qui ea commodo ut aliquip proident id fugiat pariatur sit.\r\n",
@@ -170,20 +170,10 @@ var boydog = function(server) {
         return data;
       }
     },
-    "taskQuantity": {
-      "_r": function(data) {
-        
-        return data;
-      },
-      "_w": function(data) {
-        
-        return data;
-      }
-    },
-    "createNewTask": {
+    "increaseApples": {
       "_a": function() {
         
-        var t = write("taskQuantity", read("taskQuantity") + 1)
+        var t = write("appleQuantity", read("appleQuantity") + 1)
         
         console.log("createNewTask action", t);
       }

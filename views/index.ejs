@@ -43,7 +43,6 @@
       </div>
       <div class="column">
         <input type="text" dog-val="tasks" dog-options="stringify">
-        add task: <input type="text" placeholder="qty" dog-val="taskQuantity">
         <input id="taskItems" type="text" placeholder="qty" dog-val="tasks" dog-options="length">
         <table>
           <thead>
@@ -64,7 +63,8 @@
           </tbody>
         </table>
         taskname: <input type="text" dog-val="newTaskName">
-        <a class="button" dog-run="createNewTask">Add item</a>
+        apples: <input type="text" dog-val="appleQuantity">
+        <a class="button" href="javascript:void(0);" dog-run="increaseApples">Increase apples</a>
         <button class="button button-outline">Other function A</button>
         <input class="button button-clear" type="submit" value="Other function B">
       </div>
@@ -221,7 +221,7 @@
         
         el.val(msg);
       });
-    })
+    });
   </script>
 </body>
 
