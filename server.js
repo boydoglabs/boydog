@@ -183,9 +183,9 @@ var boydog = function(server) {
     "createNewTask": {
       "_a": function() {
         
+        var t = write("taskQuantity", read("taskQuantity") + 1)
         
-        
-        console.log("createNewTask action");
+        console.log("createNewTask action", t);
       }
     }
   }
