@@ -173,8 +173,6 @@ var boydog = function(server) {
     }
   }
   
-  //var socket;
-  
   var read = function(attr) {
     var mask = _.get(boyLogic, attr);
     var val;
