@@ -270,6 +270,14 @@ var boydog = function(server) {
         console.log('undefined boy-val')
       }
     });
+    
+    socket.on('boy-run', function(data) {
+      if (_.isUndefined(data.path)) return;
+      
+      boyLogic[data.path]["_a"]();
+      
+      console.log("run", data.path);
+    });
   });
   
   return {
