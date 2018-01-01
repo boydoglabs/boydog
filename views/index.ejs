@@ -42,8 +42,8 @@
         </form>
       </div>
       <div class="column">
-        <input type="text" dog-val="tasks" dog-options="stringify">
-        <input id="taskItems" type="text" placeholder="qty" dog-val="tasks" dog-options="length">
+        <!-- tasks stringify: <input type="text" dog-val="tasks" dog-options="stringify"> -->
+        tasks length: <input type="text" dog-val="tasks" dog-options="length">
         <table>
           <thead>
             <tr>
@@ -219,6 +219,14 @@
         var msg = data.val;
         
         if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+        if (options.indexOf("length") >= 0) {
+          
+          console.log("LENGTH SET");
+          
+          msg = msg.length;
+        }
+        
+        console.log("SET", el, options);
         
         el.val(msg);
       });
