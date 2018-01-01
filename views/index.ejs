@@ -60,6 +60,16 @@
               <td><input type="text" dog-val="tasks[{{ i }}].doer"></td>
               <td><input type="text" dog-val="tasks[{{ i }}].done"></td>
             </tr> -->
+            
+            
+            
+            <tr dog-repeat="tasks as task">
+              <td><input type="text" dog-val="task.toDo"></td>
+              <td><input type="text" dog-val="task.progress"></td>
+            </tr>
+            
+            
+            
           </tbody>
         </table>
         taskname: <input type="text" dog-val="newTaskName">
@@ -149,6 +159,57 @@
         
         $(el).css({ display: "none" });
       });*/
+      
+      $('[dog-repeat]').each(function(i, el) {
+        var repeat = $(el).attr("dog-repeat").toLowerCase().split(' as ');
+        var attr = repeat[0].trim();
+        var token = repeat[1].trim();
+        
+        var parent = $(el).parent();
+        
+        
+        
+        for (i = 0; i < 3; i++) {
+          var newEl = $(el).clone();
+          
+          newEl.removeAttr('dog-repeat');
+          
+          
+          
+          
+          newEl.find('[dog-val]').each(function(k, t) {
+            console.log("k", k, "t", t)
+            
+            var nAttr = _.toPath($(t).attr('dog-val'));
+            
+            nAttr = nAttr.map(function(v, k) {
+              
+              
+              if (v === token) {
+                var nStr = attr + "['" + i + "']";
+                
+                return nStr;
+              }
+
+              return "['" + v + "']";
+            })
+
+            console.log(nAttr)
+            
+            $(t).attr('dog-val', nAttr.join(''));
+          });
+          
+          
+          
+          
+          parent.append(newEl);
+          
+          
+          
+        }
+        
+        console.log(i, el, attr, token)
+      });
       
       $('[dog-val]').each(function(i, el) {
         var attr = $(el).attr('dog-val');
