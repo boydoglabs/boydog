@@ -54,12 +54,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr dog-each="#taskItems" dog-options="">
+            <!-- <tr dog-each="#taskItems" dog-options="">
               <td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
               <td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
               <td><input type="text" dog-val="tasks[{{ i }}].doer"></td>
               <td><input type="text" dog-val="tasks[{{ i }}].done"></td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
         taskname: <input type="text" dog-val="newTaskName">
@@ -122,7 +122,7 @@
         console.log("socket on connect");
       });
       
-      //Generate dog-each element
+      /*//Generate dog-each element
       $('[dog-each]').each(function(k, el) {
         var parent = $(el).parent();
         var blueprint = $(el).html();
@@ -148,7 +148,7 @@
         }
         
         $(el).css({ display: "none" });
-      });
+      });*/
       
       $('[dog-val]').each(function(i, el) {
         var attr = $(el).attr('dog-val');
@@ -219,14 +219,9 @@
         var msg = data.val;
         
         if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-        if (options.indexOf("length") >= 0) {
-          
-          console.log("LENGTH SET");
-          
+        if (options.indexOf("length") >= 0) { 
           msg = msg.length;
         }
-        
-        console.log("SET", el, options);
         
         el.val(msg);
       });
