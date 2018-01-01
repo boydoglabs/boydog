@@ -61,10 +61,11 @@
               <td><input type="text" dog-val="tasks[{{ i }}].done"></td>
             </tr> -->
             
-            <tr dog-walk="#forVal as i">
+            <tr dog-walk="#forVal">
               <td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
               <td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
             </tr>
+            
             
             
           </tbody>
@@ -157,48 +158,32 @@
         $(el).css({ display: "none" });
       });*/
       
+      var walkers = [];
+      
       $('[dog-walk]').each(function(i, el) {
-        var repeat = $(el).attr("dog-walk").toLowerCase().split(' as ');
-        var attr = repeat[0].trim();
+        //var repeat = $(el).attr("dog-walk").split(' as ');
+        var attr = $(el).attr("dog-walk").trim();
         
+        walkers.push($(attr).attr('dog-val'));
+        console.log(walkers);
         
-        var token = repeat[1].trim();
+        //var token = repeat[1].trim();
         var parent = $(el).parent();
-        var blueprint = $(el).html();
         
-        for (i = 0; i < 5; i++) {
+        
+        for (i = 0; i < 4; i++) {
           var newEl = $(el).clone();
           
           newEl.removeAttr('dog-walk');
           $(newEl).html(Mustache.render($(newEl).html(), { i: i }));
           
-          /*newEl.find('[dog-val]').each(function(k, t) {
-            console.log("k", k, "t", t)
-            
-            var nAttr = _.toPath($(t).attr('dog-val'));
-            
-            nAttr = nAttr.map(function(v, k) {
-              if (v === token) {
-                var nStr = attr + "['" + i + "']";
-                
-                return nStr;
-              }
-
-              return "['" + v + "']";
-            })
-
-            console.log(nAttr)
-            
-            $(t).attr('dog-val', nAttr.join(''));
-          });*/
-
           parent.append(newEl);
         }
         
         
         $(el).hide();
         
-        console.log(i, el, attr, token)
+        console.log(i, el, attr)
       });
       
       $('[dog-val]').each(function(i, el) {
@@ -269,7 +254,12 @@
         var options = $(el).attr('dog-options') || "";
         var msg = data.val;
         
-        console.log("dog-val RECEIVED", data)
+        console.log("dog-val RECEIVED", data, $(el));
+        if (_.includes(walkers, $(el).attr('dog-val'))) {
+          console.log("FOUND WALKER", $(el).attr('dog-val'));
+          
+        }
+        
         
         if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
         if (options.indexOf("length") >= 0) { 
