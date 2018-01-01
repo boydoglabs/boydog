@@ -43,14 +43,14 @@
       </div>
       <div class="column">
         <!-- tasks stringify: <input type="text" dog-val="tasks" dog-options="stringify"> -->
-        tasks length: <input type="text" dog-val="tasks" dog-options="length">
+        tasks length: <input id="forVal" type="text" dog-val="tasks" dog-options="length">
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Age</th>
-              <th>Height</th>
-              <th>Location</th>
+              <th>Task</th>
+              <th>Progress</th>
+              <th>C</th>
+              <th>D</th>
             </tr>
           </thead>
           <tbody>
@@ -61,13 +61,10 @@
               <td><input type="text" dog-val="tasks[{{ i }}].done"></td>
             </tr> -->
             
-            
-            
-            <tr dog-repeat="tasks as task">
-              <td><input type="text" dog-val="task.toDo"></td>
-              <td><input type="text" dog-val="task.progress"></td>
+            <tr dog-walk="#forVal as i">
+              <td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
+              <td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
             </tr>
-            
             
             
           </tbody>
@@ -160,31 +157,27 @@
         $(el).css({ display: "none" });
       });*/
       
-      $('[dog-repeat]').each(function(i, el) {
-        var repeat = $(el).attr("dog-repeat").toLowerCase().split(' as ');
+      $('[dog-walk]').each(function(i, el) {
+        var repeat = $(el).attr("dog-walk").toLowerCase().split(' as ');
         var attr = repeat[0].trim();
+        
+        
         var token = repeat[1].trim();
-        
         var parent = $(el).parent();
+        var blueprint = $(el).html();
         
-        
-        
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < 5; i++) {
           var newEl = $(el).clone();
           
-          newEl.removeAttr('dog-repeat');
+          newEl.removeAttr('dog-walk');
+          $(newEl).html(Mustache.render($(newEl).html(), { i: i }));
           
-          
-          
-          
-          newEl.find('[dog-val]').each(function(k, t) {
+          /*newEl.find('[dog-val]').each(function(k, t) {
             console.log("k", k, "t", t)
             
             var nAttr = _.toPath($(t).attr('dog-val'));
             
             nAttr = nAttr.map(function(v, k) {
-              
-              
               if (v === token) {
                 var nStr = attr + "['" + i + "']";
                 
@@ -197,16 +190,13 @@
             console.log(nAttr)
             
             $(t).attr('dog-val', nAttr.join(''));
-          });
-          
-          
-          
-          
+          });*/
+
           parent.append(newEl);
-          
-          
-          
         }
+        
+        
+        $(el).hide();
         
         console.log(i, el, attr, token)
       });
@@ -278,6 +268,8 @@
         var el = $('[dog-val="' + data.attr + '"]');
         var options = $(el).attr('dog-options') || "";
         var msg = data.val;
+        
+        console.log("dog-val RECEIVED", data)
         
         if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
         if (options.indexOf("length") >= 0) { 
