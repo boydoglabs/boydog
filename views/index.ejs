@@ -266,13 +266,6 @@
         var options = $(el).attr('dog-options') || "";
         var msg = data.val;
         
-        /*console.log("dog-val RECEIVED", data, $(el));
-        if (_.includes(walkers, $(el).attr('dog-val'))) {
-          console.log("FOUND WALKER", $(el).attr('dog-val'));
-          
-        }*/
-        
-        
         if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
         if (options.indexOf("length") >= 0) {
           msg = +msg.length;
@@ -302,20 +295,9 @@
           }
           
           $(el).hide();
-          
-          
           $(el).attr('dog-lastwalk', msg);
-          
-          
           rebindDog(parent);
-          console.log("do rebind", parent)
-          
-          
         }
-        
-        /*console.log("oldval", $(el).val())
-        $(el).attr('oldval', $(el).val());*/
-        
         
         el.val(msg);
       });
