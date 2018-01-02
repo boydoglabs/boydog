@@ -1,5 +1,5 @@
 ﻿# boy.dog
-Framework boilerplate for real-time web apps
+Framework for Real Time Collaborative (RTC) web apps
 
 ## License
 
