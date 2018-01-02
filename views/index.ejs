@@ -54,21 +54,12 @@
             </tr>
           </thead>
           <tbody>
-            
-            
-            
-            <!-- <tr dog-each="#taskItems" dog-options="">
-              <td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
-              <td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
-              <td><input type="text" dog-val="tasks[{{ i }}].doer"></td>
-              <td><input type="text" dog-val="tasks[{{ i }}].done"></td>
-            </tr> -->
-            
-            
-            
+          
+          
+          
             <tr dog-val="tasks" dog-options="walk">
-              <td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
-              <td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
+              <td><input type="text" dog-val="tasks[@@@].toDo"></td>
+              <td><input type="text" dog-val="tasks[@@@].progress"></td>
             </tr>
             
             
@@ -165,7 +156,7 @@
       
       var walkers = [];
       
-      $('[dog-walk]').each(function(i, el) {
+      /*$('[dog-walk]').each(function(i, el) {
         //var repeat = $(el).attr("dog-walk").split(' as ');
         var attr = $(el).attr("dog-walk").trim();
         
@@ -180,7 +171,10 @@
           var newEl = $(el).clone();
           
           newEl.removeAttr('dog-walk');
-          $(newEl).html(Mustache.render($(newEl).html(), { i: i }));
+          //$(newEl).html(Mustache.render($(newEl).html(), { i: i }));
+          
+          
+          $(newEl).html($(newEl).html().replace(/@@@/g, i));
           
           parent.append(newEl);
         }
@@ -189,7 +183,7 @@
         $(el).hide();
         
         console.log(i, el, attr)
-      });
+      });*/
       
       function rebindDog(element) {
         if (!element) element = 'html';
@@ -289,7 +283,8 @@
             
             newEl.removeAttr('dog-val');
             newEl.removeAttr('dog-options');
-            $(newEl).html(Mustache.render($(newEl).html(), { i: i }));
+            //$(newEl).html(Mustache.render($(newEl).html(), { i: i }));
+            $(newEl).html($(newEl).html().replace(/@@@/g, i));
             
             parent.append(newEl);
           }
