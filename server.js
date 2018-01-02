@@ -170,6 +170,9 @@ var boydog = function(server) {
         return data;
       }
     },
+    "tasks": {
+      "_w": null
+    },
     "addTask": {
       "_a": function() {
         
@@ -200,10 +203,13 @@ var boydog = function(server) {
     if (_.isUndefined(mask)) {
       val = _.get(boyData, attr);
     } else {
-      if (_.isUndefined(mask["_r"])) {
-        val = _.get(boyData, attr);
-      } else {
+      if (!_.isUndefined(mask["_r"])) {
+        
+        if (mask["_r"] === null) return;
+        
         val = mask["_r"](_.get(boyData, attr));
+      } else {
+        val = _.get(boyData, attr);
       }
     }
     
@@ -223,6 +229,9 @@ var boydog = function(server) {
       _.set(boyData, attr, val);  //Set the value without mask
     } else {
       if (!_.isUndefined(mask["_w"])) {
+        
+        if (mask["_w"] === null) return;
+        
         val = mask["_w"](val); //Redefine data.set here because it is used afterwards, do not optimize into the the next line
       }
       
@@ -308,7 +317,7 @@ var fs = require('fs'),
   _ = require('lodash'),
   app = express(),
   server = require('http').createServer(app),
-  boydog = boydog(server);
+  bd = boydog(server);
 
 //Express configuration
 app.set('views', __dirname + '/views');
@@ -348,8 +357,8 @@ app.get('/generic', function(req, res) {
 //Debug
 app.get('/debug', function(req, res) {
   
-  var r = boydog.read('picture');
-  var w = boydog.write('age', 999);
+  var r = bd.read('picture');
+  var w = bd.write('age', 999);
   
   return res.json({ r: r, w: w });
 });
