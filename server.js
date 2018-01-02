@@ -170,6 +170,14 @@ var boydog = function(server) {
         return data;
       }
     },
+    "addTask": {
+      "_a": function() {
+        
+        //boyData.tasks.push({ toDo: "new", progress: 50 });
+        write('tasks[3].toDo', "ABC")
+        write('name', "namechange")
+      }
+    },
     "increaseApples": {
       "_a": function() {
         

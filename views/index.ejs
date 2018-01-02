@@ -43,7 +43,7 @@
       </div>
       <div class="column">
         <!-- tasks stringify: <input type="text" dog-val="tasks" dog-options="stringify"> -->
-        <!-- tasks length: <input id="forVal" type="text" dog-val="tasks" dog-options="length"> -->
+        tasks length: <input id="forVal" type="text" dog-val="tasks" dog-options="length">
         <table>
           <thead>
             <tr>
@@ -153,44 +153,67 @@
       
       //To set a value
       socket.on('dog-val', function(data) {
-        var el = $('[dog-val="' + data.attr + '"]');
-        var options = $(el).attr('dog-options') || "";
-        var msg = data.val;
+        var elem = $('[dog-val="' + data.attr + '"]');
         
-        if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-        if (options.indexOf("length") >= 0) {
-          msg = +msg.length;
-        }
-        if (options.indexOf("walk") >= 0) {
-          msg = +msg.length;
-          
-          if (msg == $(el).attr('dog-lastwalk')) return; //If this element has not changed since the last walk, then don't walk again
-          
-          var upto = msg;
-          var parent = $(el).parent();
+        console.log(elem)
         
-          for (i = 0; i < upto; i++) {
-            var newEl = $(el).clone();
+        elem.each(function(k, el) {
+          el = $(el);
+          
+          var options = $(el).attr('dog-options') || "";
+          var msg = data.val;
+          
+          if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+          if (options.indexOf("length") >= 0) {
+            msg = +msg.length;
+          }
+          if (options.indexOf("walk") >= 0) {
+            msg = +msg.length;
             
-            newEl.removeAttr('dog-val').removeAttr('dog-options');
-            $(newEl).html($(newEl).html().replace(/@@@/g, i));
+            if (msg == $(el).attr('dog-lastwalk')) return; //If this element has not changed since the last walk, then don't walk again
             
-            /*//TODO: Implement the following append/prepend
-            if (options.indexOf("reverse") >= 0) {
-              parent.prepend(newEl);
-            } else {
+            
+            
+            var upto = msg;
+            var parent = $(el).parent();
+            
+            console.log("GOING UP TO:", upto, parent);
+          
+            for (i = 0; i < upto; i++) {
+              var existingKey = parent.find('[dog-walk-key="' + i + '"]').length;
+              
+              if (existingKey) {
+                console.log("not adding because of existingKey", i)
+                
+                continue;
+              }
+              
+              var newEl = $(el).clone();
+              
+              newEl.removeAttr('dog-val').removeAttr('dog-options').show();
+              newEl.attr('dog-walk-key', i);
+              
+              $(newEl).html($(newEl).html().replace(/@@@/g, i));
+              
+              /*//TODO: Implement append/prepend
+              if (options.indexOf("reverse") >= 0) {
+                parent.prepend(newEl);
+              } else {
+                parent.append(newEl);
+              }*/
+              
+              console.log("eleemnt appended")
+              
               parent.append(newEl);
-            }*/
+            }
             
-            parent.append(newEl);
+            $(el).hide();
+            $(el).attr('dog-lastwalk', msg);
+            rebindDog(parent);
           }
           
-          $(el).hide();
-          $(el).attr('dog-lastwalk', msg);
-          rebindDog(parent);
-        }
-        
-        el.val(msg);
+          el.val(msg);
+        })
       });
     });
   </script>
