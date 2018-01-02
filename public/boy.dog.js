@@ -96,12 +96,12 @@ var boydog = function(port) {
       
       if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
       if (options.indexOf("length") >= 0) {
-        console.log("msg", msg, el, data)
         
-        msg = +msg.length;
+        console.log("msg>>>", msg, el, data)
+        if (!_.isUndefined(msg)) msg = +msg.length;
       }
       if (options.indexOf("walk") >= 0) {
-        msg = +msg.length;
+        if (!_.isUndefined(msg)) msg = +msg.length;
         
         if (msg == $(el).attr('dog-lastwalk')) return; //If this element has not changed since the last walk, then don't walk again
         
