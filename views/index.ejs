@@ -120,34 +120,6 @@
         console.log("socket on connect");
       });
       
-      /*//Generate dog-each element
-      $('[dog-each]').each(function(k, el) {
-        var parent = $(el).parent();
-        var blueprint = $(el).html();
-        var options = $(el).attr('dog-options') || "";
-        
-        var tracking = $(el).attr('dog-each');
-        console.log("tracking", tracking, $(el), +$(tracking).val())
-        
-        for (i = 0; i < +$(tracking).val(); i++) {
-          var newEl = $(el).clone();
-          
-          newEl.removeAttr('dog-each');
-          newEl.attr('dog-id', i);
-          $(newEl).html(Mustache.render($(newEl).html(), { i: i }));
-          
-          //$(newEl).html($(newEl).html().replace('/\|i\|/g', i)); //Old replacement scheme
-          
-          if (options.indexOf("reverse") >= 0) {
-            parent.prepend(newEl);
-          } else {
-            parent.append(newEl);
-          }
-        }
-        
-        $(el).css({ display: "none" });
-      });*/
-      
       function rebindDog(element) {
         if (!element) element = 'html';
         
@@ -190,11 +162,6 @@
           //Functions for updating values
           $(el).off().keyup(function(field) {
             var val = field.currentTarget.value;
-            var eachId = $(this).closest('[dog-id]').attr('dog-id');
-            
-            if (eachId) {
-              //
-            }
             
             socket.emit('boy-val', { attr: attr, set: val });
             
