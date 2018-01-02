@@ -73,11 +73,8 @@
   <script src="/socket.io.js"></script>
   <script src="/boy.dog.js"></script>
   <script>
-    $(function() {
-      //Init
-      console.log("started");
-      bd(3090);
-    });
+    var bd = boydog(3090);
+    bd.dogLogic = { abc: 123 };
   </script>
 </body>
 
