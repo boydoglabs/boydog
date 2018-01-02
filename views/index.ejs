@@ -155,8 +155,6 @@
       socket.on('dog-val', function(data) {
         var elem = $('[dog-val="' + data.attr + '"]');
         
-        console.log(elem)
-        
         elem.each(function(k, el) {
           el = $(el);
           
@@ -172,24 +170,15 @@
             
             if (msg == $(el).attr('dog-lastwalk')) return; //If this element has not changed since the last walk, then don't walk again
             
-            
-            
             var upto = msg;
             var parent = $(el).parent();
-            
-            console.log("GOING UP TO:", upto, parent);
-          
+
             for (i = 0; i < upto; i++) {
               var existingKey = parent.find('[dog-walk-key="' + i + '"]').length;
               
-              if (existingKey) {
-                console.log("not adding because of existingKey", i)
-                
-                continue;
-              }
+              if (existingKey) continue;
               
               var newEl = $(el).clone();
-              
               newEl.removeAttr('dog-val').removeAttr('dog-options').show();
               newEl.attr('dog-walk-key', i);
               
@@ -201,8 +190,6 @@
               } else {
                 parent.append(newEl);
               }*/
-              
-              console.log("eleemnt appended")
               
               parent.append(newEl);
             }

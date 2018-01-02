@@ -177,7 +177,7 @@ var boydog = function(server) {
         
         var next = boyData.tasks.length;
         
-        write('tasks[' + next + '].toDo', "ABC")
+        write('tasks[' + next + '].toDo', read('newTaskName'))
         write('name', "namechange")
       }
     },
