@@ -43,7 +43,7 @@
       </div>
       <div class="column">
         <!-- tasks stringify: <input type="text" dog-val="tasks" dog-options="stringify"> -->
-        tasks length: <input id="forVal" type="text" dog-val="tasks" dog-options="length">
+        <!-- tasks length: <input id="forVal" type="text" dog-val="tasks" dog-options="length"> -->
         <table>
           <thead>
             <tr>
@@ -54,6 +54,9 @@
             </tr>
           </thead>
           <tbody>
+            
+            
+            
             <!-- <tr dog-each="#taskItems" dog-options="">
               <td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
               <td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
@@ -61,7 +64,9 @@
               <td><input type="text" dog-val="tasks[{{ i }}].done"></td>
             </tr> -->
             
-            <tr dog-walk="#forVal">
+            
+            
+            <tr dog-val="tasks" dog-options="walk">
               <td><input type="text" dog-val="tasks[{{ i }}].toDo"></td>
               <td><input type="text" dog-val="tasks[{{ i }}].progress"></td>
             </tr>
@@ -186,59 +191,66 @@
         console.log(i, el, attr)
       });
       
-      $('[dog-val]').each(function(i, el) {
-        var attr = $(el).attr('dog-val');
+      function rebindDog(element) {
+        if (!element) element = 'html';
         
-        /*//Get initial values (use the POST version only as a fallback)
-        $.post("/get", {
-          attr: attr
-        }).done(function(json) {
-          var options = $(el).attr('dog-options') || "";
+        $(element).find('[dog-val]').each(function(i, el) {
+          var attr = $(el).attr('dog-val');
           
-          var msg = json.msg;
-          
-          //if (options.indexOf("repeat") >= 0) {
-          //  var parent = $(el).parent();
-          //  console.log("is repeat");
-          //  parent.empty();
-          //  for (i = 0; i < 3; i++) {
-          //    var blueprint = $(el).clone();
-          //    console.log('bp', blueprint)
-          //    parent.append(blueprint);
-          //  }
-          //  return;
-          //}
-          
-          if (options.indexOf("stringify") >= 0) {
-            msg = JSON.stringify(msg);
-          } else if (options.indexOf("length") >= 0) {
-            msg = JSON.stringify(msg.length);
-          } else if (options.indexOf("keysAsArray") >= 0) {
-            msg = JSON.stringify(_.range(msg.length));
-          }
-          
-          $(el).val(msg);
-        });*/
-        
-        socket.emit('boy-val', { attr: attr, get: true });
-        
-        //Functions for updating values
-        $(el).keyup(function(field) {
-          var val = field.currentTarget.value;
-          var eachId = $(this).closest('[dog-id]').attr('dog-id');
-          
-          if (eachId) {
-            //
-          }
-          
-          socket.emit('boy-val', { attr: attr, set: val });
-          
-          //TODO: Implement fallback POST set version
-          /*$.post("/set", { attr: attr, val: val }).done(function(json) {
-            //
+          /*//Get initial values (use the POST version only as a fallback)
+          $.post("/get", {
+            attr: attr
+          }).done(function(json) {
+            var options = $(el).attr('dog-options') || "";
+            
+            var msg = json.msg;
+            
+            //if (options.indexOf("repeat") >= 0) {
+            //  var parent = $(el).parent();
+            //  console.log("is repeat");
+            //  parent.empty();
+            //  for (i = 0; i < 3; i++) {
+            //    var blueprint = $(el).clone();
+            //    console.log('bp', blueprint)
+            //    parent.append(blueprint);
+            //  }
+            //  return;
+            //}
+            
+            if (options.indexOf("stringify") >= 0) {
+              msg = JSON.stringify(msg);
+            } else if (options.indexOf("length") >= 0) {
+              msg = JSON.stringify(msg.length);
+            } else if (options.indexOf("keysAsArray") >= 0) {
+              msg = JSON.stringify(_.range(msg.length));
+            }
+            
+            $(el).val(msg);
           });*/
+          
+          socket.emit('boy-val', { attr: attr, get: true });
+          
+          //Functions for updating values
+          $(el).off().keyup(function(field) {
+            var val = field.currentTarget.value;
+            var eachId = $(this).closest('[dog-id]').attr('dog-id');
+            
+            if (eachId) {
+              //
+            }
+            
+            socket.emit('boy-val', { attr: attr, set: val });
+            
+            //TODO: Implement fallback POST set version
+            /*$.post("/set", { attr: attr, val: val }).done(function(json) {
+              //
+            });*/
+          });
         });
-      });
+      }
+      
+      rebindDog();
+      
       
       $('[dog-run]').each(function(i, el) {
         var path = $(el).attr('dog-run');
@@ -254,17 +266,56 @@
         var options = $(el).attr('dog-options') || "";
         var msg = data.val;
         
-        console.log("dog-val RECEIVED", data, $(el));
+        /*console.log("dog-val RECEIVED", data, $(el));
         if (_.includes(walkers, $(el).attr('dog-val'))) {
           console.log("FOUND WALKER", $(el).attr('dog-val'));
           
-        }
+        }*/
         
         
         if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-        if (options.indexOf("length") >= 0) { 
-          msg = msg.length;
+        if (options.indexOf("length") >= 0) {
+          msg = +msg.length;
         }
+        if (options.indexOf("walk") >= 0) {
+          msg = +msg.length;
+          
+          console.log("should walk for?", msg)
+          
+          if (msg == $(el).attr('dog-lastwalk')) {
+            console.log("no walk needed")
+            
+            return;
+          }
+          
+          var upto = msg;
+          var parent = $(el).parent();
+        
+          for (i = 0; i < upto; i++) {
+            var newEl = $(el).clone();
+            
+            newEl.removeAttr('dog-val');
+            newEl.removeAttr('dog-options');
+            $(newEl).html(Mustache.render($(newEl).html(), { i: i }));
+            
+            parent.append(newEl);
+          }
+          
+          $(el).hide();
+          
+          
+          $(el).attr('dog-lastwalk', msg);
+          
+          
+          rebindDog(parent);
+          console.log("do rebind", parent)
+          
+          
+        }
+        
+        /*console.log("oldval", $(el).val())
+        $(el).attr('oldval', $(el).val());*/
+        
         
         el.val(msg);
       });
