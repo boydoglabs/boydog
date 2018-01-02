@@ -1,0 +1,35 @@
+{
+  "name": "boydog",
+  "version": "1.0.0",
+  "description": "Framework for Real Time Collaborative (RTC) web apps",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boydoglabs/boydog.git"
+  },
+  "keywords": [
+    "RTC",
+    "boydog",
+    "boy-dog",
+    "real time",
+    "real-time",
+    "socket",
+    "socket-io",
+    "websocket",
+    "web framework"
+    "real time collaborative"
+  ],
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "socket.io": "^2.0.4"
+  },
+  "author": "BoyDogLabs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/boydoglabs/boydog/issues"
+  },
+  "homepage": "https://github.com/boydoglabs/boydog#readme"
+}
