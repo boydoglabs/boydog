@@ -174,7 +174,10 @@ var boydog = function(server) {
       "_a": function() {
         
         //boyData.tasks.push({ toDo: "new", progress: 50 });
-        write('tasks[3].toDo', "ABC")
+        
+        var next = boyData.tasks.length;
+        
+        write('tasks[' + next + '].toDo', "ABC")
         write('name', "namechange")
       }
     },
