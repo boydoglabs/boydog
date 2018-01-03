@@ -2,15 +2,29 @@
 
 require('dotenv').config();
 
+//Constants
+const dbPath = './db/';
+
+//Vars
+var fs = require('fs'),
+  path = require('path'),
+  express = require('express'),
+  ejs = require('ejs'),
+  _ = require('lodash'),
+  app = express(),
+  server = require('http').createServer(app);
+
 //Module dummy definition
-var boydog = function(server, boyData, boyLogic) {
-  'use strict';
-  
-  //var boyData = { empty: true };
-  //var boyLogic = { empty: true };
-  
+var boydog = function(server) {
   var io = require('socket.io')(server);
   
+  var boyData = { empty: true };
+  var boyLogic = { empty: true };
+  
+  var setDataLogic = function(data, logic) {
+    boyData = data;
+    boyLogic = logic;
+  }
   
   var read = function(attr) {
     var mask = _.get(boyLogic, attr);
@@ -127,23 +141,13 @@ var boydog = function(server, boyData, boyLogic) {
     boyLogic: boyLogic,
     read: read,
     write: write,
+    setDataLogic: setDataLogic,
     run: run
   }
 }
 
-//Constants
-const dbPath = './db/';
+var bd = boydog(server);
 
-//Vars
-var fs = require('fs'),
-  path = require('path'),
-  express = require('express'),
-  ejs = require('ejs'),
-  _ = require('lodash'),
-  app = express(),
-  server = require('http').createServer(app);
-  
-  
 var boyData = {
   "index": 0,
   "guid": "2bb9ad64-8b39-4a62-bbf6-b30c7fb16010",
@@ -316,22 +320,21 @@ var boyLogic = {
       
       var next = boyData.tasks.length;
       
-      write('tasks[' + next + '].toDo', read('newTaskName'))
-      write('name', "namechange")
+      bd.write('tasks[' + next + '].toDo', bd.read('newTaskName'))
+      bd.write('name', "namechange")
     }
   },
   "increaseApples": {
     "_a": function() {
       
-      var t = write("appleQuantity", read("appleQuantity") + 1)
+      var t = bd.write("appleQuantity", bd.read("appleQuantity") + 1)
       
       console.log("createNewTask action", t);
     }
   }
 }
 
-var bd = boydog(server, boyData, boyLogic);
-
+bd.setDataLogic(boyData, boyLogic);
 
 
 //Express configuration
