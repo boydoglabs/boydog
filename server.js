@@ -9,144 +9,11 @@ const dbPath = './db/';
 var fs = require('fs'),
   path = require('path'),
   express = require('express'),
-  ejs = require('ejs'),
-  _ = require('lodash'),
-  app = express(),
-  server = require('http').createServer(app);
+  ejs = require('ejs');
 
-//Module dummy definition
-var boydog = function(server) {
-  var io = require('socket.io')(server);
-  
-  var boyData = { empty: true };
-  var boyLogic = { empty: true };
-  
-  var setDataLogic = function(data, logic) {
-    boyData = data;
-    boyLogic = logic;
-  }
-  
-  var read = function(attr) {
-    var mask = _.get(boyLogic, attr);
-    var val;
-    
-    console.log("r attr", attr, "mm", mask)
-    
-    if (_.isUndefined(mask)) {
-      val = _.get(boyData, attr);
-      console.log("WHOSE VALUE WITHOUT MASK IS", boyData)
-    } else {
-      if (!_.isUndefined(mask["_r"])) {
-        
-        if (mask["_r"] === null) return;
-        
-        val = mask["_r"](_.get(boyData, attr));
-      } else {
-        val = _.get(boyData, attr);
-      }
-    }
-    
-    console.log("emit", attr, val)
-    
-    try {
-      io.emit('dog-val', { attr: attr, val: val }); //Get the value using mask
-    } catch(e) { } //Don't care if value is not emitted to users
-    
-    return val;
-  };
-  
-  var write = function(attr, val) {
-    var mask = _.get(boyLogic, attr);
-    
-    if (_.isUndefined(mask)) {
-      _.set(boyData, attr, val);  //Set the value without mask
-    } else {
-      if (!_.isUndefined(mask["_w"])) {
-        
-        if (mask["_w"] === null) return;
-        
-        val = mask["_w"](val); //Redefine data.set here because it is used afterwards, do not optimize into the the next line
-      }
-      
-      _.set(boyData, attr, val);  //Set the value with a mask
-    }
-    
-    //Propagation of current field to all clients
-    try {
-        io.emit('dog-val', { attr: attr, val: val }); //Propagate the changing field to all clients *must happen as soon as possible*
-    } catch(e) { } //Don't care if value is not emitted to users
-    
-    //Backpropagation of related fields to all clients
-    var path = _.toPath(attr);
-    var relatedPaths = [path[0]];
-    var str = path[0];
-    var i;
-    
-    for (i = 1; i < path.length - 1; i++) {
-      str += "['" + path[i] + "']";
-      relatedPaths.push(str);
-    }
-    for (i = relatedPaths.length - 1; i >= 0; i--) {
-      //socket.broadcast.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields other clients (used for sockets)
-      console.log("bprop to", relatedPaths[i])
-      io.emit('dog-val', { attr: relatedPaths[i], val: _.get(boyData, relatedPaths[i]) }); //Propagate related fields to myself
-    }
-    
-    //Propagation of the main container
-    //io.broadcast.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields other clients (used for sockets)
-    io.emit('dog-val', { attr: '.', val: boyData }); //Propagate related fields to myself
-    
-    return 1;
-  }
-  
-  var run = function(path) {
-    var mask = _.get(boyLogic, path);
-      
-    if (_.isUndefined(mask)) return;
-    
-    if (!_.isUndefined(mask["_a"])) {
-      
-      return mask["_a"]();
-    }
-  }
-  
-  var debug = function() {
-    console.log("debug")
-    
-  }
-  
-  //Socket.io
-  io.on('connection', function(socket) {
-    console.log("connection")
-    
-    socket.on('boy-val', function(data) {
-      if (!_.isUndefined(data.set)) {
-        
-        write(data.attr, data.set);
-      } else if (!_.isUndefined(data.get)) {
-        read(data.attr);
-      } else {
-        console.log('undefined boy-val')
-      }
-    });
-    
-    socket.on('boy-run', function(data) {
-      run(data.path);
-    });
-  });
-  
-  return {
-    debug: debug,
-    boyData: boyData,
-    boyLogic: boyLogic,
-    read: read,
-    write: write,
-    setDataLogic: setDataLogic,
-    run: run
-  }
-}
-
-var bd = boydog(server);
+var app = express(),
+  server = require('http').createServer(app),
+  bd = require('boydog-boy')(server);
 
 var boyData = {
   "index": 0,
@@ -335,7 +202,6 @@ var boyLogic = {
 }
 
 bd.setDataLogic(boyData, boyLogic);
-
 
 //Express configuration
 app.set('views', __dirname + '/views');
