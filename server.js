@@ -388,5 +388,5 @@ app.post('/get', function(req, res) {
 });
 
 //Run
-server.listen(process.env.PORT);
-console.log("Started at " + process.env.PORT);
+server.listen(process.env.PORT ? process.env.PORT : 3090);
+console.log("Started at " + (process.env.PORT ? process.env.PORT : 3090));

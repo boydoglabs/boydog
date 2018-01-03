@@ -20,7 +20,7 @@
     "socket",
     "socket-io",
     "websocket",
-    "web framework"
+    "web framework",
     "real time collaborative"
   ],
   "dependencies": {
