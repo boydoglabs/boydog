@@ -9,11 +9,18 @@
 <body>
   <div class="container">
     <div class="row">
+      <div class="column"></div>
+      <div class="column">
+        <h1>boy.dog<sup>alpha</sup></h1>
+      </div>
+      <div class="column"></div>
+    </div>
+    <div class="row">
       <div class="column">
         <form>
           <fieldset>
-            global name: <input type="text" dog-val="name">
-            global age: <input type="number" dog-val="age">
+            <label>Change to uppercase: <input type="text" dog-val="name" /></label>
+            <label>Change to negative: <input type="number" dog-val="age" /></label>
             <input type="text" placeholder="name" dog-val="users['1']['name']">
             <input type="text" placeholder="age" dog-val="users[1].age">
             <input type="text" placeholder="email" dog-val="users[1].email">

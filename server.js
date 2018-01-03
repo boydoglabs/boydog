@@ -231,20 +231,15 @@ app.get('/', function(req, res) {
 app.get('/landing', function(req, res) {
   return res.render("landing");
 });
-app.get('/elements', function(req, res) {
-  return res.render("elements");
-});
-app.get('/generic', function(req, res) {
-  return res.render("generic");
-});
 
 //Debug
 app.get('/debug', function(req, res) {
+  console.log(boyData)
+  boyData.about = "CHANGING DATA";
   
-  var r = bd.read('picture');
-  var w = bd.write('age', 999);
+  console.log(boyData)
   
-  return res.json({ r: r, w: w });
+  return res.json({ data: true });
 });
 
 app.post('/get', function(req, res) {
