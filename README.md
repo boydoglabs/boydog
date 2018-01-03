@@ -1,6 +1,6 @@
-# framews
-ws testing
+# boy.dog framework for realtime web-apps
 
+Status: Early alpha
 
 ### boyLogic middleware functions:
 
@@ -11,3 +11,7 @@ ws testing
  - _mr: Executed on read of a value inside the current level
  - _mw: Executed on write of a value inside the current level
  - _mrw: Executed on read or write of a value inside the current level (the execution order is _mrw, _mr, _mw)
+
+## License
+
+[MIT] © boy.dog

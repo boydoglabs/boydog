@@ -1,16 +1,30 @@
 {
-  "name": "framews",
+  "name": "boydog",
   "version": "1.0.0",
-  "description": "",
+  "description": "Framework for Real Time Collaborative (RTC) web apps",
   "main": "index.js",
   "scripts": {
     "start": "forever --verbose --uid \"framews\" -w -c \"node --inspect\" ./server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boydoglabs/boydog.git"
+  },
+  "keywords": [
+    "RTC",
+    "boydog",
+    "boy-dog",
+    "real time",
+    "real-time",
+    "socket",
+    "socket-io",
+    "websocket",
+    "web framework"
+    "real time collaborative"
+  ],
   "dependencies": {
-    "body-parser": "^1.18.2",
+  	"body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
     "ejs": "^2.5.7",
@@ -20,5 +34,11 @@
     "socket.io": "^2.0.4",
     "lodash": "^4.17.4",
     "validator": "^9.1.1"
-  }
+  },
+  "author": "boy.dog (www.boy.dog)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/boydoglabs/boydog/issues"
+  },
+  "homepage": "https://github.com/boydoglabs/boydog#readme"
 }
