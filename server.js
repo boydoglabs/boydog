@@ -17,21 +17,20 @@ var app = express(),
 
 var boyData = {
   "name": "Hyde Malone",
-  "company": "OMATOM",
+  "email": "hydemalone@mail.com",
   "age": 25,
+  "company": "OMATOM",
   "products": 500,
-  "email": "hydemalone@omatom.com",
-  "phone": "+1 (816) 437-3238",
-  "isActive": false,
-  "balance": "$1,300.59",
-  "picture": "http://placehold.it/32x32",
+  //"isActive": false, //TODO
+  //"balance": "$1,300.59", //TODO
+  //"picture": "http://placehold.it/32x32", //TODO
   "features": {
     "body": {
       "up": {
         "eyes": [{
-          "color": "green"
+          "color": "black"
         },{
-          "color": "blue"
+          "color": "green"
         }]
       },
       "down": {
@@ -43,26 +42,6 @@ var boyData = {
       "stamina": 90
     }
   },
-  "users": [
-    {
-      "id": 555,
-      "name": "first user",
-      "age" : 20,
-      "email": "first@mail.com"
-    },
-    {
-      "id": 456,
-      "name": "second user",
-      "age" : 15,
-      "email": "second@mail.com"
-    },
-    {
-      "id": 900,
-      "name": "third3 user",
-      "age" : 23,
-      "email": "third3@mail.com"
-    }
-  ],
   "tasks" : [{
     "toDo": "do ABC",
     "progress": 30,
@@ -128,13 +107,13 @@ var boyLogic = {
     return data;
   },
   "features": {
+    "_w": null,
     "body": {
+      "_w": null,
       "up": {
-        "color": {
-          "_r": function(data) {
-          },
-          "_w": function(data) {
-          }
+        "_w": null,
+        "eyes": {
+          "_w": null
         }
       },
       "down": {

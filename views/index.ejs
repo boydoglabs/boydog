@@ -43,29 +43,41 @@
           </div>
         </div>
         <h3>Deep property binding</h3>
-        <label>Features (object bind): <input type="text" placeholder="deep feature" dog-val="features" dog-options="stringify"></label>
-        <label>Features.body (object bind): <input type="text" placeholder="deep feature" dog-val="features['body']" dog-options="stringify"></label>
-        <label>Features.body.up (object bind): <input type="text" placeholder="deep feature" dog-val="features['body']['up']" dog-options="stringify"></label>
-        <label>Features.body.up.eyes (array bind): <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-options="stringify">
-        <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[0].color">
-        <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[1].color">
-        feet<input type="text" placeholder="deep feature" dog-val="features.body.down.feet">
-        <label for="ageRangeField">Age Range</label>
-        <select id="ageRangeField">
+        <label>Features (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features" dog-options="stringify"></textarea></label>
+        <label>Features.body (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features['body']" dog-options="stringify"></textarea></label>
+        <label>Features.body.up (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features['body']['up']" dog-options="stringify"></textarea></label>
+        <label>Features.body.up.eyes (read-only array bind): <textarea type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-options="stringify"></textarea>
+        <div class="row">
+          <div class="column">
+            <label>Features.body.up.eyes[0].color: <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[0].color"></label>
+          </div>
+          <div class="column">
+            <label>Features.body.up.eyes[1].color: <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[1].color"></label>
+          </div>
+          <div class="column">
+            <label>Features.body.down.feet: <input type="text" placeholder="deep feature" dog-val="features.body.down.feet"></label>
+          </div>
+        </div>
+        
+        
+        
+        
+        <!-- TODO -->
+        <!-- <label for="ageRangeField">Age Range</label>
+         <select id="ageRangeField">
           <option value="0-13">0-13</option>
           <option value="14-17">14-17</option>
           <option value="18-23">18-23</option>
           <option value="24+">24+</option>
-        </select>
-        <label for="commentField">Comment</label>
-        <textarea placeholder="about" id="commentField" dog-val="about"></textarea>
-        <label for="jsonField">JSON</label>
-        <textarea placeholder="about" id="commentField" dog-val="." dog-options="stringify"></textarea>
-        <div class="float-right">
+        </select> -->
+        
+        
+        
+        <!-- TODO -->
+        <!-- <div class="float-right">
           <input type="checkbox" id="confirmField">
-          <label class="label-inline" for="confirmField">Send a copy to yourself</label>
-        </div>
-        <input class="button-primary" type="submit" value="Send">
+          <label class="label-inline" for="confirmField">True or false?</label>
+        </div> -- >
       </div>
       <div class="column">
         <!-- tasks stringify: <input type="text" dog-val="tasks" dog-options="stringify"> -->
