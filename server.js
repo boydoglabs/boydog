@@ -211,6 +211,9 @@ app.get('/', function(req, res) {
 app.get('/landing', function(req, res) {
   return res.render("landing");
 });
+app.get('/example', function(req, res) {
+  return res.render("example");
+});
 
 //Debug
 app.get('/debug', function(req, res) {
