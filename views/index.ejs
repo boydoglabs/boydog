@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>A Simple HTML Document</title>
+  <title>boy.dog real-time framework</title>
   <link rel="stylesheet" href="/milligram.css">
   <script src="/jquery-2.2.4.min.js"></script>
 </head>
@@ -17,36 +17,55 @@
     </div>
     <div class="row">
       <div class="column">
-        <form>
-          <fieldset>
-            <label>Change to uppercase: <input type="text" dog-val="name" /></label>
-            <label>Change to negative: <input type="number" dog-val="age" /></label>
-            <input type="text" placeholder="name" dog-val="users['1']['name']">
-            <input type="text" placeholder="age" dog-val="users[1].age">
-            <input type="text" placeholder="email" dog-val="users[1].email">
-            <input type="text" placeholder="deep feature" dog-val="features['body']['up']" dog-options="stringify">
-            <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-options="stringify">
-            <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[0].color">
-            <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[1].color">
-            feet<input type="text" placeholder="deep feature" dog-val="features.body.down.feet">
-            <label for="ageRangeField">Age Range</label>
-            <select id="ageRangeField">
-              <option value="0-13">0-13</option>
-              <option value="14-17">14-17</option>
-              <option value="18-23">18-23</option>
-              <option value="24+">24+</option>
-            </select>
-            <label for="commentField">Comment</label>
-            <textarea placeholder="about" id="commentField" dog-val="about"></textarea>
-            <label for="jsonField">JSON</label>
-            <textarea placeholder="about" id="commentField" dog-val="." dog-options="stringify"></textarea>
-            <div class="float-right">
-              <input type="checkbox" id="confirmField">
-              <label class="label-inline" for="confirmField">Send a copy to yourself</label>
-            </div>
-            <input class="button-primary" type="submit" value="Send">
-          </fieldset>
-        </form>
+        <h3>Basic bindings</h3>
+        <div class="row">
+          <div class="column">
+            <label>Name (string bind): <input type="text" dog-val="name" /></label>
+          </div>
+          <div class="column">
+            <label>Email (string bind): <input type="text" placeholder="email" dog-val="email"></label>
+          </div>
+          <div class="column">
+            <label>Age (number bind): <input type="text" dog-val="age" /></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <label>Company (bind and change string to uppercase by BoyLogic): <input type="text" dog-val="company" /></label>
+          </div>
+          <div class="column">
+            <label>Products (bind and make number negative by BoyLogic): <input type="number" dog-val="products" /></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <label>About (large string bind): <textarea placeholder="about" id="commentField" dog-val="about"></textarea></label>
+          </div>
+        </div>
+        <h3>Deep property binding</h3>
+        <label>Features (object bind): <input type="text" placeholder="deep feature" dog-val="features" dog-options="stringify"></label>
+        <label>Features.body (object bind): <input type="text" placeholder="deep feature" dog-val="features['body']" dog-options="stringify"></label>
+        <label>Features.body.up (object bind): <input type="text" placeholder="deep feature" dog-val="features['body']['up']" dog-options="stringify"></label>
+        <label>Features.body.up.eyes (array bind): <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-options="stringify">
+        <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[0].color">
+        <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[1].color">
+        feet<input type="text" placeholder="deep feature" dog-val="features.body.down.feet">
+        <label for="ageRangeField">Age Range</label>
+        <select id="ageRangeField">
+          <option value="0-13">0-13</option>
+          <option value="14-17">14-17</option>
+          <option value="18-23">18-23</option>
+          <option value="24+">24+</option>
+        </select>
+        <label for="commentField">Comment</label>
+        <textarea placeholder="about" id="commentField" dog-val="about"></textarea>
+        <label for="jsonField">JSON</label>
+        <textarea placeholder="about" id="commentField" dog-val="." dog-options="stringify"></textarea>
+        <div class="float-right">
+          <input type="checkbox" id="confirmField">
+          <label class="label-inline" for="confirmField">Send a copy to yourself</label>
+        </div>
+        <input class="button-primary" type="submit" value="Send">
       </div>
       <div class="column">
         <!-- tasks stringify: <input type="text" dog-val="tasks" dog-options="stringify"> -->

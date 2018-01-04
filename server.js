@@ -16,12 +16,15 @@ var app = express(),
   bd = require('boydog-boy')(server);
 
 var boyData = {
-  "index": 0,
-  "guid": "2bb9ad64-8b39-4a62-bbf6-b30c7fb16010",
+  "name": "Hyde Malone",
+  "company": "OMATOM",
+  "age": 25,
+  "products": 500,
+  "email": "hydemalone@omatom.com",
+  "phone": "+1 (816) 437-3238",
   "isActive": false,
   "balance": "$1,300.59",
   "picture": "http://placehold.it/32x32",
-  "age": -27,
   "features": {
     "body": {
       "up": {
@@ -40,11 +43,6 @@ var boyData = {
       "stamina": 90
     }
   },
-  "name": "Hyde Malone",
-  "gender": "male",
-  "company": "OMATOM",
-  "email": "hydemalone@omatom.com",
-  "phone": "+1 (816) 437-3238",
   "users": [
     {
       "id": 555,
@@ -153,7 +151,7 @@ var boyLogic = {
       }
     }
   },
-  "name": {
+  "company": {
     "_r": function(data) {
       
       return data.toUpperCase();
@@ -163,8 +161,11 @@ var boyLogic = {
       return data.toUpperCase();
     }
   },
-  "age": {
+  "products": {
     "_r": function(data) {
+      
+      if (data > 0) data = data * -1;
+      bd.write('products', -data);
       
       return data;
     },
