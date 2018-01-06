@@ -106,13 +106,6 @@ var boyLogic = {
     
     return data;
   },
-  /*"_over-rw": function(data) {
-    console.log("main middleware, received data", data);
-    
-    data += "M";
-    
-    return data;
-  },*/
   "features": {
     "_w": null,
     "body": {

@@ -62,7 +62,7 @@ var boydog = function(port) {
       socket.emit('boy-val', { attr: attr, get: true });
       
       //Functions for updating values
-      $(el).off().keyup(function(field) {
+      $(el).on('input', function(field) {
         var val = field.currentTarget.value;
         
         socket.emit('boy-val', { attr: attr, set: val });
