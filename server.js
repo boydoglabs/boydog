@@ -98,14 +98,21 @@ var boyData = {
 }
 
 var boyLogic = {
-  "_r": function(data) {
+  "_middle-rw": function(data) {
+    
+    console.log("LOG TYPE");
+    
+    data = data + "_";
     
     return data;
   },
-  "_w": function(data) {
+  /*"_over-rw": function(data) {
+    console.log("main middleware, received data", data);
+    
+    data += "M";
     
     return data;
-  },
+  },*/
   "features": {
     "_w": null,
     "body": {
@@ -157,9 +164,6 @@ var boyLogic = {
       return data;
     }
   },
-  //"tasks": {
-  //  "_w": null
-  //},
   "addTask": {
     "_a": function() {
       
