@@ -16,6 +16,35 @@ var app = express(),
   bd = require('boydog-boy')(server);
 
 var boyData = {
+  "users": {
+    "guest-1": {
+      "auth": {
+        "user": "secret",
+        "pass": "pass"
+      },
+      "name": "Mr. Guest",
+      "age": 22,
+      "tags": ["guest", "visitor", "viewing"]
+    },
+    "guest-2": {
+      "auth": {
+        "user": "secret2",
+        "pass": "pass2"
+      },
+      "name": "Mr. Guest 2",
+      "age": 25,
+      "tags": ["guest", "secondary", "temporal"]
+    },
+    "editor": {
+      "auth": {
+        "user": "secret-editor",
+        "pass": "pass-editor"
+      },
+      "name": "Mr. Editor",
+      "age": 30,
+      "tags": ["editor", "book", "writer"]
+    }
+  },
   "name": "Hyde Malone",
   "email": "hydemalone@mail.com",
   "age": 25,
@@ -100,11 +129,12 @@ var boyData = {
 var boyLogic = {
   "_middle-rw": function(data) {
     
-    console.log("LOG TYPE");
-    
-    data = data + "_";
+    console.log("LOG TYPE", data);
     
     return data;
+  },
+  "users": {
+    "_w": null
   },
   "features": {
     "_w": null,

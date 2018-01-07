@@ -17,27 +17,31 @@
     </div>
     <div class="row">
       <div class="column">
+        
+        <h3>Auth</h3>
+        <div class="row">
+          <div class="column">
+            <label>Username: <input id="username" type="text" value="guest-1" /></label>
+          </div>
+          <div class="column">
+            <label>Password: <input id="pass-word" type="text" value="secret" /></label>
+          </div>
+        </div>
+        <label>User list (read-only object bind): <textarea type="text" dog-val="users" dog-logic="stringify"></textarea></label>
+        
         <h3>Basic bindings</h3>
         <div class="row">
           <div class="column">
-            <label>Name (string bind): <input type="text" dog-val="name" /></label>
+            <label>Name (string bind): <input type="text" dog-val="users[#username].name" /></label>
           </div>
           <div class="column">
-            <label>Email (string bind): <input type="text" placeholder="email" dog-val="email"></label>
+            <label>Email (string bind): <input type="text" placeholder="email" dog-val="email" /></label>
           </div>
           <div class="column">
             <label>Age (number bind): <input type="text" dog-val="age" /></label>
           </div>
         </div>
-        <h3>Auth</h3>
-        <div class="row">
-          <div class="column">
-            <label>Username: <input type="text" dog-val="name" /></label>
-          </div>
-          <div class="column">
-            <label>Password: <input type="text" placeholder="email" dog-val="email"></label>
-          </div>
-        </div>
+        
         <div class="row">
           <div class="column">
             <label>Company (bind and change string to uppercase by BoyLogic): <input type="text" dog-val="company" /></label>
@@ -52,10 +56,10 @@
           </div>
         </div>
         <h3>Deep property binding</h3>
-        <label>Features (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features" dog-options="stringify"></textarea></label>
-        <label>Features.body (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features['body']" dog-options="stringify"></textarea></label>
-        <label>Features.body.up (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features['body']['up']" dog-options="stringify"></textarea></label>
-        <label>Features.body.up.eyes (read-only array bind): <textarea type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-options="stringify"></textarea>
+        <label>Features (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features" dog-logic="stringify"></textarea></label>
+        <label>Features.body (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features['body']" dog-logic="stringify"></textarea></label>
+        <label>Features.body.up (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features['body']['up']" dog-logic="stringify"></textarea></label>
+        <label>Features.body.up.eyes (read-only array bind): <textarea type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-logic="stringify"></textarea>
         <div class="row">
           <div class="column">
             <label>Features.body.up.eyes[0].color: <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[0].color"></label>
@@ -82,6 +86,7 @@
         
         
         
+        
         <!-- TODO -->
         <!-- <div class="float-right">
           <input type="checkbox" id="confirmField">
@@ -89,8 +94,8 @@
         </div> -- >
       </div>
       <div class="column">
-        <!-- tasks stringify: <input type="text" dog-val="tasks" dog-options="stringify"> -->
-        tasks length: <input id="forVal" type="text" dog-val="tasks" dog-options="length">
+        <!-- tasks stringify: <input type="text" dog-val="tasks" dog-logic="stringify"> -->
+        tasks length: <input id="forVal" type="text" dog-val="tasks" dog-logic="length">
         <table>
           <thead>
             <tr>
@@ -101,7 +106,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dog-val="tasks" dog-options="walk">
+            <tr dog-val="tasks" dog-logic="walk">
               <td><input type="text" dog-val="tasks[@@@].toDo"></td>
               <td><input type="text" dog-val="tasks[@@@].progress"></td>
             </tr>
@@ -121,7 +126,14 @@
   <script src="/boydog-dog.js"></script>
   <script>
     var bd = boydog(3090);
-    bd.dogLogic = { abc: 123 };
+    bd.dogLogic = {
+      addAuth: function(data) {
+        
+        console.log("addAuth")
+        
+        return data;
+      }
+    };
   </script>
 </body>
 
