@@ -7,11 +7,11 @@ var boydog = function(port) {
   
   console.log("boyDog connect", port);
   
-  jQuery.fn.htmlClean = function() {
+  var htmlClean = function(rootElement) {
     //Clean whitespaces
-    this.contents().filter(function() {
+    $(rootElement).contents().filter(function() {
       if (this.nodeType != 3) {
-        $(this).htmlClean();
+        htmlClean($(this));
         return false;
       } else {
         this.textContent = $.trim(this.textContent);
@@ -19,52 +19,68 @@ var boydog = function(port) {
       }
     }).remove();
     
-    //Normalize attribute paths (i.e.: address.gps.lat = address['gps']['lat'])
-    function normalizePaths(attrName) {
+    return this;
+  }
+  htmlClean('html'); //Clean html for whitespaces and line-breaks
+  
+  //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'])
+  var normalizePaths = function(names) {
+    names.forEach(function(attrName) {
       $('[' + attrName + ']').each(function(i, el) {
         var attr = $(el).attr(attrName);
-
         var attr = _.toPath(attr);
-      
+        
         if (attr.length > 1) {
-          attr = attr.shift() + "['" + attr.join("']['") + "']";
+          attr = _.map(attr, function(item, i) {
+            if (i === 0) return item;
+            
+            if((item[0] === "#") || ((item[0] === "."))) return item;
+              
+            return "'" + item + "'";
+          })
+          
+          attr = attr.shift() + "[" + attr.join("][") + "]";
         } else {
           attr = attr.shift();
         }
         
         $(el).attr(attrName, attr);
       });
-    };
-    
-    normalizePaths('dog-val');
-    normalizePaths('dog-run');
-    //TODO: Add all normalizations
-    
-    return this;
-  }
-  $('html').htmlClean(); //Clean html for whitespaces and line-breaks
+    });
+  };
+  
+  normalizePaths(['dog-val', 'dog-run']); //TODO: Add all normalizations
   
   var socket = io.connect('http://localhost:' + port);
-  
   var dogLogic = {};
   
   //Socket functions
   socket.on('connect', function(data) {
     console.log("socket on connect");
   });
-
+  
+  function getElementAttr(el, attr) {
+    var attr = $(el).attr('dog-val');
+    
+    return attr.replace(/(#[a-zA-Z0-9_-]+)/g, function(a) {
+      
+      return "'" + $(a).val() + "'";
+    });
+  }
+  
   function rebindDog(element) {
     if (!element) element = 'html';
     
     $(element).find('[dog-val]').each(function(i, el) {
-      var attr = $(el).attr('dog-val');
-      
+      var attr = getElementAttr(el, 'dog-val');
+
       socket.emit('boy-val', { attr: attr, get: true });
       
       //Functions for updating values
       $(el).on('input', function(field) {
+        var attr = getElementAttr(el, 'dog-val');
         var val = field.currentTarget.value;
-        
+
         socket.emit('boy-val', { attr: attr, set: val });
         
         /*//TODO: Implement fallback POST and GET version
@@ -72,32 +88,38 @@ var boydog = function(port) {
         $.post("/set", {}).done(function(json) { });*/
       });
     });
+    
+    $(element).find('[dog-run]').each(function(i, el) {
+      var path = $(el).attr('dog-run');
+      
+      $(el).off().on('click', function() {
+        socket.emit('boy-run', { path: path });
+      });
+    });
   }
 
   rebindDog();
-
-  $('[dog-run]').each(function(i, el) {
-    var path = $(el).attr('dog-run');
-    
-    $(el).off().on('click', function() {
-      socket.emit('boy-run', { path: path });
-    });
-  });
 
   //To set a value
   socket.on('dog-val', function(data) {
     var elem = $('[dog-val="' + data.attr + '"]');
     
+    if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
+      $('[dog-val*="#"]').each(function(k, el) {
+        var attr = getElementAttr(el, 'dog-val');
+        if (data.attr === attr) elem = $(el);
+      })
+    }
+    
     elem.each(function(k, el) {
       el = $(el);
       
-      var options = $(el).attr('dog-options') || "";
+      var options = $(el).attr('dog-logic') || "";
       var msg = data.val;
       
       if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
       if (options.indexOf("length") >= 0) {
         
-        console.log("msg>>>", msg, el, data)
         if (!_.isUndefined(msg)) msg = +msg.length;
       }
       if (options.indexOf("walk") >= 0) {
@@ -114,7 +136,7 @@ var boydog = function(port) {
           if (existingKey) continue;
           
           var newEl = $(el).clone();
-          newEl.removeAttr('dog-val').removeAttr('dog-options').show();
+          newEl.removeAttr('dog-val').removeAttr('dog-logic').show();
           newEl.attr('dog-walk-key', i);
           
           $(newEl).html($(newEl).html().replace(/@@@/g, i));
@@ -137,7 +159,6 @@ var boydog = function(port) {
       el.val(msg);
     })
   });
-  
   
   return {
     dogLogic: dogLogic
