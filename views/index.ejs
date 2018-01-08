@@ -21,10 +21,10 @@
         <h3>Auth</h3>
         <div class="row">
           <div class="column">
-            <label>Username: <input id="username" type="text" value="guest-1" /></label>
+            <label>Username: <input id="username" type="text" dog-val="|void|" value="guest-1" /></label>
           </div>
           <div class="column">
-            <label>Password: <input id="pass-word" type="text" value="secret" /></label>
+            <label>Password: <input id="password" type="text" value="secret" /></label>
           </div>
         </div>
         <label>User list (read-only object bind): <textarea type="text" dog-val="users" dog-logic="stringify"></textarea></label>
@@ -127,11 +127,14 @@
   <script>
     var bd = boydog(3090);
     bd.dogLogic = {
-      addAuth: function(data) {
+      /*addAuth: function(data) {
         
         console.log("addAuth")
         
         return data;
+      }*/
+      none: function() {
+        
       }
     };
     

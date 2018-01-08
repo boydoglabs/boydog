@@ -11,6 +11,11 @@ Status: Early alpha
  - |middle-r|: Executed on read of a value inside the current level
  - |middle-w|: Executed on write of a value inside the current level
  - |middle-rw|: Executed on read or write of a value inside the current level (the execution order is _mrw, _mr, _mw)
+ 
+ ### dogLogic middleware functions:
+
+ - |u|: On upload event (dog updates boy)
+ - |d|: On download event (boy updates dog)
 
 ## License
 
