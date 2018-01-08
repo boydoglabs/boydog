@@ -35,7 +35,7 @@
             <label>Name (string bind): <input type="text" dog-val="users[#username].name" /></label>
           </div>
           <div class="column">
-            <label>Email (string bind): <input type="text" placeholder="email" dog-val="email" /></label>
+            <label>Email (string bind): <input type="text" placeholder="email" dog-val="users[#username].email" /></label>
           </div>
           <div class="column">
             <label>Age (number bind): <input type="text" dog-val="age" /></label>
@@ -134,6 +134,12 @@
         return data;
       }
     };
+    
+    $('#username').keyup(function() {
+      console.log("bd", bd)
+      
+      bd.rebindDog();
+    })
   </script>
 </body>
 

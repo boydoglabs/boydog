@@ -68,19 +68,26 @@ var boydog = function(port) {
     });
   }
   
-  function rebindDog(element) {
+  var rebindDog = function(element) {
     if (!element) element = 'html';
     
     $(element).find('[dog-val]').each(function(i, el) {
       var attr = getElementAttr(el, 'dog-val');
-
+      var isDynamic = ($(el).attr('dog-val').indexOf('#') > 0);
+      
+      console.log("isDyn", isDynamic);
+      
       socket.emit('boy-val', { attr: attr, get: true });
       
       //Functions for updating values
       $(el).on('input', function(field) {
-        var attr = getElementAttr(el, 'dog-val');
+        
         var val = field.currentTarget.value;
-
+        
+        if (isDynamic) {
+          attr = getElementAttr(el, 'dog-val');
+        }
+        
         socket.emit('boy-val', { attr: attr, set: val });
         
         /*//TODO: Implement fallback POST and GET version
@@ -97,9 +104,9 @@ var boydog = function(port) {
       });
     });
   }
-
+  
   rebindDog();
-
+  
   //To set a value
   socket.on('dog-val', function(data) {
     var elem = $('[dog-val="' + data.attr + '"]');
@@ -161,6 +168,7 @@ var boydog = function(port) {
   });
   
   return {
-    dogLogic: dogLogic
+    dogLogic: dogLogic,
+    rebindDog: rebindDog
   };
 }

@@ -23,6 +23,7 @@ var boyData = {
         "pass": "pass"
       },
       "name": "Mr. Guest",
+      "email": "guest@mail.com",
       "age": 22,
       "tags": ["guest", "visitor", "viewing"]
     },
@@ -32,6 +33,7 @@ var boyData = {
         "pass": "pass2"
       },
       "name": "Mr. Guest 2",
+      "email": "guest2@mail.com",
       "age": 25,
       "tags": ["guest", "secondary", "temporal"]
     },
@@ -41,6 +43,7 @@ var boyData = {
         "pass": "pass-editor"
       },
       "name": "Mr. Editor",
+      "email": "editor@mail.com",
       "age": 30,
       "tags": ["editor", "book", "writer"]
     }
