@@ -21,7 +21,7 @@
         <h3>Auth</h3>
         <div class="row">
           <div class="column">
-            <label>Username: <input id="username" type="text" dog-val="|void|" value="guest-1" /></label>
+            <label>Username: <input id="username" type="text" value="guest-1" /></label>
           </div>
           <div class="column">
             <label>Password: <input id="password" type="text" value="secret" /></label>
@@ -72,9 +72,6 @@
           </div>
         </div>
         
-        
-        
-        
         <!-- TODO -->
         <!-- <label for="ageRangeField">Age Range</label>
          <select id="ageRangeField">
@@ -84,16 +81,12 @@
           <option value="24+">24+</option>
         </select> -->
         
-        
-        
-        
         <!-- TODO -->
         <!-- <div class="float-right">
           <input type="checkbox" id="confirmField">
           <label class="label-inline" for="confirmField">True or false?</label>
-        </div> -- >
-      </div>
-      <div class="column">
+        </div> -->
+      
         <!-- tasks stringify: <input type="text" dog-val="tasks" dog-logic="stringify"> -->
         tasks length: <input id="forVal" type="text" dog-val="tasks" dog-logic="length">
         <table>
@@ -133,8 +126,19 @@
         
         return data;
       }*/
-      none: function() {
+      "users": function(data) {
         
+        return data;
+      },
+      "company": {
+        "|u|": function(data) {
+          
+          return data;
+        },
+        "|d|": function(data) {
+          
+          return data;
+        }
       }
     };
     

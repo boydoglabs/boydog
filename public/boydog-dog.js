@@ -48,7 +48,6 @@ var boydog = function(port) {
       });
     });
   };
-  
   normalizePaths(['dog-val', 'dog-run']); //TODO: Add all normalizations
   
   var socket = io.connect('http://localhost:' + port);
@@ -88,7 +87,9 @@ var boydog = function(port) {
           attr = getElementAttr(el, 'dog-val');
         }
         
-        socket.emit('boy-val', { attr: attr, set: val });
+        //TODO: Implement 'package' var here
+        
+        socket.emit('boy-val', { attr: attr, set: val }); //TODO: Send 'package'
         
         /*//TODO: Implement fallback POST and GET version
         $.post("/get", {}).done(function(json) { });
