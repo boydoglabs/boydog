@@ -119,7 +119,9 @@
   <script src="/boydog-dog.js"></script>
   <script>
     var bd = boydog(3090);
-    bd.dogLogic = {
+    
+    var dogData = 'html';
+    var dogLogic = {
       /*addAuth: function(data) {
         
         console.log("addAuth")
@@ -139,13 +141,49 @@
           
           return data;
         }
+      },
+      "features": {
+        //Working middlewares
+        "|middle-u|": function(data) {
+          
+          console.log("features middel up", data)
+          
+          data.set = data.set + "+";
+          
+          return data;
+        },
+        "|middle-d|": function(data) {
+          
+          console.log("features middel up")
+          
+          return data;
+        },
+        "body": {
+          "|middle-u|": function(data) {
+            
+            console.log("features middel up body", data)
+            data.set = data.set + "b";
+            
+            return data;
+          },
+          "up": { eyes: { '0': { color: {
+            "|u|": function(data) {
+              
+              console.log("executing last upload", data)
+              
+              return data;
+            }
+          } } } }
+        }
       }
     };
+    
+    bd.dogSet(dogData, dogLogic);
     
     $('#username').keyup(function() {
       console.log("bd", bd)
       
-      bd.rebindDog();
+      bd.dogRebind();
     })
   </script>
 </body>
