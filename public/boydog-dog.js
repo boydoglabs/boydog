@@ -87,9 +87,7 @@ var boydog = function(port) {
       var val;
       var mask;
       
-      console.log("isDyn", isDynamic);
-      
-      socket.emit('dog-boy', { attr: attr });
+      socket.emit('dog-boy', { attr: attr }); //Fetch first value load
       
       //Functions for updating values
       $(el).on('input', function(field) {
@@ -106,9 +104,9 @@ var boydog = function(port) {
           var tmpPath = _.take(fullPath, i);
           
           mask = _.get(dogLogic, tmpPath);
-          if (mask !== undefined) {
-            if (mask === null) return;
-            
+          
+          if (mask === null) return;
+          if (mask) {
             if (dogLogic["|middle-ud|"] === null) return;
             if (mask["|middle-ud|"]) packet = mask["|middle-u|"](packet);
             
@@ -120,19 +118,15 @@ var boydog = function(port) {
         //Execute the last item |w|
         mask = _.get(dogLogic, attr);
         
-        if (mask !== undefined) {
-          if (mask === null) return;
-          
-          if (mask["|u|"] !== undefined) {
-            if (mask["|u|"] === null) return;
-            
-            packet = mask["|u|"](packet);
-          }
+        if (mask === null) return;
+        if (mask) {
+          if (mask["|u|"] === null) return;
+          if (mask["|u|"]) packet = mask["|u|"](packet);
         }
         
-        socket.emit('dog-boy', packet); //TODO: Send 'package'
+        socket.emit('dog-boy', packet);
         
-        /*//TODO: Implement fallback POST and GET version
+        /*//TODO: Implement POST and GET fallback version
         $.post("/get", {}).done(function(json) { });
         $.post("/set", {}).done(function(json) { });*/
       });
