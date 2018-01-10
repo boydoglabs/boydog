@@ -136,18 +136,18 @@
         return data;
       },
       "company": {
-        "|u|": function(data) {
+        "__u": function(data) {
           
           return data;
         },
-        "|d|": function(data) {
+        "__d": function(data) {
           
           return data;
         }
       },
       "features": {
         //Working middlewares
-        "|middle-u|": function(data) {
+        "__middleU": function(data) {
           
           console.log("features middel up", data)
           
@@ -155,14 +155,14 @@
           
           return data;
         },
-        "|middle-d|": function(data) {
+        "__middleD": function(data) {
           
           console.log("features middel up")
           
           return data;
         },
         "body": {
-          "|middle-u|": function(data) {
+          "__middleU": function(data) {
             
             console.log("features middel up body", data)
             data.set = data.set + "b";
@@ -170,7 +170,7 @@
             return data;
           },
           "up": { eyes: { '0': { color: {
-            "|u|": function(data) {
+            "__u": function(data) {
               
               console.log("executing last upload", data)
               

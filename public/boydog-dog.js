@@ -7,7 +7,7 @@ var boydog = function(port) {
     if (!data) data = "html";
     dogData = data;
     dogLogic = logic;
-    //dogLogic["|void|"] = null; //A default place to avoid reading/writing
+    //dogLogic["__void"] = null; //A default place to avoid reading/writing
   }
   
   console.log("boyDog connect", port);
@@ -60,8 +60,6 @@ var boydog = function(port) {
   };
   normalizePaths(['dog-value', 'dog-run']); //TODO: Add all normalizations
   
-
-  
   //Socket functions
   socket.on('connect', function(data) {
     console.log("socket on connect");
@@ -107,11 +105,11 @@ var boydog = function(port) {
           
           if (mask === null) return;
           if (mask) {
-            if (dogLogic["|middle-ud|"] === null) return;
-            if (mask["|middle-ud|"]) packet = mask["|middle-u|"](packet);
+            if (dogLogic["__middleUD"] === null) return;
+            if (mask["__middleUD"]) packet = mask["__middleU"](packet);
             
-            if (dogLogic["|middle-u|"] === null) return;
-            if (mask["|middle-u|"]) packet = mask["|middle-u|"](packet);
+            if (dogLogic["__middleU"] === null) return;
+            if (mask["__middleU"]) packet = mask["__middleU"](packet);
           }
         }
         
@@ -120,8 +118,8 @@ var boydog = function(port) {
         
         if (mask === null) return;
         if (mask) {
-          if (mask["|u|"] === null) return;
-          if (mask["|u|"]) packet = mask["|u|"](packet);
+          if (mask["__u"] === null) return;
+          if (mask["__u"]) packet = mask["__u"](packet);
         }
         
         socket.emit('dog-boy', packet);
