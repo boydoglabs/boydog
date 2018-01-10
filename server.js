@@ -211,7 +211,7 @@ var boyLogic = {
   }
 }
 
-bd.setDataLogic(boyData, boyLogic);
+bd.boySet(boyData, boyLogic);
 
 //Express configuration
 app.set('views', __dirname + '/views');

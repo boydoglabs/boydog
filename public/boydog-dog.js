@@ -4,6 +4,7 @@ var boydog = function(port) {
   var dogLogic = {};
   
   var dogSet = function(data, logic) {
+    if (!data) data = "html";
     dogData = data;
     dogLogic = logic;
     //dogLogic["|void|"] = null; //A default place to avoid reading/writing
@@ -30,7 +31,7 @@ var boydog = function(port) {
     
     return this;
   }
-  htmlClean('html'); //Clean html for whitespaces and line-breaks
+  htmlClean(dogData); //Clean html for whitespaces and line-breaks
   
   //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'])
   var normalizePaths = function(names) {
@@ -57,7 +58,9 @@ var boydog = function(port) {
       });
     });
   };
-  normalizePaths(['dog-val', 'dog-run']); //TODO: Add all normalizations
+  normalizePaths(['dog-value', 'dog-run']); //TODO: Add all normalizations
+  
+
   
   //Socket functions
   socket.on('connect', function(data) {
@@ -65,7 +68,7 @@ var boydog = function(port) {
   });
   
   function getElementAttr(el, attr) {
-    var attr = $(el).attr('dog-val');
+    var attr = $(el).attr('dog-value');
     
     return attr.replace(/(#[a-zA-Z0-9_-]+)/g, function(a) {
       
@@ -74,24 +77,24 @@ var boydog = function(port) {
   }
   
   var dogRebind = function(element) {
-    if (!element) element = 'html';
+    if (!element) element = dogData;
     
-    $(element).find('[dog-val]').each(function(i, el) {
-      var attr = getElementAttr(el, 'dog-val');
-      var isDynamic = ($(el).attr('dog-val').indexOf('#') > 0);
+    $(element).find('[dog-value]').each(function(i, el) {
+      var attr = getElementAttr(el, 'dog-value');
+      var isDynamic = ($(el).attr('dog-value').indexOf('#') > 0);
       var fullPath;
       var packet;
       var val;
       
       console.log("isDyn", isDynamic);
       
-      socket.emit('boy-val', { attr: attr, get: true });
+      socket.emit('dog-boy', { attr: attr, get: true });
       
       //Functions for updating values
       $(el).on('input', function(field) {
         val = field.currentTarget.value;
         
-        if (isDynamic) attr = getElementAttr(el, 'dog-val');
+        if (isDynamic) attr = getElementAttr(el, 'dog-value');
         fullPath = _.toPath(attr);
         
         //Build packet to be sent
@@ -116,7 +119,9 @@ var boydog = function(port) {
         //TODO: Add "|u|" execution
         console.log("packet so far", packet)
         
-        socket.emit('boy-val', packet); //TODO: Send 'package'
+        
+        
+        socket.emit('dog-boy', packet); //TODO: Send 'package'
         
         /*//TODO: Implement fallback POST and GET version
         $.post("/get", {}).done(function(json) { });
@@ -136,12 +141,12 @@ var boydog = function(port) {
   dogRebind();
   
   //To set a value
-  socket.on('dog-val', function(data) {
-    var elem = $('[dog-val="' + data.attr + '"]');
+  socket.on('boy-dog', function(data) {
+    var elem = $('[dog-value="' + data.attr + '"]');
     
     if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
-      $('[dog-val*="#"]').each(function(k, el) {
-        var attr = getElementAttr(el, 'dog-val');
+      $('[dog-value*="#"]').each(function(k, el) {
+        var attr = getElementAttr(el, 'dog-value');
         if (data.attr === attr) elem = $(el);
       })
     }
@@ -149,15 +154,15 @@ var boydog = function(port) {
     elem.each(function(k, el) {
       el = $(el);
       
-      var options = $(el).attr('dog-logic') || "";
+      var dogRun = $(el).attr('dog-run') || "";
       var msg = data.val;
       
-      if (options.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-      if (options.indexOf("length") >= 0) {
+      if (dogRun.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+      if (dogRun.indexOf("length") >= 0) {
         
         if (!_.isUndefined(msg)) msg = +msg.length;
       }
-      if (options.indexOf("walk") >= 0) {
+      if (dogRun.indexOf("walk") >= 0) {
         if (!_.isUndefined(msg)) msg = +msg.length;
         
         if (msg == $(el).attr('dog-lastwalk')) return; //If this element has not changed since the last walk, then don't walk again
@@ -171,13 +176,13 @@ var boydog = function(port) {
           if (existingKey) continue;
           
           var newEl = $(el).clone();
-          newEl.removeAttr('dog-val').removeAttr('dog-logic').show();
+          newEl.removeAttr('dog-value').removeAttr('dog-run').show();
           newEl.attr('dog-walk-key', i);
           
           $(newEl).html($(newEl).html().replace(/@@@/g, i));
           
           /*//TODO: Implement append/prepend
-          if (options.indexOf("reverse") >= 0) {
+          if (dogRun.indexOf("reverse") >= 0) {
             parent.prepend(newEl);
           } else {
             parent.append(newEl);

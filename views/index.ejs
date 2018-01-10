@@ -27,48 +27,51 @@
             <label>Password: <input id="password" type="text" value="secret" /></label>
           </div>
         </div>
-        <label>User list (read-only object bind): <textarea type="text" dog-val="users" dog-logic="stringify"></textarea></label>
+        <label>User list (read-only object bind): <textarea type="text" dog-value="users" dog-run="stringify"></textarea></label>
         
         <h3>Basic bindings</h3>
         <div class="row">
           <div class="column">
-            <label>Name (string bind): <input type="text" dog-val="users[#username].name" /></label>
+            <label>Name (string bind): <input type="text" dog-value="users[#username].name" /></label>
           </div>
           <div class="column">
-            <label>Email (string bind): <input type="text" placeholder="email" dog-val="users[#username].email" /></label>
+            <label>Email (string bind): <input type="text" placeholder="email" dog-value="users[#username].email" /></label>
           </div>
           <div class="column">
-            <label>Age (number bind): <input type="text" dog-val="age" /></label>
+            <label>Age (number bind): <input type="text" dog-value="age" /></label>
           </div>
         </div>
         
         <div class="row">
           <div class="column">
-            <label>Company (bind and change string to uppercase by BoyLogic): <input type="text" dog-val="company" /></label>
+            <label>Company (bind and change string to uppercase by BoyLogic): <input type="text" dog-value="company" /></label>
           </div>
           <div class="column">
-            <label>Products (bind and make number negative by BoyLogic): <input type="number" dog-val="products" /></label>
+            <label>Products (bind and make number negative by BoyLogic): <input type="number" dog-value="products" /></label>
+          </div>
+          <div class="column">
+            <label>HTML (print as HTML): <span dog-value="registered" dog-run="toHTML"></span></label>
           </div>
         </div>
         <div class="row">
           <div class="column">
-            <label>About (large string bind): <textarea placeholder="about" id="commentField" dog-val="about"></textarea></label>
+            <label>About (large string bind): <textarea placeholder="about" id="commentField" dog-value="about"></textarea></label>
           </div>
         </div>
         <h3>Deep property binding</h3>
-        <label>Features (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features" dog-logic="stringify"></textarea></label>
-        <label>Features.body (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features['body']" dog-logic="stringify"></textarea></label>
-        <label>Features.body.up (read-only object bind): <textarea type="text" placeholder="deep feature" dog-val="features['body']['up']" dog-logic="stringify"></textarea></label>
-        <label>Features.body.up.eyes (read-only array bind): <textarea type="text" placeholder="deep feature" dog-val="features.body.up.eyes" dog-logic="stringify"></textarea>
+        <label>Features (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features" dog-run="stringify"></textarea></label>
+        <label>Features.body (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']" dog-run="stringify"></textarea></label>
+        <label>Features.body.up (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']['up']" dog-run="stringify"></textarea></label>
+        <label>Features.body.up.eyes (read-only array bind): <textarea type="text" placeholder="deep feature" dog-value="features.body.up.eyes" dog-run="stringify"></textarea>
         <div class="row">
           <div class="column">
-            <label>Features.body.up.eyes[0].color: <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[0].color"></label>
+            <label>Features.body.up.eyes[0].color: <input type="text" placeholder="deep feature" dog-value="features.body.up.eyes[0].color"></label>
           </div>
           <div class="column">
-            <label>Features.body.up.eyes[1].color: <input type="text" placeholder="deep feature" dog-val="features.body.up.eyes[1].color"></label>
+            <label>Features.body.up.eyes[1].color: <input type="text" placeholder="deep feature" dog-value="features.body.up.eyes[1].color"></label>
           </div>
           <div class="column">
-            <label>Features.body.down.feet: <input type="text" placeholder="deep feature" dog-val="features.body.down.feet"></label>
+            <label>Features.body.down.feet: <input type="text" placeholder="deep feature" dog-value="features.body.down.feet"></label>
           </div>
         </div>
         
@@ -87,8 +90,8 @@
           <label class="label-inline" for="confirmField">True or false?</label>
         </div> -->
       
-        <!-- tasks stringify: <input type="text" dog-val="tasks" dog-logic="stringify"> -->
-        tasks length: <input id="forVal" type="text" dog-val="tasks" dog-logic="length">
+        <!-- tasks stringify: <input type="text" dog-value="tasks" dog-run="stringify"> -->
+        tasks length: <input id="forVal" type="text" dog-value="tasks" dog-run="length">
         <table>
           <thead>
             <tr>
@@ -99,17 +102,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr dog-val="tasks" dog-logic="walk">
-              <td><input type="text" dog-val="tasks[@@@].toDo"></td>
-              <td><input type="text" dog-val="tasks[@@@].progress"></td>
+            <tr dog-value="tasks" dog-run="walk">
+              <td><input type="text" dog-value="tasks[@@@].toDo"></td>
+              <td><input type="text" dog-value="tasks[@@@].progress"></td>
             </tr>
           </tbody>
         </table>
-        taskname: <input type="text" dog-val="newTaskName">
+        taskname: <input type="text" dog-value="newTaskName">
         <a class="button" href="javascript:void(0);" dog-run="addTask">Add task</a>
         <br/>
         
-        apples: <input type="text" dog-val="appleQuantity">
+        apples: <input type="text" dog-value="appleQuantity">
         <a class="button" href="javascript:void(0);" dog-run="increaseApples">Increase apples</a>
       </div>
     </div>
