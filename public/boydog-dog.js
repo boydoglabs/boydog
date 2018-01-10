@@ -130,13 +130,13 @@ var boydog = function(port) {
       });
     });
     
-    $(element).find('[dog-run]').each(function(i, el) {
+    /*$(element).find('[dog-run]').each(function(i, el) {
       var path = $(el).attr('dog-run');
       
       $(el).off().on('click', function() {
         socket.emit('boy-run', { path: path });
       });
-    });
+    });*/
   }
   
   dogRebind();
@@ -162,6 +162,24 @@ var boydog = function(port) {
       if (dogRun.indexOf("length") >= 0) {
         
         if (!_.isUndefined(msg)) msg = +msg.length;
+      }
+      if (dogRun.indexOf("toHTML") >= 0) {
+        el.html(msg);
+      }
+      if (dogRun.indexOf("toClass") >= 0) {
+        
+        console.log("dbg addclass", el, msg);
+        
+        el.addClass(msg);
+      }
+      if (dogRun.indexOf("buttonify") >= 0) {
+        //TODO: Change this method, buttonify does not belong here
+        
+        el.off().on('click', function() {
+          console.log("buttonify click")
+          
+          socket.emit('dog-boy', { attr: data.attr, set: Date() });
+        });
       }
       if (dogRun.indexOf("walk") >= 0) {
         if (!_.isUndefined(msg)) msg = +msg.length;

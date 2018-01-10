@@ -50,8 +50,12 @@
             <label>Products (bind and make number negative by BoyLogic): <input type="number" dog-value="products" /></label>
           </div>
           <div class="column">
-            <label>HTML (print as HTML): <span dog-value="registered" dog-run="toHTML"></span></label>
+            <label>HTML (interpret as HTML):</br><span dog-value="registered" dog-run="toHTML"></span></label>
           </div>
+          <div class="column">
+            <label>Even/odd class (interpret as class):</br><span class="none" dog-class="counterClass" dog-value="counter" dog-run="toHTML"></span></br><span dog-value="counterClass" dog-run="toHTML"></span></label>
+          </div>
+          
         </div>
         <div class="row">
           <div class="column">
@@ -109,11 +113,11 @@
           </tbody>
         </table>
         taskname: <input type="text" dog-value="newTaskName">
-        <a class="button" href="javascript:void(0);" dog-run="addTask">Add task</a>
+        <a class="button" href="javascript:void(0);" dog-value="addTask" dog-run="buttonify">Add task</a>
         <br/>
         
         apples: <input type="text" dog-value="appleQuantity">
-        <a class="button" href="javascript:void(0);" dog-run="increaseApples">Increase apples</a>
+        <a class="button" href="javascript:void(0);" dog-value="increaseApples" dog-run="buttonify">Increase apples</a>
       </div>
     </div>
   </div>
