@@ -85,10 +85,11 @@ var boydog = function(port) {
       var fullPath;
       var packet;
       var val;
+      var mask;
       
       console.log("isDyn", isDynamic);
       
-      socket.emit('dog-boy', { attr: attr, get: true });
+      socket.emit('dog-boy', { attr: attr });
       
       //Functions for updating values
       $(el).on('input', function(field) {
@@ -104,22 +105,30 @@ var boydog = function(port) {
         for (var i = 0; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
           var tmpPath = _.take(fullPath, i);
           
-          var itemProps = _.get(dogLogic, tmpPath);
-          if (!itemProps) continue;
-          
-          if (dogLogic["|middle-ud|"] === null) return;
-          if (itemProps["|middle-ud|"]) packet = itemProps["|middle-u|"](packet);
-          
-          if (dogLogic["|middle-u|"] === null) return;
-          if (itemProps["|middle-u|"]) packet = itemProps["|middle-u|"](packet);
-          
-          console.log("last middleware ex", tmpPath)
+          mask = _.get(dogLogic, tmpPath);
+          if (mask !== undefined) {
+            if (mask === null) return;
+            
+            if (dogLogic["|middle-ud|"] === null) return;
+            if (mask["|middle-ud|"]) packet = mask["|middle-u|"](packet);
+            
+            if (dogLogic["|middle-u|"] === null) return;
+            if (mask["|middle-u|"]) packet = mask["|middle-u|"](packet);
+          }
         }
         
-        //TODO: Add "|u|" execution
-        console.log("packet so far", packet)
+        //Execute the last item |w|
+        mask = _.get(dogLogic, attr);
         
-        
+        if (mask !== undefined) {
+          if (mask === null) return;
+          
+          if (mask["|u|"] !== undefined) {
+            if (mask["|u|"] === null) return;
+            
+            packet = mask["|u|"](packet);
+          }
+        }
         
         socket.emit('dog-boy', packet); //TODO: Send 'package'
         
