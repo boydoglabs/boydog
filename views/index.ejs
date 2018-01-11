@@ -50,18 +50,19 @@
             <label>Products (bind and make number negative by BoyLogic): <input type="number" dog-value="products" /></label>
           </div>
           <div class="column">
-            <label>HTML (interpret as HTML):</br><span dog-value="registered" dog-run="toHTML"></span></label>
+            <label>HTML (interpret as HTML):</br><span id="txt" dog-value="registered" dog-run=""></span></label>
           </div>
+            <label>Even/odd class (interpret as class):</br><span class="none" dog-class="counterClass" dog-value="counter" dog-run=""></span></br><span dog-value="counterClass" dog-run=""></span></label>
           <div class="column">
-            <label>Even/odd class (interpret as class):</br><span class="none" dog-class="counterClass" dog-value="counter" dog-run="toHTML"></span></br><span dog-value="counterClass" dog-run="toHTML"></span></label>
           </div>
-          
         </div>
+        
         <div class="row">
           <div class="column">
             <label>About (large string bind): <textarea placeholder="about" id="commentField" dog-value="about"></textarea></label>
           </div>
         </div>
+        
         <h3>Deep property binding</h3>
         <label>Features (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features" dog-run="stringify"></textarea></label>
         <label>Features.body (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']" dog-run="stringify"></textarea></label>

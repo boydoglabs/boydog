@@ -2,6 +2,7 @@ var boydog = function(port) {
   var socket = io.connect('http://localhost:' + port);
   var dogData = "html"; //Our data is the html element by default
   var dogLogic = {};
+  var attrNames = ['id', 'class', 'value', 'html'];
   
   var dogSet = function(data, logic) {
     if (!data) data = "html";
@@ -58,7 +59,7 @@ var boydog = function(port) {
       });
     });
   };
-  normalizePaths(['dog-value', 'dog-run']); //TODO: Add all normalizations
+  normalizePaths(['dog-id', 'dog-class', 'dog-value', 'dog-html']); //TODO: Add add more normalizations
   
   //Socket functions
   socket.on('connect', function(data) {
@@ -77,6 +78,12 @@ var boydog = function(port) {
   var dogRebind = function(element) {
     if (!element) element = dogData;
     
+    $(element).find('[dog-class]').each(function(i, el) {
+      var attr = getElementAttr(el, 'dog-class');
+      
+      socket.emit('boydog', { attr: attr }); //Fetch first value load
+    });
+    
     $(element).find('[dog-value]').each(function(i, el) {
       var attr = getElementAttr(el, 'dog-value');
       var isDynamic = ($(el).attr('dog-value').indexOf('#') > 0);
@@ -85,7 +92,7 @@ var boydog = function(port) {
       var val;
       var mask;
       
-      socket.emit('dog-boy', { attr: attr }); //Fetch first value load
+      socket.emit('boydog', { attr: attr }); //Fetch first value load
       
       //Functions for updating values
       $(el).on('input', function(field) {
@@ -122,28 +129,76 @@ var boydog = function(port) {
           if (mask["__u"]) packet = mask["__u"](packet);
         }
         
-        socket.emit('dog-boy', packet);
+        socket.emit('boydog', packet);
         
         /*//TODO: Implement POST and GET fallback version
         $.post("/get", {}).done(function(json) { });
         $.post("/set", {}).done(function(json) { });*/
       });
     });
-    
-    /*$(element).find('[dog-run]').each(function(i, el) {
-      var path = $(el).attr('dog-run');
-      
-      $(el).off().on('click', function() {
-        socket.emit('boy-run', { path: path });
-      });
-    });*/
   }
   
   dogRebind();
   
   //To set a value
-  socket.on('boy-dog', function(data) {
-    var elem = $('[dog-value="' + data.attr + '"]');
+  socket.on('boydog', function(data) {
+    
+    /*['id', 'class', 'value', 'html'].forEach(function(v) {
+      console.log(v)
+    });*/
+    
+    /////////////////////
+    
+    var elem = $('[dog-class="' + data.attr + '"]');
+    if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
+      $('[dog-class*="#"]').each(function(k, el) {
+        var attr = getElementAttr(el, 'dog-class');
+        if (data.attr === attr) elem = $(el);
+      })
+    }
+    
+    elem.each(function(k, el) {
+      el = $(el);
+      
+      var _dogClassLog;
+      
+      try {
+        _dogClassLog = JSON.parse(el.attr('_dog-class-log'))
+      } catch (e) { /* We don't really care if it is not a valid JSON */ }
+      
+      if (!_.isArray(_dogClassLog)) {
+        _dogClassLog = [];
+      }
+      
+      var dogRun = $(el).attr('dog-run') || "";
+      var msg = data.val;
+      
+      if (dogRun.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+      if (dogRun.indexOf("length") >= 0) {
+        
+        if (!_.isUndefined(msg)) msg = +msg.length;
+      }
+      
+      console.log("about to addClass", data.val, msg, el, "once added", _dogClassLog)
+      _dogClassLog.push(msg);
+      
+      _dogClassLog.forEach(function(v) {
+        el.removeClass(v) //Remove once added classes
+        
+      })
+      
+      el.addClass(msg); //Add new class
+      
+      _dogClassLog = _.uniq(_dogClassLog); //TODO: Optimize this, we may need a random with a 10% prob.
+      el.attr('_dog-class-log', JSON.stringify(_dogClassLog));
+    });
+    
+    
+    
+    
+    //////////////////////
+    
+    /*var elem = $('[dog-value="' + data.attr + '"]');
     
     if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
       $('[dog-value*="#"]').each(function(k, el) {
@@ -163,24 +218,21 @@ var boydog = function(port) {
         
         if (!_.isUndefined(msg)) msg = +msg.length;
       }
-      if (dogRun.indexOf("toHTML") >= 0) {
-        el.html(msg);
-      }
-      if (dogRun.indexOf("toClass") >= 0) {
-        
-        console.log("dbg addclass", el, msg);
-        
-        el.addClass(msg);
-      }
-      if (dogRun.indexOf("buttonify") >= 0) {
+      //if (dogRun.indexOf("toHTML") >= 0) {
+        //el.html(msg);
+      //}
+      //if (dogRun.indexOf("toClass") >= 0) {
+        //console.log("dbg addclass", el, msg);
+        //el.addClass(msg);
+      //}
+      //if (dogRun.indexOf("buttonify") >= 0) {
         //TODO: Change this method, buttonify does not belong here
-        
-        el.off().on('click', function() {
-          console.log("buttonify click")
+        //el.off().on('click', function() {
+          //console.log("buttonify click")
           
-          socket.emit('dog-boy', { attr: data.attr, set: Date() });
-        });
-      }
+          //socket.emit('boydog', { attr: data.attr, set: Date() });
+        //});
+      //}
       if (dogRun.indexOf("walk") >= 0) {
         if (!_.isUndefined(msg)) msg = +msg.length;
         
@@ -200,12 +252,12 @@ var boydog = function(port) {
           
           $(newEl).html($(newEl).html().replace(/@@@/g, i));
           
-          /*//TODO: Implement append/prepend
-          if (dogRun.indexOf("reverse") >= 0) {
-            parent.prepend(newEl);
-          } else {
-            parent.append(newEl);
-          }*/
+          //TODO: Implement append/prepend
+          //if (dogRun.indexOf("reverse") >= 0) {
+            //parent.prepend(newEl);
+          //} else {
+            //parent.append(newEl);
+          //}
           
           parent.append(newEl);
         }
@@ -216,7 +268,7 @@ var boydog = function(port) {
       }
       
       el.val(msg);
-    })
+    })*/
   });
   
   return {
