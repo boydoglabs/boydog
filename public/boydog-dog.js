@@ -147,8 +147,6 @@ var boydog = function(port) {
       var attr = getElementAttr(el, 'dog-run');
       
       $(el).off().on('click', function() {
-        console.log("buttonify click")
-        
         socket.emit('boydog', { attr: attr, __run: Date() });
       });
     });
@@ -159,6 +157,7 @@ var boydog = function(port) {
   
   //To set a value
   socket.on('boydog', function(data) {
+    //TODO: Implement and optimize
     /*['id', 'class', 'value', 'html'].forEach(function(v) {
       console.log(v)
     });*/
@@ -266,14 +265,6 @@ var boydog = function(port) {
       //if (dogDown.indexOf("toClass") >= 0) {
         //console.log("dbg addclass", el, msg);
         //el.addClass(msg);
-      //}
-      //if (dogDown.indexOf("buttonify") >= 0) {
-        //TODO: Change this method, buttonify does not belong here
-        //el.off().on('click', function() {
-          //console.log("buttonify click")
-          
-          //socket.emit('boydog', { attr: data.attr, set: Date() });
-        //});
       //}
       if (dogDown.indexOf("walk") >= 0) {
         if (!_.isUndefined(msg)) msg = +msg.length;
