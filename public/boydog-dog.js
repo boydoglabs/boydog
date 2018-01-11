@@ -142,17 +142,16 @@ var boydog = function(port) {
         $.post("/set", {}).done(function(json) { });*/
       });
     });
-  
-    //TODO: Implement
-    /*$(element).find('[dog-run]').each(function(i, el) {
-      var attr = ge1tElementAttr(el, 'dog-run');
+    
+    $(element).find('[dog-run]').each(function(i, el) {
+      var attr = getElementAttr(el, 'dog-run');
       
       $(el).off().on('click', function() {
         console.log("buttonify click")
         
-        socket.emit('boydog', { attr: data.attr, set: Date() });
+        socket.emit('boydog', { attr: attr, __run: Date() });
       });
-    });*/
+    });
     
   }
   

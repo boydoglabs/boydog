@@ -193,7 +193,7 @@ var boyLogic = {
     }
   },
   "addTask": {
-    "_w": function() {
+    "_a": function() {
       
       //boyData.tasks.push({ toDo: "new", progress: 50 });
       
@@ -213,7 +213,7 @@ var boyLogic = {
     }
   },
   "increaseApples": {
-    "_w": function() {
+    "_a": function() {
       
       var t = bd.write("appleQuantity", bd.read("appleQuantity") + 1)
       
