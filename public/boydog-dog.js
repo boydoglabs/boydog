@@ -67,7 +67,7 @@ var boydog = function(port) {
   });
   
   function getElementAttr(el, attr) {
-    var attr = $(el).attr('dog-value');
+    var attr = $(el).attr(attr);
     
     return attr.replace(/(#[a-zA-Z0-9_-]+)/g, function(a) {
       
@@ -77,6 +77,12 @@ var boydog = function(port) {
   
   var dogRebind = function(element) {
     if (!element) element = dogData;
+    
+    $(element).find('[dog-html]').each(function(i, el) {
+      var attr = getElementAttr(el, 'dog-html');
+      
+      socket.emit('boydog', { attr: attr }); //Fetch first value load
+    });
     
     $(element).find('[dog-class]').each(function(i, el) {
       var attr = getElementAttr(el, 'dog-class');
@@ -147,6 +153,40 @@ var boydog = function(port) {
       console.log(v)
     });*/
     
+    
+    /////////////////////
+    
+    
+    var elem = $('[dog-html="' + data.attr + '"]');
+    
+    console.log("htmls found", elem.length, data.attr)
+    
+    if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
+      $('[dog-html*="#"]').each(function(k, el) {
+        var attr = getElementAttr(el, 'dog-html');
+        if (data.attr === attr) elem = $(el);
+      })
+    }
+    
+    elem.each(function(k, el) {
+      el = $(el);
+      
+      var dogRun = $(el).attr('dog-run') || "";
+      var msg = data.val;
+      
+      //TODO: Make a stack for all dogRun functions
+      if (dogRun.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+      if (dogRun.indexOf("length") >= 0) {
+        
+        if (!_.isUndefined(msg)) msg = +msg.length;
+      }
+      
+      el.html(msg); //Add new class
+    });
+    
+    return;
+    
+    
     /////////////////////
     
     var elem = $('[dog-class="' + data.attr + '"]');
@@ -173,6 +213,7 @@ var boydog = function(port) {
       var dogRun = $(el).attr('dog-run') || "";
       var msg = data.val;
       
+      //TODO: Make a stack for all dogRun functions
       if (dogRun.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
       if (dogRun.indexOf("length") >= 0) {
         
@@ -189,16 +230,15 @@ var boydog = function(port) {
       
       el.addClass(msg); //Add new class
       
-      _dogClassLog = _.uniq(_dogClassLog); //TODO: Optimize this, we may need a random with a 10% prob.
+      _dogClassLog = _.uniq(_dogClassLog); //TODO: Optimize this, perform this call only 1/10 times
       el.attr('_dog-class-log', JSON.stringify(_dogClassLog));
     });
     
     
     
-    
     //////////////////////
     
-    /*var elem = $('[dog-value="' + data.attr + '"]');
+    var elem = $('[dog-value="' + data.attr + '"]');
     
     if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
       $('[dog-value*="#"]').each(function(k, el) {
@@ -268,7 +308,7 @@ var boydog = function(port) {
       }
       
       el.val(msg);
-    })*/
+    })
   });
   
   return {
