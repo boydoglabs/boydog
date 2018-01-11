@@ -132,32 +132,32 @@ var boyData = {
 }
 
 var boyLogic = {
-  "_middle-rw": function(data) {
+  __middleRW: function(data) {
     
     console.log("LOG TYPE", data);
     
     return data;
   },
-  "users": {
-    "_w": null
+  users: {
+    __set: null
   },
-  "features": {
-    "_w": null,
-    "body": {
-      "_w": null,
-      "up": {
-        "_w": null,
-        "eyes": {
-          "_w": null
+  features: {
+    __set: null,
+    body: {
+      __set: null,
+      up: {
+        __set: null,
+        eyes: {
+          __set: null
         }
       },
-      "down": {
-        "feet": {
-          "_r": function(data) {
+      down: {
+        feet: {
+          __get: function(data) {
             
             return data;
           },
-          "_w": function(data) {
+          __set: function(data) {
             
             return data;
           }
@@ -165,25 +165,25 @@ var boyLogic = {
       }
     }
   },
-  "company": {
-    "_r": function(data) {
+  company: {
+    __get: function(data) {
       
       return data.toUpperCase();
     },
-    "_w": function(data) {
+    __set: function(data) {
       
       return data.toUpperCase();
     }
   },
-  "products": {
-    "_r": function(data) {
+  products: {
+    __get: function(data) {
       
       if (data > 0) data = data * -1;
-      bd.write('products', -data);
+      bd.set('products', -data);
       
       return data;
     },
-    "_w": function(data) {
+    __set: function(data) {
       
       if (data > 0) {
         data = data * -1;
@@ -192,30 +192,30 @@ var boyLogic = {
       return data;
     }
   },
-  "addTask": {
-    "_a": function() {
+  counter: {
+    __set: function(data) {
+      
+      console.log("middleware write run");
+      bd.set("counterClass", ["even", "odd"][boyData.counter % 2]);
+      
+      return data;
+    }
+  },
+  addTask: {
+    __run: function() {
       
       //boyData.tasks.push({ toDo: "new", progress: 50 });
       
       var next = boyData.tasks.length;
       
-      bd.write('tasks[' + next + '].toDo', bd.read('newTaskName'))
-      bd.write('name', "namechange")
+      bd.set('tasks[' + next + '].toDo', bd.get('newTaskName'))
+      bd.set('name', "namechange")
     }
   },
-  "counter": {
-    "_w": function(data) {
+  increaseApples: {
+    __run: function() {
       
-      console.log("middleware write run");
-      bd.write("counterClass", ["even", "odd"][boyData.counter % 2]);
-      
-      return data;
-    }
-  },
-  "increaseApples": {
-    "_a": function() {
-      
-      var t = bd.write("appleQuantity", bd.read("appleQuantity") + 1)
+      var t = bd.set("appleQuantity", bd.get("appleQuantity") + 1)
       
       console.log("createNewTask action", t);
     }
@@ -225,7 +225,7 @@ var boyLogic = {
 bd.boySet(boyData, boyLogic);
 
 setInterval(function() {
-  bd.write("counter", boyData.counter + 1);
+  bd.set("counter", boyData.counter + 1);
 }, 1000);
 
 //Express configuration

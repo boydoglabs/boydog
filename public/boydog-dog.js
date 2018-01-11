@@ -1,4 +1,9 @@
 var boydog = function(port) {
+  const TYPE_NONE = 0;
+  const TYPE_SET = 1;
+  const TYPE_GET = 2;
+  const TYPE_RUN = 3;
+  
   var socket = io.connect('http://localhost:' + port);
   var dogData = "html"; //Our data is the html element by default
   var dogLogic = {};
@@ -79,15 +84,15 @@ var boydog = function(port) {
     if (!element) element = dogData;
     
     $(element).find('[dog-html]').each(function(i, el) {
-      var attr = getElementAttr(el, 'dog-html');
+      var path = getElementAttr(el, 'dog-html');
       
-      socket.emit('boydog', { attr: attr }); //Fetch first value load
+      socket.emit('boydog', { __get: path, _type: TYPE_GET }); //Fetch first value load
     });
     
     $(element).find('[dog-class]').each(function(i, el) {
-      var attr = getElementAttr(el, 'dog-class');
+      var path = getElementAttr(el, 'dog-class');
       
-      socket.emit('boydog', { attr: attr }); //Fetch first value load
+      socket.emit('boydog', { __get: path, _type: TYPE_GET }); //Fetch first value load
     });
     
     $(element).find('[dog-value]').each(function(i, el) {
@@ -98,7 +103,7 @@ var boydog = function(port) {
       var val;
       var mask;
       
-      socket.emit('boydog', { attr: attr }); //Fetch first value load
+      socket.emit('boydog', { __get: attr }); //Fetch first value load
       
       //Functions for updating values
       $(el).on('input', function(field) {
@@ -108,7 +113,7 @@ var boydog = function(port) {
         fullPath = _.toPath(attr);
         
         //Build packet to be sent
-        packet = { attr: attr, set: val };
+        packet = { __set: attr, _type: TYPE_SET, set: val };
         
         //Execute path to the actual value middleware
         for (var i = 0; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
@@ -147,7 +152,7 @@ var boydog = function(port) {
       var attr = getElementAttr(el, 'dog-run');
       
       $(el).off().on('click', function() {
-        socket.emit('boydog', { attr: attr, __run: Date() });
+        socket.emit('boydog', { __run: attr, _type: TYPE_RUN });
       });
     });
     
