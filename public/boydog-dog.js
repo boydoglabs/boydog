@@ -143,11 +143,16 @@ var boydog = function(port) {
       });
     });
   
-    $(element).find('[dog-html]').each(function(i, el) {
-      var attr = getElementAttr(el, 'dog-html');
+    //TODO: Implement
+    /*$(element).find('[dog-run]').each(function(i, el) {
+      var attr = ge1tElementAttr(el, 'dog-run');
       
-      socket.emit('boydog', { attr: attr }); //Fetch first value load
-    });
+      $(el).off().on('click', function() {
+        console.log("buttonify click")
+        
+        socket.emit('boydog', { attr: data.attr, set: Date() });
+      });
+    });*/
     
   }
   
@@ -155,18 +160,13 @@ var boydog = function(port) {
   
   //To set a value
   socket.on('boydog', function(data) {
-    
     /*['id', 'class', 'value', 'html'].forEach(function(v) {
       console.log(v)
     });*/
     
-    
-    /////////////////////
-    
+    ///////////////////// html
     
     var elem = $('[dog-html="' + data.attr + '"]');
-    
-    console.log("htmls found", elem.length, data.attr)
     
     if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
       $('[dog-html*="#"]').each(function(k, el) {
@@ -192,7 +192,7 @@ var boydog = function(port) {
     });
     
     
-    /////////////////////
+    ///////////////////// class
     
     var elem = $('[dog-class="' + data.attr + '"]');
     if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
@@ -225,7 +225,6 @@ var boydog = function(port) {
         if (!_.isUndefined(msg)) msg = +msg.length;
       }
       
-      console.log("about to addClass", data.val, msg, el, "once added", _dogClassLog)
       _dogClassLog.push(msg);
       
       _dogClassLog.forEach(function(v) {
@@ -240,7 +239,7 @@ var boydog = function(port) {
     
     
     
-    //////////////////////
+    ////////////////////// value
     
     var elem = $('[dog-value="' + data.attr + '"]');
     
@@ -313,6 +312,7 @@ var boydog = function(port) {
       
       el.val(msg);
     })
+    
   });
   
   return {
