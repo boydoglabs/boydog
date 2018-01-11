@@ -27,7 +27,7 @@
             <label>Password: <input id="password" type="text" value="secret" /></label>
           </div>
         </div>
-        <label>User list (read-only object bind): <textarea type="text" dog-value="users" dog-run="stringify"></textarea></label>
+        <label>User list (read-only object bind): <textarea type="text" dog-value="users" dog-down="stringify"></textarea></label>
         
         <h3>Basic bindings</h3>
         <div class="row">
@@ -64,10 +64,10 @@
         </div>
         
         <h3>Deep property binding</h3>
-        <label>Features (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features" dog-run="stringify"></textarea></label>
-        <label>Features.body (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']" dog-run="stringify"></textarea></label>
-        <label>Features.body.up (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']['up']" dog-run="stringify"></textarea></label>
-        <label>Features.body.up.eyes (read-only array bind): <textarea type="text" placeholder="deep feature" dog-value="features.body.up.eyes" dog-run="stringify"></textarea>
+        <label>Features (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features" dog-down="stringify"></textarea></label>
+        <label>Features.body (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']" dog-down="stringify"></textarea></label>
+        <label>Features.body.up (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']['up']" dog-down="stringify"></textarea></label>
+        <label>Features.body.up.eyes (read-only array bind): <textarea type="text" placeholder="deep feature" dog-value="features.body.up.eyes" dog-down="stringify"></textarea>
         <div class="row">
           <div class="column">
             <label>Features.body.up.eyes[0].color: <input type="text" placeholder="deep feature" dog-value="features.body.up.eyes[0].color"></label>
@@ -95,8 +95,8 @@
           <label class="label-inline" for="confirmField">True or false?</label>
         </div> -->
       
-        <!-- tasks stringify: <input type="text" dog-value="tasks" dog-run="stringify"> -->
-        tasks length: <input id="forVal" type="text" dog-value="tasks" dog-run="length">
+        <!-- tasks stringify: <input type="text" dog-value="tasks" dog-down="stringify"> -->
+        tasks length: <input id="forVal" type="text" dog-value="tasks" dog-down="length">
         <table>
           <thead>
             <tr>
@@ -107,18 +107,18 @@
             </tr>
           </thead>
           <tbody>
-            <tr dog-value="tasks" dog-run="walk">
+            <tr dog-value="tasks" dog-down="walk">
               <td><input type="text" dog-value="tasks[@@@].toDo"></td>
               <td><input type="text" dog-value="tasks[@@@].progress"></td>
             </tr>
           </tbody>
         </table>
         taskname: <input type="text" dog-value="newTaskName">
-        <a class="button" href="javascript:void(0);" dog-value="addTask" dog-run="buttonify">Add task</a>
+        <a class="button" href="javascript:void(0);" dog-rux="addTask">Add task</a>
         <br/>
         
         apples: <input type="text" dog-value="appleQuantity">
-        <a class="button" href="javascript:void(0);" dog-value="increaseApples" dog-run="buttonify">Increase apples</a>
+        <a class="button" href="javascript:void(0);" dog-rux="increaseApples">Increase apples</a>
       </div>
     </div>
   </div>

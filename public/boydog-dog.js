@@ -142,6 +142,13 @@ var boydog = function(port) {
         $.post("/set", {}).done(function(json) { });*/
       });
     });
+  
+    $(element).find('[dog-html]').each(function(i, el) {
+      var attr = getElementAttr(el, 'dog-html');
+      
+      socket.emit('boydog', { attr: attr }); //Fetch first value load
+    });
+    
   }
   
   dogRebind();
@@ -171,20 +178,18 @@ var boydog = function(port) {
     elem.each(function(k, el) {
       el = $(el);
       
-      var dogRun = $(el).attr('dog-run') || "";
+      var dogDown = $(el).attr('dog-down') || "";
       var msg = data.val;
       
-      //TODO: Make a stack for all dogRun functions
-      if (dogRun.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-      if (dogRun.indexOf("length") >= 0) {
+      //TODO: Make a stack for all dogDown functions
+      if (dogDown.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+      if (dogDown.indexOf("length") >= 0) {
         
         if (!_.isUndefined(msg)) msg = +msg.length;
       }
       
       el.html(msg); //Add new class
     });
-    
-    return;
     
     
     /////////////////////
@@ -210,12 +215,12 @@ var boydog = function(port) {
         _dogClassLog = [];
       }
       
-      var dogRun = $(el).attr('dog-run') || "";
+      var dogDown = $(el).attr('dog-down') || "";
       var msg = data.val;
       
-      //TODO: Make a stack for all dogRun functions
-      if (dogRun.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-      if (dogRun.indexOf("length") >= 0) {
+      //TODO: Make a stack for all dogDown functions
+      if (dogDown.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+      if (dogDown.indexOf("length") >= 0) {
         
         if (!_.isUndefined(msg)) msg = +msg.length;
       }
@@ -225,7 +230,6 @@ var boydog = function(port) {
       
       _dogClassLog.forEach(function(v) {
         el.removeClass(v) //Remove once added classes
-        
       })
       
       el.addClass(msg); //Add new class
@@ -250,22 +254,22 @@ var boydog = function(port) {
     elem.each(function(k, el) {
       el = $(el);
       
-      var dogRun = $(el).attr('dog-run') || "";
+      var dogDown = $(el).attr('dog-down') || "";
       var msg = data.val;
       
-      if (dogRun.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-      if (dogRun.indexOf("length") >= 0) {
+      if (dogDown.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
+      if (dogDown.indexOf("length") >= 0) {
         
         if (!_.isUndefined(msg)) msg = +msg.length;
       }
-      //if (dogRun.indexOf("toHTML") >= 0) {
+      //if (dogDown.indexOf("toHTML") >= 0) {
         //el.html(msg);
       //}
-      //if (dogRun.indexOf("toClass") >= 0) {
+      //if (dogDown.indexOf("toClass") >= 0) {
         //console.log("dbg addclass", el, msg);
         //el.addClass(msg);
       //}
-      //if (dogRun.indexOf("buttonify") >= 0) {
+      //if (dogDown.indexOf("buttonify") >= 0) {
         //TODO: Change this method, buttonify does not belong here
         //el.off().on('click', function() {
           //console.log("buttonify click")
@@ -273,7 +277,7 @@ var boydog = function(port) {
           //socket.emit('boydog', { attr: data.attr, set: Date() });
         //});
       //}
-      if (dogRun.indexOf("walk") >= 0) {
+      if (dogDown.indexOf("walk") >= 0) {
         if (!_.isUndefined(msg)) msg = +msg.length;
         
         if (msg == $(el).attr('dog-lastwalk')) return; //If this element has not changed since the last walk, then don't walk again
@@ -287,13 +291,13 @@ var boydog = function(port) {
           if (existingKey) continue;
           
           var newEl = $(el).clone();
-          newEl.removeAttr('dog-value').removeAttr('dog-run').show();
+          newEl.removeAttr('dog-value').removeAttr('dog-down').show();
           newEl.attr('dog-walk-key', i);
           
           $(newEl).html($(newEl).html().replace(/@@@/g, i));
           
           //TODO: Implement append/prepend
-          //if (dogRun.indexOf("reverse") >= 0) {
+          //if (dogDown.indexOf("reverse") >= 0) {
             //parent.prepend(newEl);
           //} else {
             //parent.append(newEl);
