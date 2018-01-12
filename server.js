@@ -134,8 +134,6 @@ var boyData = {
 var boyLogic = {
   __middleRW: function(data) {
     
-    console.log("LOG TYPE", data);
-    
     return data;
   },
   users: {
@@ -147,6 +145,10 @@ var boyLogic = {
       __set: null,
       up: {
         __set: null,
+        __get: function(data) {
+          
+          return data;
+        },
         eyes: {
           __set: null
         }
@@ -195,7 +197,6 @@ var boyLogic = {
   counter: {
     __set: function(data) {
       
-      console.log("middleware write run");
       bd.set("counterClass", ["even", "odd"][boyData.counter % 2]);
       
       return data;
@@ -212,12 +213,16 @@ var boyLogic = {
       bd.set('name', "namechange")
     }
   },
+  appleQuantity: {
+    __set: null
+  },
   increaseApples: {
     __run: function() {
       
-      var t = bd.set("appleQuantity", bd.get("appleQuantity") + 1)
+      boyData.appleQuantity++;
+      bd.forwardPropagate('features.body');
       
-      console.log("createNewTask action", t);
+      //bd.set("appleQuantity", bd.get("appleQuantity") + 1)
     }
   }
 }
