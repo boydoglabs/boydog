@@ -186,6 +186,8 @@ var boydog = function(port) {
         if (!_.isUndefined(msg)) msg = +msg.length;
       }
       
+      if (!msg) msg = "";
+      
       el.html(msg); //Add new class
     });
     
