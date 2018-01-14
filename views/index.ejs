@@ -96,23 +96,27 @@
         </div> -->
       
         <!-- tasks stringify: <input type="text" dog-value="tasks" dog-down="stringify"> -->
-        tasks length: <input id="forVal" type="text" dog-value="tasks" dog-down="length">
+        <h3>Key iteration</h3>
+        <div dog-repeat="colors">
+          <p>@@@: $$$</p>
+        </div>
+        
+        <h3>Array iteration</h3>
         <table>
           <thead>
             <tr>
-              <th>Task</th>
-              <th>Progress</th>
-              <th>C</th>
-              <th>D</th>
+              <th>Product</th>
+              <th>SKU</th>
             </tr>
           </thead>
           <tbody>
-            <tr dog-value="tasks" dog-down="walk">
+            <tr dog-repeat="tasks">
               <td><input type="text" dog-value="tasks[@@@].toDo"></td>
               <td><input type="text" dog-value="tasks[@@@].progress"></td>
             </tr>
           </tbody>
         </table>
+        <p>Task length: <span dog-html="tasks" dog-down="length"></span></p>
         taskname: <input type="text" dog-value="newTaskName">
         <a class="button" href="javascript:void(0);" dog-run="addTask">Add task</a>
         <br/>
