@@ -159,9 +159,25 @@ var boydog = function(port) {
     
     $(element).find('[dog-run]').each(function(i, el) {
       var attr = getElementAttr(el, 'dog-run');
+      var packet;
       
       $(el).off().on('click', function() {
-        socket.emit('boydog', { __run: attr });
+        
+        packet = { __run: attr };
+        
+        //TODO: Execute __middleU & __middleUD too
+        
+        //Execute the last item __u
+        mask = _.get(dogLogic, attr);
+        
+        if (mask === null) return;
+        if (mask) {
+          if (mask.__u === null) return;
+          if (mask.__u) packet = mask.__u(packet);
+        }
+        
+        socket.emit('boydog', packet);
+        
       });
     });
     

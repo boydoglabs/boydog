@@ -260,9 +260,6 @@ var tempAdd = function() {
 app.get('/', function(req, res) {
   return res.render("index");
 });
-app.get('/landing', function(req, res) {
-  return res.render("landing");
-});
 app.get('/example', function(req, res) {
   return res.render("example");
 });
