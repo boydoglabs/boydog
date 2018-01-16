@@ -246,22 +246,9 @@ app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('body-parser').json());
 app.use(require('express-session')({ secret: 'd22667deca36f3e333fa87f9fd8e0218', resave: true, saveUninitialized: true }));
 
-//Temporal add item to dog-each
-var tempAdd = function() {
-  boyData.users.push({
-    "toDo": "NEW EL",
-    "progress": 3,
-    "doer": "NEW@mail.com",
-    "done": false
-  });
-}
-
-//API get
+//The landing page
 app.get('/', function(req, res) {
   return res.render("index");
-});
-app.get('/example', function(req, res) {
-  return res.render("example");
 });
 
 //Debug
@@ -274,15 +261,11 @@ app.get('/debug', function(req, res) {
   return res.json({ data: true });
 });
 
-app.post('/get', function(req, res) {
-  var attr = req.body.attr;
-  
-  if (attr === ".") return res.json({ msg: boyData });
-  var msg = _.get(boyData, attr);
-  
-  return res.json({ msg: msg });
+app.post('/boydog', function(req, res) {
+  //TODO: Implement this function as a fallback if socket.io is not available
 });
 
 //Run
-server.listen(process.env.PORT ? process.env.PORT : 3090);
-console.log("Started at " + (process.env.PORT ? process.env.PORT : 3090));
+var defaultPort = 3090;
+server.listen(process.env.PORT ? process.env.PORT : defaultPort);
+console.log("Started at " + (process.env.PORT ? process.env.PORT : defaultPort));
