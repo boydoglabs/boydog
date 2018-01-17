@@ -211,12 +211,7 @@ var boydog = function(address) {
       var dogDown = $(el).attr('dog-down') || "";
       var msg = data.val;
       
-      //TODO: Make a stack for all dogDown functions
-      if (dogDown.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-      if (dogDown.indexOf("length") >= 0) {
-        
-        if (!_.isUndefined(msg)) msg = +msg.length;
-      }
+      msg = processDownStack(el.attr('dog-down'), msg);
       
       if (!msg) msg = "";
       
@@ -250,12 +245,7 @@ var boydog = function(address) {
       var dogDown = $(el).attr('dog-down') || "";
       var msg = data.val;
       
-      //TODO: Make a stack for all dogDown functions
-      if (dogDown.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-      if (dogDown.indexOf("length") >= 0) {
-        
-        if (!_.isUndefined(msg)) msg = +msg.length;
-      }
+      msg = processDownStack(el.attr('dog-down'), msg);
       
       _dogClassLog.push(msg);
       
@@ -292,11 +282,7 @@ var boydog = function(address) {
       var dogDown = $(el).attr('dog-down') || "";
       var msg = data.val;
       
-      if (dogDown.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-      if (dogDown.indexOf("length") >= 0) {
-        
-        if (!_.isUndefined(msg)) msg = +msg.length;
-      }
+      msg = processDownStack(el.attr('dog-down'), msg);
       
       var parent = $(el).parent();
       var rebindNeeded = false;
