@@ -30,7 +30,7 @@ var boydog = function(address) {
       htmlClean(dogData); //Clean html for whitespaces and line-breaks ()
     }
     
-    dogRebind();
+    dogRefresh();
   }
   
   console.log("boyDog connect", address);
@@ -81,29 +81,19 @@ var boydog = function(address) {
     });
   }
   
-  var dogRebind = function(element) {
+  var dogRefresh = function(element) {
     if (!element) element = dogData;
     
-    $(element).find('[dog-html]').each(function(i, el) {
-      var path = getElementAttr(el, 'dog-html');
-      
-      socket.emit('boydog', { __get: path }); //Fetch first value load
+    //Fetch first values
+    ["html", "class", "repeat", "value"].forEach(function(tag) {
+      $(element).find('[dog-' + tag + ']').each(function(i, el) {
+        var path = getElementAttr(el, 'dog-' + tag);
+        
+        socket.emit('boydog', { __get: path }); //Fetch first value load
+      });
     });
     
-    $(element).find('[dog-class]').each(function(i, el) {
-      var path = getElementAttr(el, 'dog-class');
-      
-      socket.emit('boydog', { __get: path }); //Fetch first value load
-    });
-    
-    
-    $(element).find('[dog-repeat]').each(function(i, el) {
-      var path = getElementAttr(el, 'dog-repeat');
-      
-      socket.emit('boydog', { __get: path }); //Fetch first value load
-    });
-    
-    
+    //Rebind triggers
     $(element).find('[dog-value]').each(function(i, el) {
       var attr = getElementAttr(el, 'dog-value');
       var isDynamic = ($(el).attr('dog-value').indexOf('#') > 0);
@@ -111,8 +101,6 @@ var boydog = function(address) {
       var packet;
       var val;
       var mask;
-      
-      socket.emit('boydog', { __get: attr }); //Fetch first value load
       
       //Functions for updating values
       $(el).off().on('input', function(field) {
@@ -158,17 +146,17 @@ var boydog = function(address) {
     });
     
     $(element).find('[dog-run]').each(function(i, el) {
-      var attr = getElementAttr(el, 'dog-run');
+      var path = getElementAttr(el, 'dog-run');
       var packet;
       
       $(el).off().on('click', function() {
         
-        packet = { __run: attr };
+        packet = { __run: path };
         
         //TODO: Execute __middleU & __middleUD too
         
         //Execute the last item __u
-        mask = _.get(dogLogic, attr);
+        mask = _.get(dogLogic, path);
         
         if (mask === null) return;
         if (mask) {
@@ -177,13 +165,12 @@ var boydog = function(address) {
         }
         
         socket.emit('boydog', packet);
-        
       });
     });
     
   }
   
-  dogRebind();
+  dogRefresh();
   
   //To set a value
   socket.on('boydog', function(data) {
@@ -279,7 +266,7 @@ var boydog = function(address) {
       })
       
       el.hide();
-      if (rebindNeeded) dogRebind(parent);
+      if (rebindNeeded) dogRefresh(parent);
     })
     
     //Process dog-value
@@ -353,6 +340,6 @@ var boydog = function(address) {
   
   return {
     dogSet: dogSet,
-    dogRebind: dogRebind
+    dogRefresh: dogRefresh
   };
 }
