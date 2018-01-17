@@ -318,16 +318,7 @@ var boydog = function(address) {
     
     var dogAttr = "value";
     
-    var elem = $('[dog-' + dogAttr + '="' + data.attr + '"]');
-    
-    console.log("elem", elem)
-    
-    if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
-      $('[dog-' + dogAttr + '*="#"]').each(function(k, el) {
-        var attr = getElementAttr(el, 'dog-' + dogAttr);
-        if (data.attr === attr) elem = $(el);
-      })
-    }
+    var elem = getDogAttr(dogAttr, data.attr);
     
     elem.each(function(k, el) {
       el = $(el);
@@ -340,6 +331,21 @@ var boydog = function(address) {
     })
     
   });
+  
+  var getDogAttr = function(attrName, attrValue) {
+    var elem = $('[dog-' + attrName + '="' + attrValue + '"]');
+    
+    console.log("elem", elem, attrName, attrValue)
+    
+    if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
+      $('[dog-' + attrName + '*="#"]').each(function(k, el) {
+        var attr = getElementAttr(el, 'dog-' + attrName);
+        if (attrValue === attr) elem = $(el);
+      })
+    }
+    
+    return elem;
+  }
   
   //The dog-up quick function stack
   var upStack = {
