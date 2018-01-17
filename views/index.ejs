@@ -50,56 +50,56 @@
             <h3>Basic bindings</h3>
             <div class="row">
               <div class="column">
-                <label>Name (string bind): <input type="text" dog-value="users[#username].name" /></label>
+                <p>Name (string bind): <input type="text" dog-value="users[#username].name" /></p>
               </div>
               <div class="column">
-                <label>Email (string bind): <input type="text" placeholder="email" dog-value="users[#username].email" /></label>
+                <p>Email (string bind): <input type="text" placeholder="email" dog-value="users[#username].email" /></p>
               </div>
               <div class="column">
-                <label>Age (number bind): <input type="text" dog-value="age" /></label>
-              </div>
-            </div>
-            
-            <div class="row">
-              <div class="column">
-                <label>Company (bind and change string to uppercase by BoyLogic): <input type="text" dog-value="company" /></label>
-              </div>
-              <div class="column">
-                <label>Products (bind and make number negative by BoyLogic): <input type="number" dog-value="products" /></label>
-              </div>
-              <div class="column">
-                <label>HTML (interpret as HTML):</br><span id="txt" dog-html="registered"></span></label>
-              </div>
-                <label>Even/odd class (interpret as class):</br><span class="none" dog-class="counterClass" dog-html="counter"></span></br><span dog-html="counterClass"></span></label>
-              <div class="column">
+                <p>Age (number bind): <input type="text" dog-value="age" /></p>
               </div>
             </div>
             
             <div class="row">
               <div class="column">
-                <label>About (large string bind): <textarea placeholder="about" id="commentField" dog-value="about"></textarea></label>
+                <p>Company (bind and change string to uppercase by BoyLogic): <input type="text" dog-value="company" /></p>
+              </div>
+              <div class="column">
+                <p>Products (bind and make number negative by BoyLogic): <input type="number" dog-value="products" /></p>
+              </div>
+              <div class="column">
+                <p>HTML (interpret as HTML):</br><span id="txt" dog-html="registered"></span></p>
+              </div>
+                <p>Even/odd class (interpret as class):</br><span class="none" dog-class="counterClass" dog-html="counter"></span></br><span dog-html="counterClass"></span></p>
+              <div class="column">
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="column">
+                <p>About (large string bind): <textarea placeholder="about" id="commentField" dog-value="about"></textarea></p>
               </div>
             </div>
             
             <h3>Deep property binding</h3>
-            <label>Features (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features" dog-down="stringify"></textarea></label>
-            <label>Features.body (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']" dog-down="stringify"></textarea></label>
-            <label>Features.body.up (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']['up']" dog-down="stringify"></textarea></label>
-            <label>Features.body.up.eyes (read-only array bind): <textarea type="text" placeholder="deep feature" dog-value="features.body.up.eyes" dog-down="stringify"></textarea>
+            <p>Features (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features" dog-down="stringify"></textarea></p>
+            <p>Features.body (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']" dog-down="stringify"></textarea></p>
+            <p>Features.body.up (read-only object bind): <textarea type="text" placeholder="deep feature" dog-value="features['body']['up']" dog-down="stringify"></textarea></p>
+            <p>Features.body.up.eyes (read-only array bind): <textarea type="text" placeholder="deep feature" dog-value="features.body.up.eyes" dog-down="stringify"></textarea>
             <div class="row">
               <div class="column">
-                <label>Features.body.up.eyes[0].color: <input type="text" placeholder="deep feature" dog-value="features.body.up.eyes[0].color"></label>
+                <p>Features.body.up.eyes[0].color: <input type="text" placeholder="deep feature" dog-value="features.body.up.eyes[0].color"></p>
               </div>
               <div class="column">
-                <label>Features.body.up.eyes[1].color: <input type="text" placeholder="deep feature" dog-value="features.body.up.eyes[1].color"></label>
+                <p>Features.body.up.eyes[1].color: <input type="text" placeholder="deep feature" dog-value="features.body.up.eyes[1].color"></p>
               </div>
               <div class="column">
-                <label>Features.body.down.feet: <input type="text" placeholder="deep feature" dog-value="features.body.down.feet"></label>
+                <p>Features.body.down.feet: <input type="text" placeholder="deep feature" dog-value="features.body.down.feet"></p>
               </div>
             </div>
             
             <!-- TODO -->
-            <!-- <label for="ageRangeField">Age Range</label>
+            <!-- <label for="ageRangeField">Age Range</p>
              <select id="ageRangeField">
               <option value="0-13">0-13</option>
               <option value="14-17">14-17</option>
@@ -110,7 +110,7 @@
             <!-- TODO -->
             <!-- <div class="float-right">
               <input type="checkbox" id="confirmField">
-              <label class="label-inline" for="confirmField">True or false?</label>
+              <label class="label-inline" for="confirmField">True or false?</p>
             </div> -->
           
             <!-- tasks stringify: <input type="text" dog-value="tasks" dog-down="stringify"> -->
@@ -144,9 +144,11 @@
           </div>
         </div>
         
+        <h2 class="title">Contributing</h2>
         <div class="row">
-          <h5 class="title">Contributing</h5>
-          <p>You're welcome, contribute to the <a href="https://github.com/boydoglabs/boydog" title="Contributing">boydog boilerplate (this page)</a>, the <a href="boydog-boy" title="Contributing">boydog-boy (server-side NPM module)</a>, or <a href="https://github.com/boydoglabs/boydog" title="boydog-dog">boydog-dog (the client library)</a>.</p>
+          <div class="column">
+            <p>You can contribute to the <a href="https://github.com/boydoglabs/boydog" title="Contributing">boydog boilerplate (this page)</a>, the <a href="boydog-boy" title="Contributing">boydog-boy (server-side NPM module)</a>, or <a href="https://github.com/boydoglabs/boydog" title="boydog-dog">boydog-dog (the client library)</a>.</p>
+          </div>
         </div>
       </section>
       

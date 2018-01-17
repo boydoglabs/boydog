@@ -190,46 +190,49 @@ var boydog = function(address) {
     var elem;
     
     //Process dog-html
-    elem = getDogAttr("html", data.attr);
-    elem.each(function(k, el) {
+    getDogAttr("html", data.attr).each(function(k, el) {
       el = $(el);
-      
-      var dogDown = $(el).attr('dog-down') || "";
       var msg = data.val;
+      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
       
-      msg = processDownStack(el.attr('dog-down'), msg);
+      //BuiltIn dog-down stack functions
+      msg = thruBuiltInStack(dogDown, msg);
       
+      //Additional mixin dog-down stack functions
+      //msg = {}(dogDown, msg);
+      
+      //Process
       if (!msg) msg = "";
-      
-      el.html(msg); //Add new class
+      el.html(msg); //Write html content
     });
     
-    
     //Process dog-class
-    elem = getDogAttr("class", data.attr);
-    elem.each(function(k, el) {
+    getDogAttr("class", data.attr).each(function(k, el) {
       el = $(el);
+      var msg = data.val;
+      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
       
+      //BuiltIn dog-down stack functions
+      msg = thruBuiltInStack(dogDown, msg);
+      
+      //Additional mixin dog-down stack functions
+      //msg = {}(dogDown, msg);
+      
+      //Process
       var _dogClassLog;
       
       try {
         _dogClassLog = JSON.parse(el.attr('_dog-class-log'))
       } catch (e) { /* We don't really care if it is not a valid JSON */ }
       
-      if (!_.isArray(_dogClassLog)) {
-        _dogClassLog = [];
-      }
-      
-      var dogDown = $(el).attr('dog-down') || "";
-      var msg = data.val;
-      
-      msg = processDownStack(el.attr('dog-down'), msg);
+      if (!_.isArray(_dogClassLog)) _dogClassLog = [];
       
       _dogClassLog.push(msg);
       
-      _dogClassLog.forEach(function(v) {
-        el.removeClass(v) //Remove once added classes
-      })
+      //Remove all once added classes
+      _dogClassLog.forEach(function(cl) { el.removeClass(cl) });
       
       el.addClass(msg); //Add new class
       
@@ -238,15 +241,21 @@ var boydog = function(address) {
     });
     
     //Process dog-html
-    elem = getDogAttr("repeat", data.attr);
-    elem.each(function(k, el) {
+    getDogAttr("repeat", data.attr).each(function(k, el) {
       el = $(el);
-      
-      var dogDown = $(el).attr('dog-down') || "";
       var msg = data.val;
+      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+      var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
       
-      msg = processDownStack(el.attr('dog-down'), msg);
+      console.log(dogDown)
       
+      //BuiltIn dog-down stack functions
+      msg = thruBuiltInStack(dogDown, msg);
+      
+      //Additional mixin dog-down stack functions
+      //msg = {}(dogDown, msg);
+      
+      //Process
       var parent = $(el).parent();
       var rebindNeeded = false;
       
@@ -262,30 +271,31 @@ var boydog = function(address) {
         
         $(newEl).html($(newEl).html().replace(/@@@/g, k).replace(/\$\$\$/g, v));
         
-        //TODO: Implement append/prepend
-        //if (dogDown.indexOf("reverse") >= 0) {
-          //parent.prepend(newEl);
-        //} else {
-          //parent.append(newEl);
-        //}
-        
-        el.before(newEl);
+        if (dogOpt.indexOf("inverse") >= 0) {
+          el.after(newEl);
+        } else {
+          el.before(newEl);
+        }
       })
       
       el.hide();
       if (rebindNeeded) dogRebind(parent);
     })
     
-    
     //Process dog-value
-    elem = getDogAttr("value", data.attr);
-    elem.each(function(k, el) {
+    getDogAttr("value", data.attr).each(function(k, el) {
       el = $(el);
-      
       var msg = data.val;
+      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
       
-      msg = processDownStack(el.attr('dog-down'), msg);
+      //BuiltIn dog-down stack functions
+      msg = thruBuiltInStack(dogDown, msg);
       
+      //Additional mixin dog-down stack functions
+      //msg = {}(dogDown, msg);
+      
+      //Process
       el.val(msg);
     })
     
@@ -293,8 +303,6 @@ var boydog = function(address) {
   
   var getDogAttr = function(attrName, attrValue) {
     var elem = $('[dog-' + attrName + '="' + attrValue + '"]');
-    
-    console.log("elem", elem, attrName, attrValue)
     
     if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
       $('[dog-' + attrName + '*="#"]').each(function(k, el) {
@@ -333,16 +341,9 @@ var boydog = function(address) {
   }
   
   //Will read and run down stack
-  var processDownStack = function(stack, msg) {
+  var thruBuiltInStack = function(stack, msg) {
     if (stack) {
-        stack = stack.split(',').map(function(item) {
-        
-        return item.trim()
-      });
-      
       _.each(stack, function(item) {
-        console.log("dog down proc", item);
-        
         if (downStack[item]) msg = downStack[item](msg);
       })
     }
