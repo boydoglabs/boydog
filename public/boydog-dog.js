@@ -350,46 +350,6 @@ var boydog = function(address) {
         
         if (!_.isUndefined(msg)) msg = +msg.length;
       }
-      //if (dogDown.indexOf("toHTML") >= 0) {
-        //el.html(msg);
-      //}
-      //if (dogDown.indexOf("toClass") >= 0) {
-        //console.log("dbg addclass", el, msg);
-        //el.addClass(msg);
-      //}
-      if (dogDown.indexOf("walk") >= 0) {
-        if (!_.isUndefined(msg)) msg = +msg.length;
-        
-        if (msg == $(el).attr('dog-lastwalk')) return; //If this element has not changed since the last walk, then don't walk again
-        
-        var upto = msg;
-        var parent = $(el).parent();
-
-        for (i = 0; i < upto; i++) {
-          var existingKey = parent.find('[dog-walk-key="' + i + '"]').length;
-          
-          if (existingKey) continue;
-          
-          var newEl = $(el).clone();
-          newEl.removeAttr('dog-value').removeAttr('dog-down').show();
-          newEl.attr('dog-walk-key', i);
-          
-          $(newEl).html($(newEl).html().replace(/@@@/g, i));
-          
-          //TODO: Implement append/prepend
-          //if (dogDown.indexOf("reverse") >= 0) {
-            //parent.prepend(newEl);
-          //} else {
-            //parent.append(newEl);
-          //}
-          
-          parent.append(newEl);
-        }
-        
-        $(el).hide();
-        $(el).attr('dog-lastwalk', msg);
-        dogRebind(parent);
-      }
       
       el.val(msg);
     })
