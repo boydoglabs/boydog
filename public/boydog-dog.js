@@ -124,29 +124,29 @@ var boydog = function(address) {
         //Build packet to be sent
         packet = { __set: attr, set: val };
         
-        //Execute path to the actual value middleware
-        for (var i = 0; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
+        //Execute thru-functions to the actual value
+        for (var i = 0; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the thru's
           var tmpPath = _.take(fullPath, i);
           
           mask = _.get(dogLogic, tmpPath);
           
           if (mask === null) return;
           if (mask) {
-            if (dogLogic["__middleUD"] === null) return;
-            if (mask["__middleUD"]) packet = mask["__middleU"](packet);
+            if (dogLogic.__middleUD === null) return;
+            if (mask.__middleUD) packet = mask.__middleU(packet);
             
-            if (dogLogic["__middleU"] === null) return;
-            if (mask["__middleU"]) packet = mask["__middleU"](packet);
+            if (dogLogic.__middleU === null) return;
+            if (mask.__middleU) packet = mask.__middleU(packet);
           }
         }
         
-        //Execute the last item |w|
+        //Execute the last item __give
         mask = _.get(dogLogic, attr);
         
         if (mask === null) return;
         if (mask) {
-          if (mask["__u"] === null) return;
-          if (mask["__u"]) packet = mask["__u"](packet);
+          if (mask.__up === null) return;
+          if (mask.__up) packet = mask.__up(packet);
         }
         
         socket.emit('boydog', packet);
@@ -191,6 +191,8 @@ var boydog = function(address) {
     /*['id', 'class', 'value', 'html'].forEach(function(v) {
       console.log(v)
     });*/
+    
+    
     
     ///////////////////// html
     
@@ -296,29 +298,20 @@ var boydog = function(address) {
         if (!_.isUndefined(msg)) msg = +msg.length;
       }
       
-      console.log("dog-repeat: ", el, msg);
-      
       var parent = $(el).parent();
       var rebindNeeded = false;
       
       _.each(msg, function(v, k) {
-        console.log("iterating key", k);
-        
         var existingKey = parent.find('[_dog-repeat-key="' + k + '"]').length;
-        console.log("existingKey", existingKey);
         
         if (existingKey) return;
         rebindNeeded = true;
-        console.log("ADDING key")
         
         var newEl = el.clone();
         newEl.removeAttr('dog-repeat').removeAttr('dog-down').removeAttr('dog-up').show();
         newEl.attr('_dog-repeat-key', k);
         
-        console.log("replaciING", $(newEl), v)
-        
         $(newEl).html($(newEl).html().replace(/@@@/g, k).replace(/\$\$\$/g, v));
-        //$(newEl).html($(newEl).html().replace(/@@@/g, k));
         
         //TODO: Implement append/prepend
         //if (dogDown.indexOf("reverse") >= 0) {
@@ -327,7 +320,7 @@ var boydog = function(address) {
           //parent.append(newEl);
         //}
         
-        el.after(newEl);
+        el.before(newEl);
       })
       
       el.hide();

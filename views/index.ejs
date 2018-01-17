@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="boydog">
     <meta name="description" content="Go realtime. Build ultra-fast, realtime-collaborative webpages in Node.JS + Socket.IO">
-    <title>boy.dog</title>
+    <title>boydog</title>
     
     <!-- Landing page resources -->
     <link rel="icon" href="/landing/icon.png">
@@ -44,7 +44,7 @@
             </div>
             <p>User list (read-only object bind): <textarea type="text" dog-value="users" dog-down="stringify"></textarea></p>
             
-            <pre><code dog-html="users" dog-down="stringify">.milligram { color: #9b4dca; }</code></pre>
+            <pre><code dog-html="users"></code></pre>
 
 
             <h3>Basic bindings</h3>
@@ -171,23 +171,29 @@
           
           return data;
         }*/
-        "users": function(data) {
-          
-          return data;
+        "users": {
+          __down: {
+            function(data) {
+              
+              console.log("users", data)
+              
+              return data;
+            }
+          }
         },
         "company": {
-          "__u": function(data) {
+          __up: function(data) {
             
             return data;
           },
-          "__d": function(data) {
+          __down: function(data) {
             
             return data;
           }
         },
         "features": {
           //Working middlewares
-          "__middleU": function(data) {
+          __middleU: function(data) {
             
             console.log("features middel up", data)
             
@@ -195,14 +201,14 @@
             
             return data;
           },
-          "__middleD": function(data) {
+          __middleD: function(data) {
             
             console.log("features middel up")
             
             return data;
           },
           "body": {
-            "__middleU": function(data) {
+            __middleU: function(data) {
               
               console.log("features middel up body", data)
               data.set = data.set + "b";
@@ -210,7 +216,7 @@
               return data;
             },
             "up": { eyes: { '0': { color: {
-              "__u": function(data) {
+              __up: function(data) {
                 
                 console.log("executing last upload", data)
                 

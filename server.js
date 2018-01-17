@@ -229,11 +229,11 @@ var boyLogic = {
   }
 }
 
-bd.boySet(boyData, boyLogic);
+setInterval(function() {
+  bd.set("counter", boyData.counter + 1);
+}, 1000);
 
-//setInterval(function() {
-//  bd.set("counter", boyData.counter + 1);
-//}, 1000);
+bd.boySet(boyData, boyLogic);
 
 //Express configuration
 app.set('views', __dirname + '/views');
