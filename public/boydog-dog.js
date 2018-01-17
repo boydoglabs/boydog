@@ -187,24 +187,10 @@ var boydog = function(address) {
   
   //To set a value
   socket.on('boydog', function(data) {
-    //TODO: Implement and optimize
-    /*['id', 'class', 'value', 'html'].forEach(function(v) {
-      console.log(v)
-    });*/
+    var elem;
     
-    
-    
-    ///////////////////// html
-    
-    var elem = $('[dog-html="' + data.attr + '"]');
-    
-    if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
-      $('[dog-html*="#"]').each(function(k, el) {
-        var attr = getElementAttr(el, 'dog-html');
-        if (data.attr === attr) elem = $(el);
-      })
-    }
-    
+    //Process dog-html
+    elem = getDogAttr("html", data.attr);
     elem.each(function(k, el) {
       el = $(el);
       
@@ -219,16 +205,8 @@ var boydog = function(address) {
     });
     
     
-    ///////////////////// class
-    
-    var elem = $('[dog-class="' + data.attr + '"]');
-    if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
-      $('[dog-class*="#"]').each(function(k, el) {
-        var attr = getElementAttr(el, 'dog-class');
-        if (data.attr === attr) elem = $(el);
-      })
-    }
-    
+    //Process dog-class
+    elem = getDogAttr("class", data.attr);
     elem.each(function(k, el) {
       el = $(el);
       
@@ -259,23 +237,8 @@ var boydog = function(address) {
       el.attr('_dog-class-log', JSON.stringify(_dogClassLog));
     });
     
-    
-    
-    
-    
-    
-    
-    ////////////////////// repeat
-    
-    var elem = $('[dog-repeat="' + data.attr + '"]');
-    
-    if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
-      $('[dog-repeat*="#"]').each(function(k, el) {
-        var attr = getElementAttr(el, 'dog-repeat');
-        if (data.attr === attr) elem = $(el);
-      })
-    }
-    
+    //Process dog-html
+    elem = getDogAttr("repeat", data.attr);
     elem.each(function(k, el) {
       el = $(el);
       
@@ -314,12 +277,8 @@ var boydog = function(address) {
     })
     
     
-    ////////////////////// value
-    
-    var dogAttr = "value";
-    
-    var elem = getDogAttr(dogAttr, data.attr);
-    
+    //Process dog-value
+    elem = getDogAttr("value", data.attr);
     elem.each(function(k, el) {
       el = $(el);
       
