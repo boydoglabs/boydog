@@ -330,11 +330,15 @@ var boydog = function(address) {
     
     ////////////////////// value
     
-    var elem = $('[dog-value="' + data.attr + '"]');
+    var dogAttr = "value";
+    
+    var elem = $('[dog-' + dogAttr + '="' + data.attr + '"]');
+    
+    console.log("elem", elem)
     
     if (elem.length === 0) { //If length is 0 then it is probably a dynamic element
-      $('[dog-value*="#"]').each(function(k, el) {
-        var attr = getElementAttr(el, 'dog-value');
+      $('[dog-' + dogAttr + '*="#"]').each(function(k, el) {
+        var attr = getElementAttr(el, 'dog-' + dogAttr);
         if (data.attr === attr) elem = $(el);
       })
     }
@@ -342,19 +346,58 @@ var boydog = function(address) {
     elem.each(function(k, el) {
       el = $(el);
       
-      var dogDown = $(el).attr('dog-down') || "";
       var msg = data.val;
       
-      if (dogDown.indexOf("stringify") >= 0) msg = JSON.stringify(msg);
-      if (dogDown.indexOf("length") >= 0) {
-        
-        if (!_.isUndefined(msg)) msg = +msg.length;
-      }
+      msg = processDownStack(el.attr('dog-down'), msg);
       
       el.val(msg);
     })
     
   });
+  
+  //The dog-up quick function stack
+  var upStack = {
+    //TODO
+  };
+  
+  //The dog-down quick function stack
+  var downStack = {
+    stringify: function(data) {
+      
+      return JSON.stringify(data);
+    },
+    length: function(data) {
+      if (!_.isUndefined(data)) data = +data.length;
+      
+      return data;
+    }
+  }
+  
+  //Will read and run up stack
+  var processUpStack = function(stack, msg) {
+    
+    //TODO
+    
+    return msg;
+  }
+  
+  //Will read and run down stack
+  var processDownStack = function(stack, msg) {
+    if (stack) {
+        stack = stack.split(',').map(function(item) {
+        
+        return item.trim()
+      });
+      
+      _.each(stack, function(item) {
+        console.log("dog down proc", item);
+        
+        if (downStack[item]) msg = downStack[item](msg);
+      })
+    }
+    
+    return msg;
+  }
   
   return {
     dogSet: dogSet,

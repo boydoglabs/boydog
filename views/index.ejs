@@ -42,11 +42,11 @@
                 <p>Password: <input id="password" type="text" value="this is a valid password for any user" /></p>
               </div>
             </div>
-            <p>User list (read-only object bind): <textarea type="text" dog-value="users" dog-down="stringify"></textarea></p>
+            <p>User list (read-only object bind): <textarea type="text" dog-value="users" dog-down="stringify, abc, cde, asdfsaf(adsf)"></textarea></p>
+            <p>User list chart length: <input type="text" dog-value="users" dog-down="stringify, length" /></p>
             
             <pre><code dog-html="users" dog-down="stringify"></code></pre>
-
-
+            
             <h3>Basic bindings</h3>
             <div class="row">
               <div class="column">
