@@ -36,13 +36,21 @@
             <h5>Authentication</h5>
             <div class="row">
               <div class="column">
-                <p>Logged in as: <input id="username" type="text" value="guest-1" /></p>
+                <p>Username: <input id="username" type="text" value="guest" /></p>
               </div>
               <div class="column">
-                <p>Password: <input id="password" type="text" value="this is a valid password for any user" /></p>
+                <p>Password: <input id="password" type="text" value="password" /></p>
+              </div>
+              <div class="column">
+                <p>Only "guest" can read/write this: <input type="text" placeholder="Forbidden" dog-value="users.guest.secret" /></p>
+              </div>
+              <div class="column">
+                <p>Only "editor" can read/write this: <input type="text" placeholder="Forbidden" dog-value="users.editor.secret" /></p>
               </div>
             </div>
-            <p>User list (read-only object bind): <textarea type="text" dog-value="users" dog-down="stringify, abc, cde, asdfsaf(adsf)"></textarea></p>
+            
+            
+            <p>User list (read-only object bind): <textarea type="text" dog-value="users" dog-down="stringify"></textarea></p>
             <p>User list chart length: <input type="text" dog-value="users" dog-down="stringify, length" /></p>
             
             <pre><code dog-html="users" dog-down="stringify"></code></pre>

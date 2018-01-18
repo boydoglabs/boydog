@@ -16,36 +16,28 @@ var app = express(),
   bd = require('boydog-boy')(server);
 
 var boyData = {
-  "users": {
-    "guest-1": {
-      "auth": {
-        "user": "secret",
-        "pass": "pass"
+  users: {
+    guest: {
+      auth: {
+        user: "secret",
+        pass: "pass"
       },
-      "name": "Mr. Guest",
-      "email": "guest@mail.com",
-      "age": 22,
-      "tags": ["guest", "visitor", "viewing"]
+      name: "Mr. Guest",
+      email: "guest@mail.com",
+      secret: "I like being a guest",
+      age: 22,
+      tags: ["guest", "visitor", "viewing"]
     },
-    "guest-2": {
-      "auth": {
-        "user": "secret2",
-        "pass": "pass2"
+    editor: {
+      auth: {
+        user: "secret-editor",
+        pass: "pass-editor"
       },
-      "name": "Mr. Guest 2",
-      "email": "guest2@mail.com",
-      "age": 25,
-      "tags": ["guest", "secondary", "temporal"]
-    },
-    "editor": {
-      "auth": {
-        "user": "secret-editor",
-        "pass": "pass-editor"
-      },
-      "name": "Mr. Editor",
-      "email": "editor@mail.com",
-      "age": 30,
-      "tags": ["editor", "book", "writer"]
+      name: "Mr. Editor",
+      email: "editor@mail.com",
+      secret: "I like being an editor",
+      age: 30,
+      tags: ["editor", "book", "writer"]
     }
   },
   "name": "Hyde Malone",
@@ -139,7 +131,18 @@ var boyLogic = {
   __get: null,
   __set: null,
   users: {
-    __set: null
+    __set: null,
+    guest: {
+      __get: null,
+      secret: {
+        __get: function(data) {
+          
+          console.log("secret fetch", data)
+          
+          return data;
+        }
+      }
+    }
   },
   features: {
     __set: null,
