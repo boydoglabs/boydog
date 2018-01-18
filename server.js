@@ -137,7 +137,11 @@ var boyLogic = {
       secret: {
         __get: function(data) {
           
-          console.log("secret fetch", data)
+          console.log("secret fetch", data);
+          
+          
+          
+          
           
           return data;
         }
@@ -225,7 +229,7 @@ var boyLogic = {
     __run: function() {
       
       boyData.appleQuantity++;
-      bd.forwardPropagate('features.body');
+      //bd.forwardPropagate('features.body');
       
       //bd.set("appleQuantity", bd.get("appleQuantity") + 1)
     }
@@ -256,12 +260,9 @@ app.get('/', function(req, res) {
 
 //Debug
 app.get('/debug', function(req, res) {
-  console.log(boyData)
-  boyData.about = "CHANGING DATA";
+  console.log("debug");
   
-  console.log(boyData)
-  
-  return res.json({ data: true });
+  return res.json({});
 });
 
 app.post('/boydog', function(req, res) {

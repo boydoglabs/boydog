@@ -49,7 +49,6 @@
               </div>
             </div>
             
-            
             <p>User list (read-only object bind): <textarea type="text" dog-value="users" dog-down="stringify"></textarea></p>
             <p>User list chart length: <input type="text" dog-value="users" dog-down="stringify, length" /></p>
             
@@ -171,7 +170,7 @@
     <script src="/socket.io.js"></script>
     <script src="/boydog-dog.js"></script>
     <script>
-      var bd = boydog("http://localhost:3090/");
+      var bd = boydog("http://192.168.1.68:3090/");
       
       var dogData = 'html';
       var dogLogic = {
@@ -181,6 +180,14 @@
           
           return data;
         }*/
+        __middleU: function(data) {
+          
+          console.log("__middleU", data)
+          
+          data.date = Date();
+          
+          return data;
+        },
         "users": {
           __down: {
             function(data) {
@@ -194,9 +201,13 @@
         "company": {
           __up: function(data) {
             
+            console.log("on __up", data)
+            
             return data;
           },
           __down: function(data) {
+            
+            console.log("on __down")
             
             return data;
           }
