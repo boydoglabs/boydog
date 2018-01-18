@@ -96,7 +96,6 @@ var boydog = function(address) {
     //Rebind triggers
     $(element).find('[dog-value]').each(function(i, el) {
       var attr = getElementAttr(el, 'dog-value');
-      var isDynamic = ($(el).attr('dog-value').indexOf('#') > 0);
       var fullPath;
       var packet;
       var val;
@@ -106,7 +105,6 @@ var boydog = function(address) {
       $(el).off().on('input', function(field) {
         val = field.currentTarget.value;
         
-        if (isDynamic) attr = getElementAttr(el, 'dog-value');
         fullPath = _.toPath(attr);
         
         //Build packet to be sent
@@ -184,7 +182,7 @@ var boydog = function(address) {
       //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
       
       //BuiltIn dog-down stack functions
-      msg = thruBuiltInStack(dogDown, msg);
+      msg = thruDownStack(dogDown, msg);
       
       //Additional mixin dog-down stack functions
       //msg = {}(dogDown, msg);
@@ -202,7 +200,7 @@ var boydog = function(address) {
       //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
       
       //BuiltIn dog-down stack functions
-      msg = thruBuiltInStack(dogDown, msg);
+      msg = thruDownStack(dogDown, msg);
       
       //Additional mixin dog-down stack functions
       //msg = {}(dogDown, msg);
@@ -237,7 +235,7 @@ var boydog = function(address) {
       console.log(dogDown)
       
       //BuiltIn dog-down stack functions
-      msg = thruBuiltInStack(dogDown, msg);
+      msg = thruDownStack(dogDown, msg);
       
       //Additional mixin dog-down stack functions
       //msg = {}(dogDown, msg);
@@ -277,7 +275,7 @@ var boydog = function(address) {
       //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
       
       //BuiltIn dog-down stack functions
-      msg = thruBuiltInStack(dogDown, msg);
+      msg = thruDownStack(dogDown, msg);
       
       //Additional mixin dog-down stack functions
       //msg = {}(dogDown, msg);
@@ -321,14 +319,11 @@ var boydog = function(address) {
   
   //Will read and run up stack
   var processUpStack = function(stack, msg) {
-    
     //TODO
-    
-    return msg;
   }
   
   //Will read and run down stack
-  var thruBuiltInStack = function(stack, msg) {
+  var thruDownStack = function(stack, msg) {
     if (stack) {
       _.each(stack, function(item) {
         if (downStack[item]) msg = downStack[item](msg);
@@ -336,6 +331,11 @@ var boydog = function(address) {
     }
     
     return msg;
+  }
+  
+  //Will read and run up stack
+  var thruUpStack = function(stack, msg) {
+    //TODO
   }
   
   return {
