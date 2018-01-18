@@ -291,8 +291,6 @@ var boydog = function(address) {
       var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
       var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
       
-      console.log(dogDown)
-      
       //BuiltIn dog-down stack functions
       msg = thruDownStack(dogDown, msg);
       
