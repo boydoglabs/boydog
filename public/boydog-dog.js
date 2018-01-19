@@ -489,7 +489,19 @@ var boydog = function(address) {
       if (el[0] === document.activeElement) {
         var caretPos = el.caret();
         var diff = 0;
-        console.log("start to caret", el.val().substr(0, caretPos))
+        
+        
+        var startToCaretElText = el.val().substr(0, caretPos);
+        var startToCaretMsgText = msg.substr(0, caretPos);
+        console.log("startToCaretElText", startToCaretElText)
+        console.log("startToCaretMsgText", startToCaretMsgText)
+        
+        if (startToCaretElText !== startToCaretMsgText) {
+          diff = msg.length - el.val().length;
+          console.log("DIFF NEEDED", diff)
+        } else {
+          console.log("DIFF NOT NEEDED")
+        }
         
         console.log("caretPos", caretPos);
         el.val(msg);
