@@ -127,6 +127,14 @@ var boyData = {
 var boyLogic = {
   __middleRW: function(data) {
     
+    console.log("m rw main")
+    
+    return data;
+  },
+  __middleR: function(data) {
+    
+    console.log("m main")
+    
     return data;
   },
   __get: null,
@@ -149,9 +157,9 @@ var boyLogic = {
     __set: null,
     body: {
       __set: null,
-      __middleW: function(data) {
+      __middleR: function(data) {
         
-        console.log("feat, body, middleware", data)
+        console.log("  READ feat, body", data)
         
         return data;
       },
@@ -161,9 +169,9 @@ var boyLogic = {
           
           return data;
         },
-        __middleW: function(data) {
+        __middleR: function(data) {
           
-          console.log("feat, body, up, middleware", data)
+          console.log("  READ feat, body, up", data)
           
           return data;
         },
