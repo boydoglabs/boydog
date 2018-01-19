@@ -369,6 +369,8 @@ var boydog = function(address) {
   socket.on('boydog', function(data) {
     var elem;
     
+    console.log("socket on>>>", data)
+    
     //Process dog-html
     getDogAttr("html", data.attr).each(function(k, el) {
       el = $(el);
@@ -463,6 +465,8 @@ var boydog = function(address) {
     //Process dog-value
     getDogAttr("value", data.attr).each(function(k, el) {
       el = $(el);
+      
+      console.log("valval-data", data)
       
       var msg = data.val;
       var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });

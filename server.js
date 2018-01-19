@@ -189,11 +189,15 @@ var boyLogic = {
       
       console.log("data::", data)
       
-      return data.val.toUpperCase();
+      data.val = data.val.toUpperCase();
+      
+      return data;
     },
     __set: function(data) {
       
-      return data.val.toUpperCase();
+      data.val = data.val.toUpperCase();
+      
+      return data;
     }
   },
   products: {
