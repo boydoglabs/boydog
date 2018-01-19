@@ -125,45 +125,6 @@ var boydog = function(address) {
   }
   
   var processLogic = function(path, packet) {
-    var middlewarePath = _.toPath(path);
-    var mask;
-    
-    //Execute dogLogic first middleware
-    if (dogLogic === null) return;
-    if (dogLogic !== undefined) {
-      if (dogLogic.__middleUD === null) return;
-      if (dogLogic.__middleUD) packet = dogLogic.__middleUD(packet);
-      
-      if (dogLogic.__middleU === null) return;
-      if (dogLogic.__middleU) packet = dogLogic.__middleU(packet);
-    }
-    
-    //Execute thru-functions to the actual value
-    for (var i = 0; i < middlewarePath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
-      var tmpPath = _.take(middlewarePath, i);
-      
-      mask = _.get(dogLogic, tmpPath);
-      
-      if (mask === null) return;
-      if (mask) {
-        if (dogLogic.__middleUD === null) return;
-        if (mask.__middleUD) packet = mask.__middleU(packet);
-        
-        if (dogLogic.__middleU === null) return;
-        if (mask.__middleU) packet = mask.__middleU(packet);
-      }
-    }
-    
-    //Execute the last item __give
-    mask = _.get(dogLogic, path);
-    
-    if (mask === null) return;
-    if (mask) {
-      if (mask.__up === null) return;
-      if (mask.__up) packet = mask.__up(packet);
-    }
-    
-    return packet;
   }
   
   var dogRefresh = function(element) {
@@ -181,6 +142,7 @@ var boydog = function(address) {
     //Rebind triggers
     $(element).find('[dog-value]').each(function(i, el) {
       var path = parseAttrValue(el, 'dog-value');
+      var middlewarePath = _.toPath(path);
       var packet;
       var val;
       var mask;
@@ -192,8 +154,41 @@ var boydog = function(address) {
         //Build packet to be sent
         packet = { __set: path, set: val };
         
-        processLogic(path, packet);
+        //Execute dogLogic first middleware
+        if (dogLogic === null) return;
+        if (dogLogic !== undefined) {
+          if (dogLogic.__middleUD === null) return;
+          if (dogLogic.__middleUD) packet = dogLogic.__middleUD(packet);
+          
+          if (dogLogic.__middleU === null) return;
+          if (dogLogic.__middleU) packet = dogLogic.__middleU(packet);
+        }
         
+        //Execute thru-functions to the actual value
+        for (var i = 0; i < middlewarePath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
+          var tmpPath = _.take(middlewarePath, i);
+          
+          mask = _.get(dogLogic, tmpPath);
+          
+          if (mask === null) return;
+          if (mask) {
+            if (dogLogic.__middleUD === null) return;
+            if (mask.__middleUD) packet = mask.__middleU(packet);
+            
+            if (dogLogic.__middleU === null) return;
+            if (mask.__middleU) packet = mask.__middleU(packet);
+          }
+        }
+        
+        //Execute the last item __give
+        mask = _.get(dogLogic, path);
+        
+        if (mask === null) return;
+        if (mask) {
+          if (mask.__up === null) return;
+          if (mask.__up) packet = mask.__up(packet);
+        }
+          
         socket.emit('boydog', packet);
         
         /*//TODO: Implement POST and GET fallback version
@@ -236,8 +231,6 @@ var boydog = function(address) {
         
         //Execute the last item __give
         mask = _.get(dogLogic, path);
-        
-        console.log("mask last step", mask, path)
         
         if (mask === null) return;
         if (mask) {

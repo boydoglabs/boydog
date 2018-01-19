@@ -177,7 +177,8 @@
       var dogLogic = {
         __middleU: function(data) {
           
-          console.log("__middleU", data)
+          console.log("__middleU", data);
+          data.auth = { username: $('#username').val(), password: $('#password').val() }
           
           data.date = Date();
           
@@ -185,7 +186,8 @@
         },
         __runNext: function(data) {
           
-          console.log("__runNext .", data)
+          console.log("__runNext .", data);
+          data.auth = { username: $('#username').val(), password: $('#password').val() }
           
           return data;
         },
@@ -222,7 +224,6 @@
           }
         },
         features: {
-          //Working middlewares
           __middleU: function(data) {
             
             console.log("features middel up", data)
