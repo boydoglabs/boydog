@@ -139,10 +139,6 @@ var boyLogic = {
           
           console.log("secret fetch", data);
           
-          
-          
-          
-          
           return data;
         }
       }
