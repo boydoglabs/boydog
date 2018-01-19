@@ -234,7 +234,7 @@ var boyLogic = {
 
 setInterval(function() {
   bd.set("counter", boyData.counter + 1);
-}, 1000);
+}, 10000);
 
 bd.boySet(boyData, boyLogic);
 

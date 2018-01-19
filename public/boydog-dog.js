@@ -378,6 +378,8 @@ var boydog = function(address) {
   socket.on('boydog', function(data) {
     var elem;
     
+    console.log("boydog RX", data)
+    
     //Process dog-html
     getDogAttr("html", data.attr).each(function(k, el) {
       el = $(el);
@@ -394,7 +396,7 @@ var boydog = function(address) {
       //Process
       if (!msg) msg = "";
       el.html(msg); //Write html content
-    });
+    })
     
     //Process dog-class
     getDogAttr("class", data.attr).each(function(k, el) {
@@ -427,7 +429,7 @@ var boydog = function(address) {
       
       _dogClassLog = _.uniq(_dogClassLog); //TODO: Optimize this, perform this call only 1/10 times
       el.attr('_dog-class-log', JSON.stringify(_dogClassLog));
-    });
+    })
     
     //Process dog-html
     getDogAttr("repeat", data.attr).each(function(k, el) {
@@ -486,9 +488,12 @@ var boydog = function(address) {
       
       if (el[0] === document.activeElement) {
         var caretPos = el.caret();
+        var diff = 0;
+        console.log("start to caret", el.val().substr(0, caretPos))
+        
         console.log("caretPos", caretPos);
         el.val(msg);
-        el.caret(caretPos);
+        el.caret(caretPos + diff);
       } else {
         el.val(msg);
       }
