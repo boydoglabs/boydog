@@ -152,7 +152,7 @@ var boydog = function(address) {
         val = field.currentTarget.value;
         
         //Build packet to be sent
-        packet = { __set: path, set: val };
+        packet = { __set: path, val: val };
         
         //Execute dogLogic first middleware
         if (dogLogic === null) return;
@@ -463,6 +463,7 @@ var boydog = function(address) {
     //Process dog-value
     getDogAttr("value", data.attr).each(function(k, el) {
       el = $(el);
+      
       var msg = data.val;
       var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
       //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });

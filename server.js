@@ -187,11 +187,13 @@ var boyLogic = {
   company: {
     __get: function(data) {
       
-      return data.toUpperCase();
+      console.log("data::", data)
+      
+      return data.val.toUpperCase();
     },
     __set: function(data) {
       
-      return data.toUpperCase();
+      return data.val.toUpperCase();
     }
   },
   products: {
