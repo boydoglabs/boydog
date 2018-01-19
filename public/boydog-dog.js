@@ -1,11 +1,11 @@
 'use strict';
 
 var boydog = function(address) {
-  var socket = io.connect(address),
-    dogData = "html", //Our data is the html element by default
-    dogLogic = {},
-    dogSettings = { cleanHTML: false },
-    attrNames = ['id', 'class', 'value', 'html'];
+  var socket = io.connect(address);
+  var dogData = "html"; //Our data is the html element by default
+  var dogLogic = {};
+  var dogSettings = { cleanHTML: false };
+  var attrNames = ['id', 'class', 'value', 'html'];
   
   //Caret plugin (TODO: Optimize this on a later stage)
   (function($) {
@@ -115,6 +115,7 @@ var boydog = function(address) {
   //Dog functions
   //
   
+  //Get attribute value even if it dynamic (if it contains #element)
   var parseAttrValue = function(el, attr) {
     var attr = $(el).attr(attr);
     
@@ -124,9 +125,7 @@ var boydog = function(address) {
     });
   }
   
-  var processLogic = function(path, packet) {
-  }
-  
+  //Will fetch all values and rebind triggers
   var dogRefresh = function(element) {
     if (!element) element = dogData;
     
@@ -143,6 +142,7 @@ var boydog = function(address) {
     $(element).find('[dog-value]').each(function(i, el) {
       var path = parseAttrValue(el, 'dog-value');
       var middlewarePath = _.toPath(path);
+      var tmpPath;
       var packet;
       var val;
       var mask;
@@ -164,9 +164,9 @@ var boydog = function(address) {
           if (dogLogic.__middleU) packet = dogLogic.__middleU(packet);
         }
         
-        //Execute thru-functions to the actual value
+        //Execute middleware functions to the actual value
         for (var i = 0; i < middlewarePath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
-          var tmpPath = _.take(middlewarePath, i);
+          tmpPath = _.take(middlewarePath, i);
           
           mask = _.get(dogLogic, tmpPath);
           
@@ -200,6 +200,7 @@ var boydog = function(address) {
     $(element).find('[dog-run]').each(function(i, el) {
       var path = parseAttrValue(el, 'dog-run');
       var middlewarePath;
+      var tmpPath;
       var packet;
       var mask;
       
@@ -216,9 +217,9 @@ var boydog = function(address) {
           if (dogLogic.__runNext) packet = dogLogic.__runNext(packet);
         }
         
-        //Execute thru-functions to the actual value
+        //Execute middleware functions to the actual value
         for (var i = 0; i < middlewarePath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
-          var tmpPath = _.take(middlewarePath, i);
+          tmpPath = _.take(middlewarePath, i);
           
           mask = _.get(dogLogic, tmpPath);
           
@@ -239,16 +240,18 @@ var boydog = function(address) {
         }
         
         socket.emit('boydog', packet);
+        
+        /*//TODO: Implement POST fallback version
+        $.post("/run", {}).done(function(json) { });*/
       });
     });
   }
   
-  //Reload client
+  //Set dog data and logic
   var dogSet = function(data, logic, settings) {
     if (data) dogData = data;
     if (logic) dogLogic = logic;
     if (settings) dogSettings = settings;
-    //dogLogic["__void"] = null; //A default place to avoid reading/writing
     
     if (dogSettings.cleanHTML) {
       var htmlClean = function(rootElement) {
@@ -271,32 +274,7 @@ var boydog = function(address) {
     dogRefresh();
   }
   
-  //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'])
-  var normalizePaths = function(names) {
-    names.forEach(function(attrName) {
-      $('[' + attrName + ']').each(function(i, el) {
-        var attr = $(el).attr(attrName);
-        var attr = _.toPath(attr);
-        
-        if (attr.length > 1) {
-          attr = _.map(attr, function(item, i) {
-            if (i === 0) return item;
-            
-            if((item[0] === "#") || ((item[0] === "."))) return item;
-              
-            return "'" + item + "'";
-          })
-          
-          attr = attr.shift() + "[" + attr.join("][") + "]";
-        } else {
-          attr = attr.shift();
-        }
-        
-        $(el).attr(attrName, attr);
-      });
-    });
-  };
-  
+  //Gets dog-[something]
   var getDogAttr = function(attrName, attrValue) {
     var elem = $('[dog-' + attrName + '="' + attrValue + '"]');
     
@@ -356,6 +334,32 @@ var boydog = function(address) {
   //Socket functions
   socket.on('connect', function(data) {
     console.log("BoyDog connected to", address);
+    
+    //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'])
+    var normalizePaths = function(names) {
+      names.forEach(function(attrName) {
+        $('[' + attrName + ']').each(function(i, el) {
+          var attr = $(el).attr(attrName);
+          var attr = _.toPath(attr);
+          
+          if (attr.length > 1) {
+            attr = _.map(attr, function(item, i) {
+              if (i === 0) return item;
+              
+              if((item[0] === "#") || ((item[0] === "."))) return item;
+                
+              return "'" + item + "'";
+            })
+            
+            attr = attr.shift() + "[" + attr.join("][") + "]";
+          } else {
+            attr = attr.shift();
+          }
+          
+          $(el).attr(attrName, attr);
+        });
+      });
+    };
     
     normalizePaths(['dog-id', 'dog-class', 'dog-value', 'dog-html', 'dog-run']); //TODO: Add add more normalizations
     dogRefresh();
@@ -430,7 +434,7 @@ var boydog = function(address) {
       //msg = {}(dogDown, msg);
       
       //Process
-      var parent = $(el).parent();
+      var parent = el.parent();
       var rebindNeeded = false;
       
       _.each(msg, function(v, k) {
@@ -468,8 +472,6 @@ var boydog = function(address) {
       
       //Additional mixin dog-down stack functions
       //msg = {}(dogDown, msg);
-      
-      
       
       //Process
       if (el[0] === document.activeElement) { //If two or more people are editing the same element
