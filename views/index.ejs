@@ -183,7 +183,7 @@
           
           return data;
         },
-        "users": {
+        users: {
           __down: {
             function(data) {
               
@@ -193,7 +193,7 @@
             }
           }
         },
-        "company": {
+        company: {
           __up: function(data) {
             
             console.log("on __up", data)
@@ -207,7 +207,7 @@
             return data;
           }
         },
-        "features": {
+        features: {
           //Working middlewares
           __middleU: function(data) {
             
@@ -223,7 +223,7 @@
             
             return data;
           },
-          "body": {
+          body: {
             __middleU: function(data) {
               
               console.log("features middel up body", data)
@@ -231,7 +231,7 @@
               
               return data;
             },
-            "up": { eyes: { '0': { color: {
+            up: { eyes: { '0': { color: {
               __up: function(data) {
                 
                 console.log("executing last upload", data)
