@@ -45,6 +45,7 @@ var boyData = {
   "age": 25,
   "company": "OMATOM",
   "products": 500,
+  "products2": "500",
   //"isActive": false, //TODO
   //"balance": "$1,300.59", //TODO
   //"picture": "http://placehold.it/32x32", //TODO
@@ -189,13 +190,15 @@ var boyLogic = {
       
       console.log("data::", data)
       
-      data.val = data.val.toUpperCase();
+      //data.val = data.val.toUpperCase();
       
       return data;
     },
     __set: function(data) {
       
       data.val = data.val.toUpperCase();
+      
+      console.log("Should write instead: ", data)
       
       return data;
     }
@@ -203,15 +206,15 @@ var boyLogic = {
   products: {
     __get: function(data) {
       
-      if (data > 0) data = data * -1;
-      bd.set('products', -data);
+      if (data.val > 0) data.val = data.val * -1;
+      bd.set('products', -data.val);
       
       return data;
     },
     __set: function(data) {
       
-      if (data > 0) {
-        data = data * -1;
+      if (data.val > 0) {
+        data.val = data.val * -1;
       }
       
       return data;
@@ -251,8 +254,8 @@ var boyLogic = {
 }
 
 setInterval(function() {
-  bd.set("counter", boyData.counter + 1);
-}, 1000);
+  bd.set({ path: "counter", val: boyData.counter + 1 });
+}, 100000);
 
 bd.boySet(boyData, boyLogic);
 

@@ -31,6 +31,8 @@ var boydog = function(address) {
             
             if (target.type === "number") { //Workaround for this bug: https://stackoverflow.com/questions/21177489/selectionstart-selectionend-on-input-type-number-no-longer-allowed-in-chrome
               target.type = "text";
+              target.disabled = true;
+              target.disabled = false;
               selStart = target.selectionStart;
               target.type = "number";
             }
@@ -78,6 +80,8 @@ var boydog = function(address) {
           else {
             if (target.type === "number") { //Workaround for this bug: https://stackoverflow.com/questions/21177489/selectionstart-selectionend-on-input-type-number-no-longer-allowed-in-chrome
               target.type = "text";
+              target.disabled = true;
+              target.disabled = false;
               target.setSelectionRange(pos, pos);
               target.type = "number";
             } else {
@@ -134,7 +138,7 @@ var boydog = function(address) {
       $(element).find('[dog-' + tag + ']').each(function(i, el) {
         var path = parseAttrValue(el, 'dog-' + tag);
         
-        socket.emit('boydog', { __get: path }); //Fetch first value load
+        socket.emit('get', { path: path }); //Fetch first value load
       });
     });
     
@@ -152,7 +156,7 @@ var boydog = function(address) {
         val = field.currentTarget.value;
         
         //Build packet to be sent
-        packet = { __set: path, val: val };
+        packet = { path: path, val: val };
         
         //Execute dogLogic first middleware
         if (dogLogic === null) return;
@@ -180,7 +184,7 @@ var boydog = function(address) {
           }
         }
         
-        //Execute the last item __give
+        //Execute the last item __get
         mask = _.get(dogLogic, path);
         
         if (mask === null) return;
@@ -189,7 +193,7 @@ var boydog = function(address) {
           if (mask.__up) packet = mask.__up(packet);
         }
           
-        socket.emit('boydog', packet);
+        socket.emit('set', packet);
         
         /*//TODO: Implement POST and GET fallback version
         $.post("/get", {}).done(function(json) { });
@@ -230,7 +234,7 @@ var boydog = function(address) {
           }
         }
         
-        //Execute the last item __give
+        //Execute the last item __get
         mask = _.get(dogLogic, path);
         
         if (mask === null) return;
@@ -239,7 +243,7 @@ var boydog = function(address) {
           if (mask.__run) packet = mask.__run(packet);
         }
         
-        socket.emit('boydog', packet);
+        socket.emit('run', packet);
         
         /*//TODO: Implement POST fallback version
         $.post("/run", {}).done(function(json) { });*/
@@ -366,13 +370,13 @@ var boydog = function(address) {
   });
   
   //To set a value
-  socket.on('boydog', function(data) {
+  socket.on('update', function(data) {
     var elem;
     
     console.log("socket on>>>", data)
     
     //Process dog-html
-    getDogAttr("html", data.attr).each(function(k, el) {
+    getDogAttr("html", data.path).each(function(k, el) {
       el = $(el);
       var msg = data.val;
       var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
@@ -390,7 +394,7 @@ var boydog = function(address) {
     })
     
     //Process dog-class
-    getDogAttr("class", data.attr).each(function(k, el) {
+    getDogAttr("class", data.path).each(function(k, el) {
       el = $(el);
       var msg = data.val;
       var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
@@ -423,7 +427,7 @@ var boydog = function(address) {
     })
     
     //Process dog-html
-    getDogAttr("repeat", data.attr).each(function(k, el) {
+    getDogAttr("repeat", data.path).each(function(k, el) {
       el = $(el);
       var msg = data.val;
       var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
@@ -463,10 +467,10 @@ var boydog = function(address) {
     })
     
     //Process dog-value
-    getDogAttr("value", data.attr).each(function(k, el) {
+    getDogAttr("value", data.path).each(function(k, el) {
       el = $(el);
       
-      console.log("valval-data", data)
+      console.log("valval-data", data);
       
       var msg = data.val;
       var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
@@ -482,9 +486,14 @@ var boydog = function(address) {
       if (el[0] === document.activeElement) { //If two or more people are editing the same element
         var caretPos = el.caret(); //Save caret position
         var diff = 0; //Assume we don't need to move caret
+        var valAsStr = el.val();
+        var msgAsStr = msg;
         
-        if (el.val().substr(0, caretPos) !== msg.substr(0, caretPos)) {
-          diff = msg.length - el.val().length; //Calculate steps to move caret if needed
+        //if (_.isNumber(valAsStr)) valAsStr = valAsStr.toString(); //Do we need this one? Uncomment if yes
+        if (_.isNumber(msgAsStr)) msgAsStr = msgAsStr.toString();
+
+        if (valAsStr.substr(0, caretPos) !== msgAsStr.substr(0, caretPos)) {
+          diff = msgAsStr.length - valAsStr.length; //Calculate steps to move caret if needed
         }
         
         el.val(msg);
