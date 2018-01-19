@@ -183,6 +183,12 @@
           
           return data;
         },
+        __runNext: function(data) {
+          
+          console.log("__runNext .", data)
+          
+          return data;
+        },
         users: {
           __down: {
             function(data) {
@@ -203,6 +209,14 @@
           __down: function(data) {
             
             console.log("on __down")
+            
+            return data;
+          }
+        },
+        addTask: {
+          __run: function(data) {
+            
+            console.log("__runNext final", data)
             
             return data;
           }

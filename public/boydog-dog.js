@@ -214,16 +214,11 @@ var boydog = function(address) {
         //Build packet to be sent
         packet = { __run: path };
         
-        
-        
         //Execute dogLogic first middleware
         if (dogLogic === null) return;
         if (dogLogic !== undefined) {
-          if (dogLogic.__middleUD === null) return;
-          if (dogLogic.__middleUD) packet = dogLogic.__middleUD(packet);
-          
-          if (dogLogic.__middleU === null) return;
-          if (dogLogic.__middleU) packet = dogLogic.__middleU(packet);
+          if (dogLogic.__runNext === null) return;
+          if (dogLogic.__runNext) packet = dogLogic.__runNext(packet);
         }
         
         //Execute thru-functions to the actual value
@@ -234,21 +229,20 @@ var boydog = function(address) {
           
           if (mask === null) return;
           if (mask) {
-            if (dogLogic.__middleUD === null) return;
-            if (mask.__middleUD) packet = mask.__middleU(packet);
-            
-            if (dogLogic.__middleU === null) return;
-            if (mask.__middleU) packet = mask.__middleU(packet);
+            if (dogLogic.__runNext === null) return;
+            if (mask.__runNext) packet = mask.__runNext(packet);
           }
         }
         
         //Execute the last item __give
         mask = _.get(dogLogic, path);
         
+        console.log("mask last step", mask, path)
+        
         if (mask === null) return;
         if (mask) {
-          if (mask.__up === null) return;
-          if (mask.__up) packet = mask.__up(packet);
+          if (mask.__run === null) return;
+          if (mask.__run) packet = mask.__run(packet);
         }
         
         socket.emit('boydog', packet);
@@ -481,6 +475,8 @@ var boydog = function(address) {
       
       //Additional mixin dog-down stack functions
       //msg = {}(dogDown, msg);
+      
+      
       
       //Process
       if (el[0] === document.activeElement) { //If two or more people are editing the same element
