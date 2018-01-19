@@ -175,9 +175,9 @@
       
       var dogData = 'html';
       var dogLogic = {
-        __middleU: function(data) {
+        __upNext: function(data) {
           
-          console.log("__middleU", data);
+          console.log("__upNext", data);
           data.auth = { username: $('#username').val(), password: $('#password').val() }
           
           data.date = Date();
@@ -224,7 +224,7 @@
           }
         },
         features: {
-          __middleU: function(data) {
+          __upNext: function(data) {
             
             console.log("features middel up", data)
             
@@ -232,14 +232,14 @@
             
             return data;
           },
-          __middleD: function(data) {
+          __downNext: function(data) {
             
             console.log("features middel up")
             
             return data;
           },
           body: {
-            __middleU: function(data) {
+            __upNext: function(data) {
               
               console.log("features middel up body", data)
               data.set = data.set + "b";

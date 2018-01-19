@@ -157,11 +157,11 @@ var boydog = function(address) {
         //Execute dogLogic first middleware
         if (dogLogic === null) return;
         if (dogLogic !== undefined) {
-          if (dogLogic.__middleUD === null) return;
-          if (dogLogic.__middleUD) packet = dogLogic.__middleUD(packet);
+          if (dogLogic.__updownNext === null) return;
+          if (dogLogic.__updownNext) packet = dogLogic.__updownNext(packet);
           
-          if (dogLogic.__middleU === null) return;
-          if (dogLogic.__middleU) packet = dogLogic.__middleU(packet);
+          if (dogLogic.__upNext === null) return;
+          if (dogLogic.__upNext) packet = dogLogic.__upNext(packet);
         }
         
         //Execute middleware functions to the actual value
@@ -172,11 +172,11 @@ var boydog = function(address) {
           
           if (mask === null) return;
           if (mask) {
-            if (dogLogic.__middleUD === null) return;
-            if (mask.__middleUD) packet = mask.__middleU(packet);
+            if (dogLogic.__updownNext === null) return;
+            if (mask.__updownNext) packet = mask.__upNext(packet);
             
-            if (dogLogic.__middleU === null) return;
-            if (mask.__middleU) packet = mask.__middleU(packet);
+            if (dogLogic.__upNext === null) return;
+            if (mask.__upNext) packet = mask.__upNext(packet);
           }
         }
         
