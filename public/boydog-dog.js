@@ -485,25 +485,14 @@ var boydog = function(address) {
       //msg = {}(dogDown, msg);
       
       //Process
-      
-      if (el[0] === document.activeElement) {
-        var caretPos = el.caret();
-        var diff = 0;
+      if (el[0] === document.activeElement) { //If two or more people are editing the same element
+        var caretPos = el.caret(); //Save caret position
+        var diff = 0; //Assume we don't need to move caret
         
-        
-        var startToCaretElText = el.val().substr(0, caretPos);
-        var startToCaretMsgText = msg.substr(0, caretPos);
-        console.log("startToCaretElText", startToCaretElText)
-        console.log("startToCaretMsgText", startToCaretMsgText)
-        
-        if (startToCaretElText !== startToCaretMsgText) {
-          diff = msg.length - el.val().length;
-          console.log("DIFF NEEDED", diff)
-        } else {
-          console.log("DIFF NOT NEEDED")
+        if (el.val().substr(0, caretPos) !== msg.substr(0, caretPos)) {
+          diff = msg.length - el.val().length; //Calculate steps to move caret if needed
         }
         
-        console.log("caretPos", caretPos);
         el.val(msg);
         el.caret(caretPos + diff);
       } else {
