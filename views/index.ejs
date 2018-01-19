@@ -222,41 +222,6 @@
             
             return data;
           }
-        },
-        features: {
-          __upNext: function(data) {
-            
-            console.log("features middel up", data)
-            
-            data.set = data.set + "+";
-            
-            return data;
-          },
-          __downNext: function(data) {
-            
-            console.log("features middel up")
-            
-            return data;
-          },
-          body: {
-            __upNext: function(data) {
-              
-              console.log("features middel up body", data)
-              data.set = data.set + "b";
-              
-              return data;
-            },
-            up: { eyes: { '0': { color: {
-              __up: function(data) {
-                
-                console.log("executing last upload", data)
-                
-                data.set += ">";
-                
-                return data;
-              }
-            } } } }
-          }
         }
       };
       

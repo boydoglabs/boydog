@@ -148,9 +148,21 @@ var boyLogic = {
     __set: null,
     body: {
       __set: null,
+      __middleW: function(data) {
+        
+        console.log("feat, body, middleware", data)
+        
+        return data;
+      },
       up: {
         __set: null,
         __get: function(data) {
+          
+          return data;
+        },
+        __middleW: function(data) {
+          
+          console.log("feat, body, up, middleware", data)
           
           return data;
         },
