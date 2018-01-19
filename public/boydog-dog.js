@@ -378,8 +378,6 @@ var boydog = function(address) {
   socket.on('boydog', function(data) {
     var elem;
     
-    console.log("boydog RX", data)
-    
     //Process dog-html
     getDogAttr("html", data.attr).each(function(k, el) {
       el = $(el);
