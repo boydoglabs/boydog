@@ -509,8 +509,6 @@ var dog = function(address) {
   
   //To force a refresh
   socket.on('refresh', function(paths) {
-    console.log("refresh", paths);
-    
     refresh(); //TODO: Implement method to update only the requiered field(s)
   })
   

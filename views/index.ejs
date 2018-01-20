@@ -185,7 +185,6 @@
         },
         __runNext: function(data) {
           
-          console.log("__runNext .", data);
           data.auth = { username: $('#username').val(), password: $('#password').val() }
           
           return data;
@@ -194,32 +193,8 @@
           __down: {
             function(data) {
               
-              console.log("users", data)
-              
               return data;
             }
-          }
-        },
-        company: {
-          __up: function(data) {
-            
-            console.log("on __up", data)
-            
-            return data;
-          },
-          __down: function(data) {
-            
-            console.log("on __down")
-            
-            return data;
-          }
-        },
-        addTask: {
-          __run: function(data) {
-            
-            console.log("__runNext final", data)
-            
-            return data;
           }
         }
       };
@@ -227,8 +202,6 @@
       dog.assign(scope, logic);
       
       $('#username').keyup(function() {
-        console.log("dog", dog)
-        
         dog.refresh();
       })
     </script>

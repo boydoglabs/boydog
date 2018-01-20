@@ -2,18 +2,30 @@
 
 require('dotenv').config();
 
-//Constants
 const dbPath = './db/';
+var fs = require('fs');
+var path = require('path');
+var express = require('express');
+var ejs = require('ejs');
+var app = express();
+var server = require('http').createServer(app);
 
-//Vars
-var fs = require('fs'),
-  path = require('path'),
-  express = require('express'),
-  ejs = require('ejs');
+//Express configuration
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
 
-var app = express(),
-  server = require('http').createServer(app),
-  boy = require('boydog-boy')(server);
+//Use application-level express middleware
+app.use(express.static('public'));
+app.use(require('cookie-parser')("your-secret-cookie"));
+app.use(require('body-parser').urlencoded({ extended: true }));
+app.use(require('body-parser').json());
+app.use(require('express-session')({ secret: 'your-secret-session', resave: true, saveUninitialized: true }));
+
+//
+//Init boydog and assign your scope and logic
+//
+
+var boy = require('boydog-boy')(server);
 
 var scope = {
   users: {
@@ -142,8 +154,6 @@ var logic = {
       secret: {
         __get: function(data) {
           
-          console.log("secret fetch", data);
-          
           return data;
         }
       }
@@ -195,8 +205,6 @@ var logic = {
     __set: function(data) {
       
       data.val = data.val.toUpperCase();
-      
-      console.log("Should write instead: ", data)
       
       return data;
     }
@@ -258,17 +266,6 @@ setInterval(function() {
 
 boy.assign(scope, logic);
 
-//Express configuration
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
-
-//Use application-level middleware
-app.use(express.static('public'));
-app.use(require('cookie-parser')("frame-ws"));
-app.use(require('body-parser').urlencoded({ extended: true }));
-app.use(require('body-parser').json());
-app.use(require('express-session')({ secret: 'd22667deca36f3e333fa87f9fd8e0218', resave: true, saveUninitialized: true }));
-
 //REST fallbacks
 app.post('/assign', function(req, res) {
   //TODO: Implement this function as a fallback if socket.io is not available
@@ -279,7 +276,7 @@ app.post('/refresh', function(req, res) {
 });
 
 //
-//Your website routes
+//Your REST routes
 //
 
 //The landing page
