@@ -379,6 +379,8 @@ var dog = function(address) {
   socket.on('update', function(data) {
     var elem;
     
+    console.log("update RX", data)
+    
     //Process dog-html
     getDogAttr("html", data.path).each(function(k, el) {
       el = $(el);
