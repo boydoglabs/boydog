@@ -178,8 +178,8 @@
         __upNext: function(data) {
           
           data.auth = { username: $('#username').val(), password: $('#password').val() }
-          
           data.date = Date();
+          console.log("mid .")
           
           return data;
         },
@@ -188,6 +188,46 @@
           data.auth = { username: $('#username').val(), password: $('#password').val() }
           
           return data;
+        },
+        company: {
+          __up: function(data) {
+            
+            console.log("mid company")
+            
+            return data;
+          }
+        },
+        features: {
+          __upNext: function(data) {
+            
+            console.log("mid features")
+            
+            return data;
+          },
+          body: {
+            __upNext: function(data) {
+              
+              console.log("mid features body")
+              
+              return data;
+            },
+            up: {
+              __upNext: function(data) {
+                
+                console.log("mid features body up")
+                
+                return data;
+              },
+              eyes: {
+                __upNext: function(data) {
+                  
+                  console.log("mid features body up eyes")
+                  
+                  return data;
+                }
+              }
+            }
+          }
         },
         users: {
           __down: {

@@ -185,26 +185,26 @@ var dog = function(address) {
       //Functions for updating values
       $(el).off().on('input', function(field) {
         var path = parseAttrValue(el, 'dog-value');
-        var middlewarePath = _.toPath(path);
+        var fullPath = _.toPath(path);
         
         val = field.currentTarget.value;
         
         //Build packet to be sent
         packet = { path: path, val: val };
         
-        //Execute logic first middleware
-        if (logic === null) return;
-        if (logic !== undefined) {
-          if (logic.__updownNext === null) return;
-          if (logic.__updownNext) packet = logic.__updownNext(packet);
-          
-          if (logic.__upNext === null) return;
-          if (logic.__upNext) packet = logic.__upNext(packet);
+        //Execute the last item __up
+        mask = _.get(logic, path);
+        
+        if (mask === null) return;
+        if (mask) {
+          if (mask.__up === null) return;
+          if (mask.__up) packet = mask.__up(packet);
         }
         
         //Execute middleware functions to the actual value
-        for (var i = 0; i < middlewarePath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
-          tmpPath = _.take(middlewarePath, i);
+        for (var i = 0; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
+          //tmpPath = _.take(fullPath, i);
+          tmpPath = _.take(fullPath, (fullPath.length - i));
           
           mask = _.get(logic, tmpPath);
           
@@ -218,16 +218,15 @@ var dog = function(address) {
           }
         }
         
-        //Execute the last item __get
-        mask = _.get(logic, path);
-        
-        if (mask === null) return;
-        if (mask) {
-          if (mask.__up === null) return;
-          if (mask.__up) packet = mask.__up(packet);
+        //Execute logic top middleware
+        if (logic === null) return;
+        if (logic !== undefined) {
+          if (logic.__updownNext === null) return;
+          if (logic.__updownNext) packet = logic.__updownNext(packet);
+          
+          if (logic.__upNext === null) return;
+          if (logic.__upNext) packet = logic.__upNext(packet);
         }
-        
-        console.log("emitIng", packet)
         
         socket.emit('set', packet);
         
