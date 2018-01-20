@@ -238,14 +238,13 @@ var dog = function(address) {
     });
     
     $(element).find('[dog-run]').each(function(i, el) {
-      var path = parseAttrValue(el, 'dog-run');
-      var middlewarePath;
       var tmpPath;
       var packet;
       var mask;
       
       $(el).off().on('click', function() {
-        middlewarePath = _.toPath(path);
+        var path = parseAttrValue(el, 'dog-run');
+        var middlewarePath = _.toPath(path);
         
         //Build packet to be sent
         packet = { path: path };
