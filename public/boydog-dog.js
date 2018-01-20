@@ -212,7 +212,7 @@ var boydog = function(address) {
         middlewarePath = _.toPath(path);
         
         //Build packet to be sent
-        packet = { __run: path };
+        packet = { path: path };
         
         //Execute dogLogic first middleware
         if (dogLogic === null) return;

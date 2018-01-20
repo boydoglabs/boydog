@@ -127,13 +127,9 @@ var boyData = {
 var boyLogic = {
   __middleRW: function(data) {
     
-    console.log("m rw main")
-    
     return data;
   },
   __middleR: function(data) {
-    
-    console.log("m main")
     
     return data;
   },
@@ -159,8 +155,6 @@ var boyLogic = {
       __set: null,
       __middleR: function(data) {
         
-        console.log("  READ feat, body", data)
-        
         return data;
       },
       up: {
@@ -170,8 +164,6 @@ var boyLogic = {
           return data;
         },
         __middleR: function(data) {
-          
-          console.log("  READ feat, body, up", data)
           
           return data;
         },
@@ -195,10 +187,8 @@ var boyLogic = {
   },
   company: {
     __get: function(data) {
-      
-      console.log("data::", data)
-      
-      //data.val = data.val.toUpperCase();
+
+      data.val = data.val.toUpperCase();
       
       return data;
     },
@@ -243,8 +233,16 @@ var boyLogic = {
       
       var next = boyData.tasks.length;
       
-      bd.set('tasks[' + next + '].toDo', bd.get('newTaskName'))
-      bd.set('name', "namechange")
+      //bd.set('tasks[' + next + '].toDo', bd.get('newTaskName'));
+      
+      boyData.tasks.push({
+        "toDo": boyData.newTaskName,
+        "progress": 90
+      })
+      
+      //bd.set({ path: "tasks[" + next + "].toDo", val: bd.get({ path: "newTaskName" }).val });
+      
+      bd.sync(['boyData.tasks'])
     }
   },
   appleQuantity: {
