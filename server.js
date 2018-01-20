@@ -259,10 +259,10 @@ var logic = {
   }
 }
 
-setInterval(function() {
+/*setInterval(function() {
   scope.counter++;
   boy.refresh();
-}, 1000);
+}, 1000);*/
 
 boy.assign(scope, logic);
 

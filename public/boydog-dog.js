@@ -131,11 +131,8 @@ var dog = function(address) {
     });
   }
   
-  //Refresh values (will normalize all paths beforehand)
-  var refresh = function(element) {
-    if (!element) element = scope;
-    
-    //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'])
+  //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'])
+  var normalizePaths = function() {
     ['dog-id', 'dog-class', 'dog-value', 'dog-html', 'dog-run'].forEach(function(attrName) {
       $('[' + attrName + ']').each(function(i, el) {
         var attr = $(el).attr(attrName);
@@ -158,6 +155,11 @@ var dog = function(address) {
         $(el).attr(attrName, attr);
       });
     });
+  }
+  
+  //Refresh values (will normalize all paths beforehand)
+  var refresh = function(element) {
+    if (!element) element = scope;
     
     //Fetch first values
     ["html", "class", "repeat", "value"].forEach(function(tag) {
@@ -370,7 +372,7 @@ var dog = function(address) {
   socket.on('connect', function(data) {
     console.log("BoyDog connected to", address);
     
-    refresh(), rebind();
+    normalizePaths(), refresh(), rebind();
   });
   
   //To set a value
@@ -488,8 +490,10 @@ var dog = function(address) {
       if (el[0] === document.activeElement) { //If two or more people are editing the same element
         var caretPos = el.caret(); //Save caret position
         var diff = 0; //Assume we don't need to move caret
-        var valAsStr = el.val();
-        var msgAsStr = msg;
+        var valAsStr = el.val() || "";
+        var msgAsStr = msg || "";
+        
+        console.log("DEBUG msgAsStr", data, msgAsStr, caretPos, valAsStr)
         
         //if (_.isNumber(valAsStr)) valAsStr = valAsStr.toString(); //Do we need this one? Uncomment if yes
         if (_.isNumber(msgAsStr)) msgAsStr = msgAsStr.toString();
