@@ -177,8 +177,6 @@ var dog = function(address) {
     
     //Rebind triggers
     $(element).find('[dog-value]').each(function(i, el) {
-      var path = parseAttrValue(el, 'dog-value');
-      var middlewarePath = _.toPath(path);
       var tmpPath;
       var packet;
       var val;
@@ -186,6 +184,9 @@ var dog = function(address) {
       
       //Functions for updating values
       $(el).off().on('input', function(field) {
+        var path = parseAttrValue(el, 'dog-value');
+        var middlewarePath = _.toPath(path);
+        
         val = field.currentTarget.value;
         
         //Build packet to be sent
@@ -225,7 +226,9 @@ var dog = function(address) {
           if (mask.__up === null) return;
           if (mask.__up) packet = mask.__up(packet);
         }
-          
+        
+        console.log("emitIng", packet)
+        
         socket.emit('set', packet);
         
         /*//TODO: Implement POST and GET fallback version
@@ -494,8 +497,6 @@ var dog = function(address) {
         var diff = 0; //Assume we don't need to move caret
         var valAsStr = el.val() || "";
         var msgAsStr = msg || "";
-        
-        console.log("DEBUG msgAsStr", data, msgAsStr, caretPos, valAsStr)
         
         //if (_.isNumber(valAsStr)) valAsStr = valAsStr.toString(); //Do we need this one? Uncomment if yes
         if (_.isNumber(msgAsStr)) msgAsStr = msgAsStr.toString();
