@@ -13,9 +13,9 @@ var fs = require('fs'),
 
 var app = express(),
   server = require('http').createServer(app),
-  bd = require('boydog-boy')(server);
+  boy = require('boydog-boy')(server);
 
-var boyData = {
+var scope = {
   users: {
     guest: {
       auth: {
@@ -124,12 +124,12 @@ var boyData = {
   "favoriteFruit": "apple"
 }
 
-var boyLogic = {
-  __middleRW: function(data) {
+var logic = {
+  __getsetNext: function(data) {
     
     return data;
   },
-  __middleR: function(data) {
+  __getNext: function(data) {
     
     return data;
   },
@@ -153,7 +153,7 @@ var boyLogic = {
     __set: null,
     body: {
       __set: null,
-      __middleR: function(data) {
+      __getNext: function(data) {
         
         return data;
       },
@@ -163,7 +163,7 @@ var boyLogic = {
           
           return data;
         },
-        __middleR: function(data) {
+        __getNext: function(data) {
           
           return data;
         },
@@ -205,7 +205,7 @@ var boyLogic = {
     __get: function(data) {
       
       if (data.val > 0) data.val = data.val * -1;
-      bd.set('products', -data.val);
+      boy.set('products', -data.val);
       
       return data;
     },
@@ -221,21 +221,21 @@ var boyLogic = {
   counter: {
     __set: function(data) {
       
-      bd.set("counterClass", ["even", "odd"][boyData.counter % 2]);
+      boy.set("counterClass", ["even", "odd"][scope.counter % 2]);
       
       return data;
     }
   },
   addTask: {
     __run: function() {
-      var next = boyData.tasks.length;
+      var next = scope.tasks.length;
       
-      boyData.tasks.push({
-        "toDo": boyData.newTaskName,
+      scope.tasks.push({
+        "toDo": scope.newTaskName,
         "progress": 90
       })
       
-      bd.refresh(['boyData.tasks']);
+      boy.refresh(['scope.tasks']);
     }
   },
   appleQuantity: {
@@ -244,20 +244,20 @@ var boyLogic = {
   increaseApples: {
     __run: function() {
       
-      boyData.appleQuantity++;
-      //bd.forwardPropagate('features.body');
+      scope.appleQuantity++;
+      //boy.forwardPropagate('features.body');
       
-      //bd.set("appleQuantity", bd.get("appleQuantity") + 1)
-      bd.refresh(['increaseApples']);
+      //boy.set("appleQuantity", boy.get("appleQuantity") + 1)
+      boy.refresh(['increaseApples']);
     }
   }
 }
 
 setInterval(function() {
-  bd.set({ path: "counter", val: boyData.counter + 1 });
+  boy.set({ path: "counter", val: scope.counter + 1 });
 }, 100000);
 
-bd.boySet(boyData, boyLogic);
+boy.assign(scope, logic);
 
 //Express configuration
 app.set('views', __dirname + '/views');

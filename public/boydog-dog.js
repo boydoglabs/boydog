@@ -1,3 +1,5 @@
+//BoyDog dog (client) module
+
 'use strict';
 
 var dog = function(address) {
