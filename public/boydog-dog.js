@@ -1,9 +1,9 @@
 'use strict';
 
-var boydog = function(address) {
+var dog = function(address) {
   var socket = io.connect(address);
-  var dogData = "html"; //Our data is the html element by default
-  var dogLogic = {};
+  var scope = "html"; //Our data is the html element by default
+  var logic = {};
   var dogSettings = { cleanHTML: false };
   var attrNames = ['id', 'class', 'value', 'html'];
   
@@ -129,9 +129,33 @@ var boydog = function(address) {
     });
   }
   
-  //Will fetch all values and rebind triggers
-  var dogRefresh = function(element) {
-    if (!element) element = dogData;
+  //Refresh values (will normalize all paths beforehand)
+  var refresh = function(element) {
+    if (!element) element = scope;
+    
+    //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'])
+    ['dog-id', 'dog-class', 'dog-value', 'dog-html', 'dog-run'].forEach(function(attrName) {
+      $('[' + attrName + ']').each(function(i, el) {
+        var attr = $(el).attr(attrName);
+        var attr = _.toPath(attr);
+        
+        if (attr.length > 1) {
+          attr = _.map(attr, function(item, i) {
+            if (i === 0) return item;
+            
+            if((item[0] === "#") || ((item[0] === "."))) return item;
+              
+            return "'" + item + "'";
+          })
+          
+          attr = attr.shift() + "[" + attr.join("][") + "]";
+        } else {
+          attr = attr.shift();
+        }
+        
+        $(el).attr(attrName, attr);
+      });
+    });
     
     //Fetch first values
     ["html", "class", "repeat", "value"].forEach(function(tag) {
@@ -140,7 +164,12 @@ var boydog = function(address) {
         
         socket.emit('get', { path: path }); //Fetch first value load
       });
-    });
+    })
+  }
+  
+  //Will fetch all values and rebind triggers
+  var rebind = function(element) {
+    if (!element) element = scope;
     
     //Rebind triggers
     $(element).find('[dog-value]').each(function(i, el) {
@@ -158,34 +187,34 @@ var boydog = function(address) {
         //Build packet to be sent
         packet = { path: path, val: val };
         
-        //Execute dogLogic first middleware
-        if (dogLogic === null) return;
-        if (dogLogic !== undefined) {
-          if (dogLogic.__updownNext === null) return;
-          if (dogLogic.__updownNext) packet = dogLogic.__updownNext(packet);
+        //Execute logic first middleware
+        if (logic === null) return;
+        if (logic !== undefined) {
+          if (logic.__updownNext === null) return;
+          if (logic.__updownNext) packet = logic.__updownNext(packet);
           
-          if (dogLogic.__upNext === null) return;
-          if (dogLogic.__upNext) packet = dogLogic.__upNext(packet);
+          if (logic.__upNext === null) return;
+          if (logic.__upNext) packet = logic.__upNext(packet);
         }
         
         //Execute middleware functions to the actual value
         for (var i = 0; i < middlewarePath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
           tmpPath = _.take(middlewarePath, i);
           
-          mask = _.get(dogLogic, tmpPath);
+          mask = _.get(logic, tmpPath);
           
           if (mask === null) return;
           if (mask) {
-            if (dogLogic.__updownNext === null) return;
+            if (logic.__updownNext === null) return;
             if (mask.__updownNext) packet = mask.__upNext(packet);
             
-            if (dogLogic.__upNext === null) return;
+            if (logic.__upNext === null) return;
             if (mask.__upNext) packet = mask.__upNext(packet);
           }
         }
         
         //Execute the last item __get
-        mask = _.get(dogLogic, path);
+        mask = _.get(logic, path);
         
         if (mask === null) return;
         if (mask) {
@@ -214,28 +243,28 @@ var boydog = function(address) {
         //Build packet to be sent
         packet = { path: path };
         
-        //Execute dogLogic first middleware
-        if (dogLogic === null) return;
-        if (dogLogic !== undefined) {
-          if (dogLogic.__runNext === null) return;
-          if (dogLogic.__runNext) packet = dogLogic.__runNext(packet);
+        //Execute logic first middleware
+        if (logic === null) return;
+        if (logic !== undefined) {
+          if (logic.__runNext === null) return;
+          if (logic.__runNext) packet = logic.__runNext(packet);
         }
         
         //Execute middleware functions to the actual value
         for (var i = 0; i < middlewarePath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
           tmpPath = _.take(middlewarePath, i);
           
-          mask = _.get(dogLogic, tmpPath);
+          mask = _.get(logic, tmpPath);
           
           if (mask === null) return;
           if (mask) {
-            if (dogLogic.__runNext === null) return;
+            if (logic.__runNext === null) return;
             if (mask.__runNext) packet = mask.__runNext(packet);
           }
         }
         
         //Execute the last item __get
-        mask = _.get(dogLogic, path);
+        mask = _.get(logic, path);
         
         if (mask === null) return;
         if (mask) {
@@ -252,9 +281,9 @@ var boydog = function(address) {
   }
   
   //Set dog data and logic
-  var dogSet = function(data, logic, settings) {
-    if (data) dogData = data;
-    if (logic) dogLogic = logic;
+  var assign = function(data, logic, settings) {
+    if (data) scope = data;
+    if (logic) logic = logic;
     if (settings) dogSettings = settings;
     
     if (dogSettings.cleanHTML) {
@@ -272,10 +301,10 @@ var boydog = function(address) {
         
         return this;
       }
-      htmlClean(dogData); //Clean html for whitespaces and line-breaks ()
+      htmlClean(scope); //Clean html for whitespaces and line-breaks ()
     }
     
-    dogRefresh();
+    refresh(), rebind();
   }
   
   //Gets dog-[something]
@@ -335,38 +364,11 @@ var boydog = function(address) {
   //Socket events
   //
   
-  //Socket functions
+  //Connecting to a server
   socket.on('connect', function(data) {
     console.log("BoyDog connected to", address);
     
-    //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'])
-    var normalizePaths = function(names) {
-      names.forEach(function(attrName) {
-        $('[' + attrName + ']').each(function(i, el) {
-          var attr = $(el).attr(attrName);
-          var attr = _.toPath(attr);
-          
-          if (attr.length > 1) {
-            attr = _.map(attr, function(item, i) {
-              if (i === 0) return item;
-              
-              if((item[0] === "#") || ((item[0] === "."))) return item;
-                
-              return "'" + item + "'";
-            })
-            
-            attr = attr.shift() + "[" + attr.join("][") + "]";
-          } else {
-            attr = attr.shift();
-          }
-          
-          $(el).attr(attrName, attr);
-        });
-      });
-    };
-    
-    normalizePaths(['dog-id', 'dog-class', 'dog-value', 'dog-html', 'dog-run']); //TODO: Add add more normalizations
-    dogRefresh();
+    refresh(), rebind();
   });
   
   //To set a value
@@ -461,14 +463,14 @@ var boydog = function(address) {
       })
       
       el.hide();
-      if (rebindNeeded) dogRefresh(parent);
+      if (rebindNeeded) {
+        refresh(), rebind(parent);
+      }
     })
     
     //Process dog-value
     getDogAttr("value", data.path).each(function(k, el) {
       el = $(el);
-      
-      console.log("valval-data", data);
       
       var msg = data.val;
       var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
@@ -507,11 +509,12 @@ var boydog = function(address) {
   socket.on('refresh', function(paths) {
     console.log("refresh", paths);
     
-    dogRefresh(); //TODO: Implement method to update only the requiered field(s)
+    refresh(); //TODO: Implement method to update only the requiered field(s)
   })
   
   return {
-    dogSet: dogSet,
-    dogRefresh: dogRefresh
+    assign: assign,
+    refresh: refresh,
+    rebind: rebind
   };
 }

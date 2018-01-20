@@ -171,10 +171,10 @@
     <script src="/socket.io.js"></script>
     <script src="/boydog-dog.js"></script>
     <script>
-      var bd = boydog("http://192.168.1.68:3090/");
+      var dog = dog("http://192.168.1.68:3090/");
       
-      var dogData = 'html';
-      var dogLogic = {
+      var scope = 'html';
+      var logic = {
         __upNext: function(data) {
           
           data.auth = { username: $('#username').val(), password: $('#password').val() }
@@ -224,12 +224,12 @@
         }
       };
       
-      bd.dogSet(dogData, dogLogic);
+      dog.assign(scope, logic);
       
       $('#username').keyup(function() {
-        console.log("bd", bd)
+        console.log("dog", dog)
         
-        bd.dogRefresh();
+        dog.refresh();
       })
     </script>
   
