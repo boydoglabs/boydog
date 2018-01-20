@@ -228,21 +228,14 @@ var boyLogic = {
   },
   addTask: {
     __run: function() {
-      
-      //boyData.tasks.push({ toDo: "new", progress: 50 });
-      
       var next = boyData.tasks.length;
-      
-      //bd.set('tasks[' + next + '].toDo', bd.get('newTaskName'));
       
       boyData.tasks.push({
         "toDo": boyData.newTaskName,
         "progress": 90
       })
       
-      //bd.set({ path: "tasks[" + next + "].toDo", val: bd.get({ path: "newTaskName" }).val });
-      
-      bd.sync(['boyData.tasks'])
+      bd.refresh(['boyData.tasks']);
     }
   },
   appleQuantity: {
@@ -255,6 +248,7 @@ var boyLogic = {
       //bd.forwardPropagate('features.body');
       
       //bd.set("appleQuantity", bd.get("appleQuantity") + 1)
+      bd.refresh(['increaseApples']);
     }
   }
 }

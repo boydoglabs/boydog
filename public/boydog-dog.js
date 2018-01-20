@@ -373,8 +373,6 @@ var boydog = function(address) {
   socket.on('update', function(data) {
     var elem;
     
-    console.log("socket on>>>", data)
-    
     //Process dog-html
     getDogAttr("html", data.path).each(function(k, el) {
       el = $(el);
@@ -504,6 +502,13 @@ var boydog = function(address) {
     })
     
   });
+  
+  //To force a refresh
+  socket.on('refresh', function(paths) {
+    console.log("refresh", paths);
+    
+    dogRefresh(); //TODO: Implement method to update only the requiered field(s)
+  })
   
   return {
     dogSet: dogSet,
