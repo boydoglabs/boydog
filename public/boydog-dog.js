@@ -6,7 +6,7 @@ var dog = function(address) {
   var socket = io.connect(address);
   var scope = "html"; //Our data is the html element by default
   var logic = {};
-  var dogSettings = { cleanHTML: false };
+  var settings = { cleanHTML: false };
   var attrNames = ['id', 'class', 'value', 'html'];
   
   //Caret plugin (TODO: Optimize this on a later stage)
@@ -282,13 +282,13 @@ var dog = function(address) {
     });
   }
   
-  //Set dog data and logic
-  var assign = function(data, logic, settings) {
-    if (data) scope = data;
-    if (logic) logic = logic;
-    if (settings) dogSettings = settings;
+  //Assign dog's data and logic
+  var assign = function(_data, _logic, _settings) {
+    if (_data) scope = _data;
+    if (_logic) logic = _logic;
+    if (_settings) settings = _settings;
     
-    if (dogSettings.cleanHTML) {
+    if (settings.cleanHTML) {
       var htmlClean = function(rootElement) {
         //Clean whitespaces
         $(rootElement).contents().filter(function() {

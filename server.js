@@ -205,7 +205,7 @@ var logic = {
     __get: function(data) {
       
       if (data.val > 0) data.val = data.val * -1;
-      boy.set('products', -data.val);
+      scope.products = -scope.products;
       
       return data;
     },
@@ -221,7 +221,8 @@ var logic = {
   counter: {
     __set: function(data) {
       
-      boy.set("counterClass", ["even", "odd"][scope.counter % 2]);
+      scope.counterClass = ["even", "odd"][scope.counter % 2];
+      
       
       return data;
     }
@@ -245,17 +246,15 @@ var logic = {
     __run: function() {
       
       scope.appleQuantity++;
-      //boy.forwardPropagate('features.body');
-      
-      //boy.set("appleQuantity", boy.get("appleQuantity") + 1)
       boy.refresh(['increaseApples']);
     }
   }
 }
 
 setInterval(function() {
-  boy.set({ path: "counter", val: scope.counter + 1 });
-}, 100000);
+  scope.counter++;
+  boy.refresh();
+}, 1000);
 
 boy.assign(scope, logic);
 
@@ -270,20 +269,22 @@ app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('body-parser').json());
 app.use(require('express-session')({ secret: 'd22667deca36f3e333fa87f9fd8e0218', resave: true, saveUninitialized: true }));
 
+//REST fallbacks
+app.post('/assign', function(req, res) {
+  //TODO: Implement this function as a fallback if socket.io is not available
+});
+
+app.post('/refresh', function(req, res) {
+  //TODO: Implement this function as a fallback if socket.io is not available
+});
+
+//
+//Your website routes
+//
+
 //The landing page
 app.get('/', function(req, res) {
   return res.render("index");
-});
-
-//Debug
-app.get('/debug', function(req, res) {
-  console.log("debug");
-  
-  return res.json({});
-});
-
-app.post('/boydog', function(req, res) {
-  //TODO: Implement this function as a fallback if socket.io is not available
 });
 
 //Run
