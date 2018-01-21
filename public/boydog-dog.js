@@ -407,8 +407,14 @@ var dog = function(address) {
     }
     
     if (bone.val === undefined) { //When the server wants the client to ask for the value
+      
+      console.log("bone without val", bone)
+      
       give({ path: bone.path }); //A bone without val is used to get the field value
     } else { //When we actually receive a value from the server
+      
+      console.log("bone ---WITH--- val", bone)
+      
       //Process dog-html
       getDogAttr("html", bone.path).each(function(k, el) {
         el = $(el);
@@ -536,6 +542,42 @@ var dog = function(address) {
           el.val(msg);
         }
       })
+      
+      
+      
+      
+      //TODO: Optimize the following algo, it can e greatly improved
+      var parentPath = _.take(fullPath, fullPath.length - 1);
+      if (parentPath.length > 0) {
+        var backPath = parentPath[0];
+        
+        for (i = 1; i < parentPath.length; i++) {
+          backPath += "['" + parentPath[i] + "']";
+        }
+        
+        console.log("asking for deep related values", backPath);
+        give({ path: backPath })
+      }
+      
+      /*var relatedPaths = [fullPath[0]];
+      var str = fullPath[0];
+      var i;
+
+      if (fullPath.length > 1) { //Don't emit the value if the changing field is a first level element
+        for (i = 1; i < fullPath.length - 1; i++) {
+          str += "['" + fullPath[i] + "']";
+          relatedPaths.push(str);
+        }
+        for (i = relatedPaths.length - 1; i >= 0; i--) {
+          //TODO: Read __get to determine if we should propagate this value
+          //io.emit('update', { path: relatedPaths[i], val: _.get(scope, relatedPaths[i]) }); //Propagate related fields to myself
+          console.log("asking for", relatedPaths[i])
+          //give({ path: bone.path }); //A bone without val is used to get the field value
+        }
+      }*/
+      
+      
+      
     }
   }
   
