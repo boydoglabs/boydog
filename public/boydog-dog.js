@@ -130,7 +130,7 @@ var dog = function(address) {
     });
   }
   
-  //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'])
+  //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'] to avoid issues when trying to access things like user.2.name)
   var normalizePaths = function() {
     ['dog-id', 'dog-class', 'dog-value', 'dog-html', 'dog-run'].forEach(function(attrName) {
       $('[' + attrName + ']').each(function(i, el) {
@@ -174,8 +174,6 @@ var dog = function(address) {
   var rebind = function(element) {
     if (!element) element = scope;
     
-    console.log("rebind called")
-    
     //Rebind triggers
     $(element).find('[dog-value]').each(function(i, el) {
       var tmpPath;
@@ -191,8 +189,8 @@ var dog = function(address) {
         give({ path: path, val: val });
         
         //$.post("/give", {}).done(function(json) { });  //TODO: Implement POST and GET fallback version
-      });
-    });
+      })
+    })
     
     /*$(element).find('[dog-run]').each(function(i, el) {
       var tmpPath;
@@ -323,11 +321,10 @@ var dog = function(address) {
     //TODO
   }
   
+  //Give a bone with a path and a value to set *or* give a bone with a path without value to ask for the value
   var give = function(bone) {
     var mask;
     var tmpPath;
-    
-    console.log("about to give", bone)
     
     //Execute the last item __give
     mask = _.get(logic, bone.path);
@@ -368,6 +365,7 @@ var dog = function(address) {
     socket.emit('give', bone);
   }
   
+  //Take a bone with a path and a value to print (write into html) *or* take a bone with a path and without a value to ask for that value (occurs several times when other users change a value)
   var take = function(bone) {
     var mask;
     var tmpPath;
@@ -409,11 +407,8 @@ var dog = function(address) {
     }
     
     if (bone.val === undefined) { //When the server wants the client to ask for the value
-      console.log("got bone without val", bone);
       give({ path: bone.path }); //A bone without val is used to get the field value
     } else { //When we actually receive a value from the server
-      console.log("got bone with val", bone);
-      
       //Process dog-html
       getDogAttr("html", bone.path).each(function(k, el) {
         el = $(el);
