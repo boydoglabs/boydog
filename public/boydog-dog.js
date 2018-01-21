@@ -165,65 +165,8 @@ var dog = function(address) {
     ["html", "class", "repeat", "value"].forEach(function(tag) {
       $(element).find('[dog-' + tag + ']').each(function(i, el) {
         var path = parseAttrValue(el, 'dog-' + tag);
-        
-        socket.emit('get', { path: path }); //Fetch first value load
+        give({ path: path }); //A bone without val is used to get the field value
       });
-    })
-  }
-  
-  var give = function(bone) {
-    var mask;
-    var tmpPath;
-    console.log("about to give bone", bone);
-    
-    //Execute the last item __give
-    mask = _.get(logic, bone.path);
-    
-    if (mask === null) return;
-    if (mask) {
-      if (mask.__give === null) return;
-      if (mask.__give) bone = mask.__give(bone);
-    }
-    
-    //Execute middleware functions to the actual value
-    var fullPath = _.toPath(bone.path);
-    for (var i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
-      //tmpPath = _.take(fullPath, i); //Verse
-      tmpPath = _.take(fullPath, (fullPath.length - i)); //Inverse
-      
-      mask = _.get(logic, tmpPath);
-      
-      if (mask === null) return;
-      if (mask) {
-        //TODO: Implement __givetake middleware
-        
-        if (logic.__give === null) return;
-        if (mask.__give) bone = mask.__give(bone);
-      }
-    }
-    
-    //Execute logic top middleware
-    if (logic === null) return;
-    
-    if (logic !== undefined) {
-      //TODO: Implement __givetake middleware
-      
-      if (logic.__give === null) return;
-      if (logic.__give) bone = logic.__give(bone);
-    }
-    
-    console.log("emiting give with bone")
-    socket.emit('give', bone);
-  }
-  
-  //Ask for a path value
-  var ask = function(path) {
-    console.log("asking for", path);
-    
-    ["html", "class", "repeat", "value"].forEach(function(tag) {
-      $(scope).find('[dog-' + tag + '="' + path + '"]').each(function(i, el) {
-        give({ path: path, val: null });
-      })
     })
   }
   
@@ -422,6 +365,235 @@ var dog = function(address) {
     //TODO
   }
   
+  
+  var give = function(bone) {
+    var mask;
+    var tmpPath;
+    console.log("about to give bone", bone);
+    
+    //Execute the last item __give
+    mask = _.get(logic, bone.path);
+    
+    if (mask === null) return;
+    if (mask !== undefined) {
+      if (mask.__give === null) return;
+      if (mask.__give) bone = mask.__give(bone);
+    }
+    
+    //Execute middleware functions to the actual value
+    var fullPath = _.toPath(bone.path);
+    for (var i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
+      //tmpPath = _.take(fullPath, i); //Verse
+      tmpPath = _.take(fullPath, (fullPath.length - i)); //Inverse
+      
+      mask = _.get(logic, tmpPath);
+      
+      if (mask === null) return;
+      if (mask === undefined) continue;
+      
+      //TODO: Implement __givetake middleware
+      
+      if (logic.__give === null) return;
+      if (mask.__give) bone = mask.__give(bone);
+    }
+    
+    //Execute logic top level middleware
+    if (logic === null) return;
+    
+    if (logic !== undefined) {
+      //TODO: Implement __givetake middleware
+      
+      if (logic.__give === null) return;
+      if (logic.__give) bone = logic.__give(bone);
+    }
+    
+    console.log("emiting give with bone")
+    socket.emit('give', bone);
+  }
+  
+  var take = function(bone) {
+    var mask;
+    var tmpPath;
+    console.log("taking bone", bone)
+    
+    //Execute logic top level middleware
+    if (logic === null) return;
+    if (logic !== undefined) {
+      //TODO: Implement __givetake middleware
+      
+      if (logic.__take === null) return;
+      if (logic.__take) bone = logic.__take(bone);
+    }
+    
+    //Execute path to the actual value middleware
+    var fullPath = _.toPath(bone.path);
+    for (var i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
+      tmpPath = _.take(fullPath, i); //Verse
+      //tmpPath = _.take(fullPath, (fullPath.length - i)); //Inverse
+      
+      mask = _.get(logic, tmpPath);
+      
+      if (mask === null) return;
+      if (mask === undefined) continue;
+      
+      //TODO: Implement __givetake middleware
+      
+      if (mask.__take === null) return;
+      if (mask.__take) bone = mask.__take(bone);
+    }
+    
+    //Execute the last item __take
+    mask = _.get(logic, bone.path);
+    
+    if (mask === null) return;
+    
+    if (mask !== undefined) {
+      if (mask.__take === null) return;
+      if (mask.__take) bone = mask.__take(bone);
+    }
+    
+    //Process dog-html
+    getDogAttr("html", bone.path).each(function(k, el) {
+      el = $(el);
+      var msg = bone.val;
+      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
+      
+      //BuiltIn dog-down stack functions
+      msg = thruDownStack(dogDown, msg);
+      
+      //Additional mixin dog-down stack functions
+      //msg = {}(dogDown, msg);
+      
+      //Process
+      if (!msg) msg = "";
+      el.html(msg); //Write html content
+    })
+    
+    //Process dog-class
+    getDogAttr("class", bone.path).each(function(k, el) {
+      el = $(el);
+      var msg = bone.val;
+      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
+      
+      //BuiltIn dog-down stack functions
+      msg = thruDownStack(dogDown, msg);
+      
+      //Additional mixin dog-down stack functions
+      //msg = {}(dogDown, msg);
+      
+      //Process
+      var _dogClassLog;
+      
+      try {
+        _dogClassLog = JSON.parse(el.attr('_dog-class-log'))
+      } catch (e) { /* We don't really care if it is not a valid JSON */ }
+      
+      if (!_.isArray(_dogClassLog)) _dogClassLog = [];
+      
+      _dogClassLog.push(msg);
+      
+      //Remove all once added classes
+      _dogClassLog.forEach(function(cl) { el.removeClass(cl) });
+      
+      el.addClass(msg); //Add new class
+      
+      _dogClassLog = _.uniq(_dogClassLog); //TODO: Optimize this, perform this call only 1/10 times
+      el.attr('_dog-class-log', JSON.stringify(_dogClassLog));
+    })
+    
+    //Process dog-html
+    getDogAttr("repeat", bone.path).each(function(k, el) {
+      el = $(el);
+      var msg = bone.val;
+      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+      var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
+      
+      //BuiltIn dog-down stack functions
+      msg = thruDownStack(dogDown, msg);
+      
+      //Additional mixin dog-down stack functions
+      //msg = {}(dogDown, msg);
+      
+      //Process
+      var parent = el.parent();
+      var rebindNeeded = false;
+      
+      _.each(msg, function(v, k) {
+        var existingKey = parent.find('[_dog-repeat-key="' + k + '"]').length;
+        
+        if (existingKey) return;
+        rebindNeeded = true;
+        
+        var newEl = el.clone();
+        newEl.removeAttr('dog-repeat').removeAttr('dog-down').removeAttr('dog-up').show();
+        newEl.attr('_dog-repeat-key', k);
+        
+        $(newEl).html($(newEl).html().replace(/@@@/g, k).replace(/\$\$\$/g, v));
+        
+        if (dogOpt.indexOf("inverse") >= 0) {
+          el.after(newEl);
+        } else {
+          el.before(newEl);
+        }
+      })
+      
+      el.hide();
+      if (rebindNeeded) {
+        refresh(), rebind(parent);
+      }
+    })
+    
+    //Process dog-value
+    getDogAttr("value", bone.path).each(function(k, el) {
+      el = $(el);
+      
+      var msg = bone.val;
+      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
+      
+      //BuiltIn dog-down stack functions
+      msg = thruDownStack(dogDown, msg);
+      
+      //Additional mixin dog-down stack functions
+      //msg = {}(dogDown, msg);
+      
+      //Process
+      if (el[0] === document.activeElement) { //If two or more people are editing the same element
+        var caretPos = el.caret(); //Save caret position
+        var diff = 0; //Assume we don't need to move caret
+        var valAsStr = el.val() || "";
+        var msgAsStr = msg || "";
+        
+        //if (_.isNumber(valAsStr)) valAsStr = valAsStr.toString(); //Do we need this one? Uncomment if yes
+        if (_.isNumber(msgAsStr)) msgAsStr = msgAsStr.toString();
+
+        if (valAsStr.substr(0, caretPos) !== msgAsStr.substr(0, caretPos)) {
+          diff = msgAsStr.length - valAsStr.length; //Calculate steps to move caret if needed
+        }
+        
+        el.val(msg);
+        el.caret(caretPos + diff);
+      } else {
+        el.val(msg);
+      }
+    })
+    
+    
+  }
+  
+  //Ask for a path value
+  var ask = function(path) {
+    console.log("asking for", path);
+    
+    ["html", "class", "repeat", "value"].forEach(function(tag) {
+      $(scope).find('[dog-' + tag + '="' + path + '"]').each(function(i, el) {
+        give({ path: path }); //A bone without val is used to get the field value
+      })
+    })
+  }
+  
   //
   //Socket events
   //
@@ -569,10 +741,10 @@ var dog = function(address) {
     
   });
   
-  //To force a full refresh
+  /*//To force a full refresh
   socket.on('refresh', function() {
     refresh();
-  })
+  })*/
   
   //To ask a path value
   socket.on('ask', function(path) {
@@ -581,9 +753,15 @@ var dog = function(address) {
     ask(path); //TODO: Implement method to update only the requiered field(s)
   })
   
+  socket.on('give', function(bone) {
+    console.log("give RX, need to run __take", bone)
+    
+    take(bone);
+  })
+  
   return {
     assign: assign,
-    refresh: refresh,
+    //refresh: refresh,
     ask: ask,
     rebind: rebind
   };

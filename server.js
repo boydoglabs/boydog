@@ -137,6 +137,15 @@ var scope = {
 }
 
 var logic = {
+  __take: function(bone) {
+    
+    console.log("main bone middleware", bone.path)
+    
+    return bone;
+  }
+}
+
+/*var logic = {
   __getsetNext: function(data) {
     
     return data;
@@ -257,7 +266,7 @@ var logic = {
       boy.refresh(['increaseApples']);
     }
   }
-}
+}*/
 
 /*setInterval(function() {
   scope.counter++;
