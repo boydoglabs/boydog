@@ -267,7 +267,7 @@ var dog = function(address) {
       htmlClean(scope); //Clean html for whitespaces and line-breaks ()
     }
     
-    refresh(), rebind();
+    normalizePaths(), refresh(), rebind();
   }
   
   //Gets dog-[something]
@@ -480,13 +480,13 @@ var dog = function(address) {
         
         //Process
         var parent = el.parent();
-        var rebindNeeded = false;
+        var updateRequired = false;
         
         _.each(msg, function(v, k) {
           var existingKey = parent.find('[_dog-repeat-key="' + k + '"]').length;
           
           if (existingKey) return;
-          rebindNeeded = true;
+          updateRequired = true;
           
           var newEl = el.clone();
           newEl.removeAttr('dog-repeat').removeAttr('dog-down').removeAttr('dog-up').show();
@@ -502,8 +502,8 @@ var dog = function(address) {
         })
         
         el.hide();
-        if (rebindNeeded) {
-          refresh(), rebind(parent);
+        if (updateRequired) {
+          refresh(parent), rebind(parent);
         }
       })
       
@@ -549,11 +549,11 @@ var dog = function(address) {
   //
   
   //Connecting to a server
-  socket.on('connect', function(data) {
-    normalizePaths(), refresh(), rebind();
+  socket.on('connect', function() {
+    console.log("Connected to server", address);
   });
   
-  //To force a full refresh
+  //To force a full refresh from server
   socket.on('refresh', function() {
     refresh();
   })
