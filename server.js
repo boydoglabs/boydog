@@ -139,8 +139,6 @@ var scope = {
 var logic = {
   __take: function(bone) {
     
-    console.log("main bone middleware", bone.path)
-    
     return bone;
   }
 }

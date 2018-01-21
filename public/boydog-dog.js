@@ -165,6 +165,7 @@ var dog = function(address) {
     ["html", "class", "repeat", "value"].forEach(function(tag) {
       $(element).find('[dog-' + tag + ']').each(function(i, el) {
         var path = parseAttrValue(el, 'dog-' + tag);
+        if ((path.indexOf("@@@") >= 0) || (path.indexOf("$$$") >= 0)) return; //Ignore dog-repeat templates
         give({ path: path }); //A bone without val is used to get the field value
       });
     })
@@ -173,6 +174,8 @@ var dog = function(address) {
   //Will fetch all values and rebind triggers
   var rebind = function(element) {
     if (!element) element = scope;
+    
+    console.log("rebind called")
     
     //Rebind triggers
     $(element).find('[dog-value]').each(function(i, el) {
@@ -184,51 +187,9 @@ var dog = function(address) {
       //Functions for updating values
       $(el).off().on('input', function(field) {
         var path = parseAttrValue(el, 'dog-value');
-        var fullPath = _.toPath(path);
+        var val = field.currentTarget.value;
         
-        val = field.currentTarget.value;
-        
-        //Build packet to be sent
-        packet = { path: path, val: val };
-        
-        //Execute the last item __up
-        mask = _.get(logic, path);
-        
-        if (mask === null) return;
-        if (mask) {
-          if (mask.__up === null) return;
-          if (mask.__up) packet = mask.__up(packet);
-        }
-        
-        //Execute middleware functions to the actual value
-        for (var i = 0; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
-          //tmpPath = _.take(fullPath, i);
-          tmpPath = _.take(fullPath, (fullPath.length - i));
-          
-          mask = _.get(logic, tmpPath);
-          
-          if (mask === null) return;
-          if (mask) {
-            if (logic.__updownNext === null) return;
-            if (mask.__updownNext) packet = mask.__upNext(packet);
-            
-            if (logic.__upNext === null) return;
-            if (mask.__upNext) packet = mask.__upNext(packet);
-          }
-        }
-        
-        //Execute logic top middleware
-        if (logic === null) return;
-        
-        if (logic !== undefined) {
-          if (logic.__updownNext === null) return;
-          if (logic.__updownNext) packet = logic.__updownNext(packet);
-          
-          if (logic.__upNext === null) return;
-          if (logic.__upNext) packet = logic.__upNext(packet);
-        }
-        
-        socket.emit('set', packet);
+        give({ path: path, val: val });
         
         /*//TODO: Implement POST and GET fallback version
         $.post("/get", {}).done(function(json) { });
@@ -236,7 +197,7 @@ var dog = function(address) {
       });
     });
     
-    $(element).find('[dog-run]').each(function(i, el) {
+    /*$(element).find('[dog-run]').each(function(i, el) {
       var tmpPath;
       var packet;
       var mask;
@@ -279,10 +240,10 @@ var dog = function(address) {
         
         socket.emit('run', packet);
         
-        /*//TODO: Implement POST fallback version
-        $.post("/run", {}).done(function(json) { });*/
+        //TODO: Implement POST fallback version
+        //$.post("/run", {}).done(function(json) { });
       });
-    });
+    });*/
   }
   
   //Assign dog's data and logic
@@ -369,7 +330,8 @@ var dog = function(address) {
   var give = function(bone) {
     var mask;
     var tmpPath;
-    console.log("about to give bone", bone);
+    
+    console.log("about to give", bone)
     
     //Execute the last item __give
     mask = _.get(logic, bone.path);
@@ -407,14 +369,12 @@ var dog = function(address) {
       if (logic.__give) bone = logic.__give(bone);
     }
     
-    console.log("emiting give with bone")
     socket.emit('give', bone);
   }
   
   var take = function(bone) {
     var mask;
     var tmpPath;
-    console.log("taking bone", bone)
     
     //Execute logic top level middleware
     if (logic === null) return;
@@ -452,140 +412,144 @@ var dog = function(address) {
       if (mask.__take) bone = mask.__take(bone);
     }
     
-    //Process dog-html
-    getDogAttr("html", bone.path).each(function(k, el) {
-      el = $(el);
-      var msg = bone.val;
-      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
-      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
+    if (bone.val === undefined) { //When the server wants the client to ask for the value
+      console.log("got bone without val", bone);
+      give({ path: bone.path }); //A bone without val is used to get the field value
+    } else { //When we actually receive a value from the server
+      console.log("got bone with val", bone);
       
-      //BuiltIn dog-down stack functions
-      msg = thruDownStack(dogDown, msg);
-      
-      //Additional mixin dog-down stack functions
-      //msg = {}(dogDown, msg);
-      
-      //Process
-      if (!msg) msg = "";
-      el.html(msg); //Write html content
-    })
-    
-    //Process dog-class
-    getDogAttr("class", bone.path).each(function(k, el) {
-      el = $(el);
-      var msg = bone.val;
-      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
-      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
-      
-      //BuiltIn dog-down stack functions
-      msg = thruDownStack(dogDown, msg);
-      
-      //Additional mixin dog-down stack functions
-      //msg = {}(dogDown, msg);
-      
-      //Process
-      var _dogClassLog;
-      
-      try {
-        _dogClassLog = JSON.parse(el.attr('_dog-class-log'))
-      } catch (e) { /* We don't really care if it is not a valid JSON */ }
-      
-      if (!_.isArray(_dogClassLog)) _dogClassLog = [];
-      
-      _dogClassLog.push(msg);
-      
-      //Remove all once added classes
-      _dogClassLog.forEach(function(cl) { el.removeClass(cl) });
-      
-      el.addClass(msg); //Add new class
-      
-      _dogClassLog = _.uniq(_dogClassLog); //TODO: Optimize this, perform this call only 1/10 times
-      el.attr('_dog-class-log', JSON.stringify(_dogClassLog));
-    })
-    
-    //Process dog-html
-    getDogAttr("repeat", bone.path).each(function(k, el) {
-      el = $(el);
-      var msg = bone.val;
-      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
-      var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
-      
-      //BuiltIn dog-down stack functions
-      msg = thruDownStack(dogDown, msg);
-      
-      //Additional mixin dog-down stack functions
-      //msg = {}(dogDown, msg);
-      
-      //Process
-      var parent = el.parent();
-      var rebindNeeded = false;
-      
-      _.each(msg, function(v, k) {
-        var existingKey = parent.find('[_dog-repeat-key="' + k + '"]').length;
+      //Process dog-html
+      getDogAttr("html", bone.path).each(function(k, el) {
+        el = $(el);
+        var msg = bone.val;
+        var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+        //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
         
-        if (existingKey) return;
-        rebindNeeded = true;
+        //BuiltIn dog-down stack functions
+        msg = thruDownStack(dogDown, msg);
         
-        var newEl = el.clone();
-        newEl.removeAttr('dog-repeat').removeAttr('dog-down').removeAttr('dog-up').show();
-        newEl.attr('_dog-repeat-key', k);
+        //Additional mixin dog-down stack functions
+        //msg = {}(dogDown, msg);
         
-        $(newEl).html($(newEl).html().replace(/@@@/g, k).replace(/\$\$\$/g, v));
+        //Process
+        if (!msg) msg = "";
+        el.html(msg); //Write html content
+      })
+      
+      //Process dog-class
+      getDogAttr("class", bone.path).each(function(k, el) {
+        el = $(el);
+        var msg = bone.val;
+        var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+        //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
         
-        if (dogOpt.indexOf("inverse") >= 0) {
-          el.after(newEl);
-        } else {
-          el.before(newEl);
+        //BuiltIn dog-down stack functions
+        msg = thruDownStack(dogDown, msg);
+        
+        //Additional mixin dog-down stack functions
+        //msg = {}(dogDown, msg);
+        
+        //Process
+        var _dogClassLog;
+        
+        try {
+          _dogClassLog = JSON.parse(el.attr('_dog-class-log'))
+        } catch (e) { /* We don't really care if it is not a valid JSON */ }
+        
+        if (!_.isArray(_dogClassLog)) _dogClassLog = [];
+        
+        _dogClassLog.push(msg);
+        
+        //Remove all once added classes
+        _dogClassLog.forEach(function(cl) { el.removeClass(cl) });
+        
+        el.addClass(msg); //Add new class
+        
+        _dogClassLog = _.uniq(_dogClassLog); //TODO: Optimize this, perform this call only 1/10 times
+        el.attr('_dog-class-log', JSON.stringify(_dogClassLog));
+      })
+      
+      //Process dog-html
+      getDogAttr("repeat", bone.path).each(function(k, el) {
+        el = $(el);
+        var msg = bone.val;
+        var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+        var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
+        
+        //BuiltIn dog-down stack functions
+        msg = thruDownStack(dogDown, msg);
+        
+        //Additional mixin dog-down stack functions
+        //msg = {}(dogDown, msg);
+        
+        //Process
+        var parent = el.parent();
+        var rebindNeeded = false;
+        
+        _.each(msg, function(v, k) {
+          var existingKey = parent.find('[_dog-repeat-key="' + k + '"]').length;
+          
+          if (existingKey) return;
+          rebindNeeded = true;
+          
+          var newEl = el.clone();
+          newEl.removeAttr('dog-repeat').removeAttr('dog-down').removeAttr('dog-up').show();
+          newEl.attr('_dog-repeat-key', k);
+          
+          $(newEl).html($(newEl).html().replace(/@@@/g, k).replace(/\$\$\$/g, v));
+          
+          if (dogOpt.indexOf("inverse") >= 0) {
+            el.after(newEl);
+          } else {
+            el.before(newEl);
+          }
+        })
+        
+        el.hide();
+        if (rebindNeeded) {
+          refresh(), rebind(parent);
         }
       })
       
-      el.hide();
-      if (rebindNeeded) {
-        refresh(), rebind(parent);
-      }
-    })
-    
-    //Process dog-value
-    getDogAttr("value", bone.path).each(function(k, el) {
-      el = $(el);
-      
-      var msg = bone.val;
-      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
-      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
-      
-      //BuiltIn dog-down stack functions
-      msg = thruDownStack(dogDown, msg);
-      
-      //Additional mixin dog-down stack functions
-      //msg = {}(dogDown, msg);
-      
-      //Process
-      if (el[0] === document.activeElement) { //If two or more people are editing the same element
-        var caretPos = el.caret(); //Save caret position
-        var diff = 0; //Assume we don't need to move caret
-        var valAsStr = el.val() || "";
-        var msgAsStr = msg || "";
+      //Process dog-value
+      getDogAttr("value", bone.path).each(function(k, el) {
+        el = $(el);
         
-        //if (_.isNumber(valAsStr)) valAsStr = valAsStr.toString(); //Do we need this one? Uncomment if yes
-        if (_.isNumber(msgAsStr)) msgAsStr = msgAsStr.toString();
+        var msg = bone.val;
+        var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+        //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
+        
+        //BuiltIn dog-down stack functions
+        msg = thruDownStack(dogDown, msg);
+        
+        //Additional mixin dog-down stack functions
+        //msg = {}(dogDown, msg);
+        
+        //Process
+        if (el[0] === document.activeElement) { //If two or more people are editing the same element
+          var caretPos = el.caret(); //Save caret position
+          var diff = 0; //Assume we don't need to move caret
+          var valAsStr = el.val() || "";
+          var msgAsStr = msg || "";
+          
+          //if (_.isNumber(valAsStr)) valAsStr = valAsStr.toString(); //Do we need this one? Uncomment if yes
+          if (_.isNumber(msgAsStr)) msgAsStr = msgAsStr.toString();
 
-        if (valAsStr.substr(0, caretPos) !== msgAsStr.substr(0, caretPos)) {
-          diff = msgAsStr.length - valAsStr.length; //Calculate steps to move caret if needed
+          if (valAsStr.substr(0, caretPos) !== msgAsStr.substr(0, caretPos)) {
+            diff = msgAsStr.length - valAsStr.length; //Calculate steps to move caret if needed
+          }
+          
+          el.val(msg);
+          el.caret(caretPos + diff);
+        } else {
+          el.val(msg);
         }
-        
-        el.val(msg);
-        el.caret(caretPos + diff);
-      } else {
-        el.val(msg);
-      }
-    })
-    
-    
+      })
+    }
   }
   
   //Ask for a path value
   var ask = function(path) {
-    console.log("asking for", path);
     
     ["html", "class", "repeat", "value"].forEach(function(tag) {
       $(scope).find('[dog-' + tag + '="' + path + '"]').each(function(i, el) {
@@ -600,7 +564,6 @@ var dog = function(address) {
   
   //Connecting to a server
   socket.on('connect', function(data) {
-    console.log("BoyDog connected to", address);
     
     normalizePaths(), refresh(), rebind();
   });
@@ -754,8 +717,6 @@ var dog = function(address) {
   })
   
   socket.on('give', function(bone) {
-    console.log("give RX, need to run __take", bone)
-    
     take(bone);
   })
   

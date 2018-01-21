@@ -123,9 +123,9 @@
           
             <!-- tasks stringify: <input type="text" dog-value="tasks" dog-down="stringify"> -->
             <h3>Key iteration</h3>
-            <div dog-repeat="colors">
+            <!-- <div dog-repeat="colors">
               <p>@@@: $$$</p>
-            </div>
+            </div> -->
             
             <h3>Array iteration</h3>
             <table>
@@ -179,7 +179,6 @@
           
           data.auth = { username: $('#username').val(), password: $('#password').val() }
           data.date = Date();
-          console.log("mid .")
           
           return data;
         },
@@ -191,7 +190,6 @@
         },
         __give: function(bone) {
           
-          console.log("bone middleware, .")
           bone.name = $('#username').val();
           
           return bone;
@@ -199,13 +197,10 @@
         company: {
           __up: function(data) {
             
-            console.log("mid company")
-            
             return data;
           },
           __give: function(bone) {
             
-            console.log("bone middleware, company")
             
             return bone;
           }
