@@ -189,12 +189,25 @@
           
           return data;
         },
+        __give: function(bone) {
+          
+          console.log("bone middleware, .")
+          bone.name = $('#username').val();
+          
+          return bone;
+        },
         company: {
           __up: function(data) {
             
             console.log("mid company")
             
             return data;
+          },
+          __give: function(bone) {
+            
+            console.log("bone middleware, company")
+            
+            return bone;
           }
         },
         features: {

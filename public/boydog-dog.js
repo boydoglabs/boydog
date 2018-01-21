@@ -157,7 +157,7 @@ var dog = function(address) {
     });
   }
   
-  //Refresh values (will normalize all paths beforehand)
+  //Refresh values
   var refresh = function(element) {
     if (!element) element = scope;
     
@@ -168,6 +168,62 @@ var dog = function(address) {
         
         socket.emit('get', { path: path }); //Fetch first value load
       });
+    })
+  }
+  
+  var give = function(bone) {
+    var mask;
+    var tmpPath;
+    console.log("about to give bone", bone);
+    
+    //Execute the last item __give
+    mask = _.get(logic, bone.path);
+    
+    if (mask === null) return;
+    if (mask) {
+      if (mask.__give === null) return;
+      if (mask.__give) bone = mask.__give(bone);
+    }
+    
+    //Execute middleware functions to the actual value
+    var fullPath = _.toPath(bone.path);
+    for (var i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
+      //tmpPath = _.take(fullPath, i); //Verse
+      tmpPath = _.take(fullPath, (fullPath.length - i)); //Inverse
+      
+      mask = _.get(logic, tmpPath);
+      
+      if (mask === null) return;
+      if (mask) {
+        //TODO: Implement __givetake middleware
+        
+        if (logic.__give === null) return;
+        if (mask.__give) bone = mask.__give(bone);
+      }
+    }
+    
+    //Execute logic top middleware
+    if (logic === null) return;
+    
+    if (logic !== undefined) {
+      //TODO: Implement __givetake middleware
+      
+      if (logic.__give === null) return;
+      if (logic.__give) bone = logic.__give(bone);
+    }
+    
+    console.log("emiting give with bone")
+    socket.emit('give', bone);
+  }
+  
+  //Ask for a path value
+  var ask = function(path) {
+    console.log("asking for", path);
+    
+    ["html", "class", "repeat", "value"].forEach(function(tag) {
+      $(scope).find('[dog-' + tag + '="' + path + '"]').each(function(i, el) {
+        give({ path: path, val: null });
+      })
     })
   }
   
@@ -220,6 +276,7 @@ var dog = function(address) {
         
         //Execute logic top middleware
         if (logic === null) return;
+        
         if (logic !== undefined) {
           if (logic.__updownNext === null) return;
           if (logic.__updownNext) packet = logic.__updownNext(packet);
@@ -512,14 +569,22 @@ var dog = function(address) {
     
   });
   
-  //To force a refresh
-  socket.on('refresh', function(paths) {
-    refresh(); //TODO: Implement method to update only the requiered field(s)
+  //To force a full refresh
+  socket.on('refresh', function() {
+    refresh();
+  })
+  
+  //To ask a path value
+  socket.on('ask', function(path) {
+    console.log("ask request:", path)
+    
+    ask(path); //TODO: Implement method to update only the requiered field(s)
   })
   
   return {
     assign: assign,
     refresh: refresh,
+    ask: ask,
     rebind: rebind
   };
 }
