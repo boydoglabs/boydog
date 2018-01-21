@@ -191,9 +191,7 @@ var dog = function(address) {
         
         give({ path: path, val: val });
         
-        /*//TODO: Implement POST and GET fallback version
-        $.post("/get", {}).done(function(json) { });
-        $.post("/set", {}).done(function(json) { });*/
+        //$.post("/give", {}).done(function(json) { });  //TODO: Implement POST and GET fallback version
       });
     });
     
@@ -325,7 +323,6 @@ var dog = function(address) {
   var thruUpStack = function(stack, msg) {
     //TODO
   }
-  
   
   var give = function(bone) {
     var mask;
@@ -548,16 +545,6 @@ var dog = function(address) {
     }
   }
   
-  //Ask for a path value
-  var ask = function(path) {
-    
-    ["html", "class", "repeat", "value"].forEach(function(tag) {
-      $(scope).find('[dog-' + tag + '="' + path + '"]').each(function(i, el) {
-        give({ path: path }); //A bone without val is used to get the field value
-      })
-    })
-  }
-  
   //
   //Socket events
   //
@@ -723,7 +710,6 @@ var dog = function(address) {
   return {
     assign: assign,
     //refresh: refresh,
-    ask: ask,
     rebind: rebind
   };
 }
