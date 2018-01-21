@@ -551,7 +551,6 @@ var dog = function(address) {
   
   //Connecting to a server
   socket.on('connect', function(data) {
-    
     normalizePaths(), refresh(), rebind();
   });
   
@@ -691,16 +690,9 @@ var dog = function(address) {
     
   });
   
-  /*//To force a full refresh
+  //To force a full refresh
   socket.on('refresh', function() {
     refresh();
-  })*/
-  
-  //To ask a path value
-  socket.on('ask', function(path) {
-    console.log("ask request:", path)
-    
-    ask(path); //TODO: Implement method to update only the requiered field(s)
   })
   
   socket.on('give', function(bone) {
@@ -709,7 +701,8 @@ var dog = function(address) {
   
   return {
     assign: assign,
-    //refresh: refresh,
+    refresh: refresh,
+    ask: ask,
     rebind: rebind
   };
 }
