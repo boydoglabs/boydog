@@ -175,19 +175,6 @@
       
       var scope = 'html';
       var logic = {
-        __upNext: function(data) {
-          
-          data.auth = { username: $('#username').val(), password: $('#password').val() }
-          data.date = Date();
-          
-          return data;
-        },
-        __runNext: function(data) {
-          
-          data.auth = { username: $('#username').val(), password: $('#password').val() }
-          
-          return data;
-        },
         __give: function(bone) {
           
           bone.name = $('#username').val();
@@ -195,54 +182,9 @@
           return bone;
         },
         company: {
-          __up: function(data) {
-            
-            return data;
-          },
           __give: function(bone) {
             
-            
             return bone;
-          }
-        },
-        features: {
-          __upNext: function(data) {
-            
-            console.log("mid features")
-            
-            return data;
-          },
-          body: {
-            __upNext: function(data) {
-              
-              console.log("mid features body")
-              
-              return data;
-            },
-            up: {
-              __upNext: function(data) {
-                
-                console.log("mid features body up")
-                
-                return data;
-              },
-              eyes: {
-                __upNext: function(data) {
-                  
-                  console.log("mid features body up eyes")
-                  
-                  return data;
-                }
-              }
-            }
-          }
-        },
-        users: {
-          __down: {
-            function(data) {
-              
-              return data;
-            }
           }
         }
       };

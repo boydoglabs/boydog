@@ -7,7 +7,6 @@ var dog = function(address) {
   var scope = "html"; //Our data is the html element by default
   var logic = {};
   var settings = { cleanHTML: false };
-  var attrNames = ['id', 'class', 'value', 'html'];
   
   //Caret plugin (TODO: Optimize this on a later stage)
   (function($) {
@@ -554,142 +553,6 @@ var dog = function(address) {
     normalizePaths(), refresh(), rebind();
   });
   
-  //To set a value
-  socket.on('update', function(data) {
-    var elem;
-    
-    console.log("update RX", data)
-    
-    //Process dog-html
-    getDogAttr("html", data.path).each(function(k, el) {
-      el = $(el);
-      var msg = data.val;
-      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
-      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
-      
-      //BuiltIn dog-down stack functions
-      msg = thruDownStack(dogDown, msg);
-      
-      //Additional mixin dog-down stack functions
-      //msg = {}(dogDown, msg);
-      
-      //Process
-      if (!msg) msg = "";
-      el.html(msg); //Write html content
-    })
-    
-    //Process dog-class
-    getDogAttr("class", data.path).each(function(k, el) {
-      el = $(el);
-      var msg = data.val;
-      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
-      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
-      
-      //BuiltIn dog-down stack functions
-      msg = thruDownStack(dogDown, msg);
-      
-      //Additional mixin dog-down stack functions
-      //msg = {}(dogDown, msg);
-      
-      //Process
-      var _dogClassLog;
-      
-      try {
-        _dogClassLog = JSON.parse(el.attr('_dog-class-log'))
-      } catch (e) { /* We don't really care if it is not a valid JSON */ }
-      
-      if (!_.isArray(_dogClassLog)) _dogClassLog = [];
-      
-      _dogClassLog.push(msg);
-      
-      //Remove all once added classes
-      _dogClassLog.forEach(function(cl) { el.removeClass(cl) });
-      
-      el.addClass(msg); //Add new class
-      
-      _dogClassLog = _.uniq(_dogClassLog); //TODO: Optimize this, perform this call only 1/10 times
-      el.attr('_dog-class-log', JSON.stringify(_dogClassLog));
-    })
-    
-    //Process dog-html
-    getDogAttr("repeat", data.path).each(function(k, el) {
-      el = $(el);
-      var msg = data.val;
-      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
-      var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
-      
-      //BuiltIn dog-down stack functions
-      msg = thruDownStack(dogDown, msg);
-      
-      //Additional mixin dog-down stack functions
-      //msg = {}(dogDown, msg);
-      
-      //Process
-      var parent = el.parent();
-      var rebindNeeded = false;
-      
-      _.each(msg, function(v, k) {
-        var existingKey = parent.find('[_dog-repeat-key="' + k + '"]').length;
-        
-        if (existingKey) return;
-        rebindNeeded = true;
-        
-        var newEl = el.clone();
-        newEl.removeAttr('dog-repeat').removeAttr('dog-down').removeAttr('dog-up').show();
-        newEl.attr('_dog-repeat-key', k);
-        
-        $(newEl).html($(newEl).html().replace(/@@@/g, k).replace(/\$\$\$/g, v));
-        
-        if (dogOpt.indexOf("inverse") >= 0) {
-          el.after(newEl);
-        } else {
-          el.before(newEl);
-        }
-      })
-      
-      el.hide();
-      if (rebindNeeded) {
-        refresh(), rebind(parent);
-      }
-    })
-    
-    //Process dog-value
-    getDogAttr("value", data.path).each(function(k, el) {
-      el = $(el);
-      
-      var msg = data.val;
-      var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
-      //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
-      
-      //BuiltIn dog-down stack functions
-      msg = thruDownStack(dogDown, msg);
-      
-      //Additional mixin dog-down stack functions
-      //msg = {}(dogDown, msg);
-      
-      //Process
-      if (el[0] === document.activeElement) { //If two or more people are editing the same element
-        var caretPos = el.caret(); //Save caret position
-        var diff = 0; //Assume we don't need to move caret
-        var valAsStr = el.val() || "";
-        var msgAsStr = msg || "";
-        
-        //if (_.isNumber(valAsStr)) valAsStr = valAsStr.toString(); //Do we need this one? Uncomment if yes
-        if (_.isNumber(msgAsStr)) msgAsStr = msgAsStr.toString();
-
-        if (valAsStr.substr(0, caretPos) !== msgAsStr.substr(0, caretPos)) {
-          diff = msgAsStr.length - valAsStr.length; //Calculate steps to move caret if needed
-        }
-        
-        el.val(msg);
-        el.caret(caretPos + diff);
-      } else {
-        el.val(msg);
-      }
-    })
-    
-  });
-  
   //To force a full refresh
   socket.on('refresh', function() {
     refresh();
@@ -702,7 +565,6 @@ var dog = function(address) {
   return {
     assign: assign,
     refresh: refresh,
-    ask: ask,
     rebind: rebind
   };
 }
