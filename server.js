@@ -140,6 +140,20 @@ var logic = {
   __take: function(bone) {
     
     return bone;
+  },
+  addTask: {
+    __take: function() {
+      
+      
+      scope.tasks.push({
+        "toDo": scope.newTaskName,
+        "progress": 90
+      })
+      
+      boy.refresh("tasks");
+      
+      console.log("addTask executed", scope.tasks)
+    }
   }
 }
 
@@ -269,7 +283,7 @@ var logic = {
 setInterval(function() {
   scope.counter = scope.counter + 1;
   boy.refresh(["counter"]);
-}, 1000);
+}, 30000);
 
 boy.assign(scope, logic);
 

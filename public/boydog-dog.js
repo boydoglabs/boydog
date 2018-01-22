@@ -132,7 +132,7 @@ var dog = function(address) {
   
   //Normalize attribute paths (i.e.: address.gps.lat becomes address['gps']['lat'] to avoid issues when trying to access things like user.2.name)
   var normalizePaths = function() {
-    ['dog-id', 'dog-class', 'dog-value', 'dog-html', 'dog-run'].forEach(function(attrName) {
+    ['dog-id', 'dog-class', 'dog-value', 'dog-html', 'dog-click'].forEach(function(attrName) {
       $('[' + attrName + ']').each(function(i, el) {
         var attr = $(el).attr(attrName);
         var attr = _.toPath(attr);
@@ -172,17 +172,26 @@ var dog = function(address) {
   var rebind = function(element) {
     if (!element) element = scope;
     
-    //Rebind triggers
+    //Rebind inputs (<input>, <textarea> or anything that uses dog-value)
     $(element).find('[dog-value]').each(function(i, el) {
-      var tmpPath;
-      var packet;
-      var val;
-      var mask;
-      
-      //Functions for updating values
       $(el).off().on('input', function(field) {
         var path = parseAttrValue(el, 'dog-value');
         var val = field.currentTarget.value;
+        
+        give({ path: path, val: val });
+        
+        //$.post("/give", {}).done(function(json) { });  //TODO: Implement POST and GET fallback version
+      })
+    })
+    
+    //Rebind buttons (could be <a>, <button>, or even any other element with dog-click)
+    $(element).find('[dog-click]').each(function(i, el) {
+      $(el).off().on('click', function(field) {
+        
+        console.log("click detected", el)
+        
+        var path = parseAttrValue(el, 'dog-click');
+        var val = Date(); //Clicking sends the current date
         
         give({ path: path, val: val });
         
@@ -282,7 +291,7 @@ var dog = function(address) {
   }
   
   //The dog-give quick function stack
-  var giveStak = {
+  var giveStack = {
     //TODO
   };
   
@@ -299,12 +308,12 @@ var dog = function(address) {
     }
   }
   
-  //Will read and run up stack
-  var processGiveStack = function(stack, msg) {
+  //The quick give stack
+  var thruGiveStack = function(stack, msg) {
     //TODO
   }
   
-  //Will read and run take stack
+  //The quick take stack
   var thruTakeStack = function(stack, msg) {
     if (stack) {
       _.each(stack, function(item) {
@@ -313,11 +322,6 @@ var dog = function(address) {
     }
     
     return msg;
-  }
-  
-  //Will read and run up stack
-  var thruUpStack = function(stack, msg) {
-    //TODO
   }
   
   //Give a bone with a path and a value to set *or* give a bone with a path without value to ask for the value
@@ -361,6 +365,9 @@ var dog = function(address) {
       if (logic.__give) bone = logic.__give(bone);
     }
     
+    console.log("emiting bone", bone)
+    
+    if (bone === undefined) return;
     socket.emit('give', bone);
   }
   
@@ -405,6 +412,7 @@ var dog = function(address) {
       if (mask.__take) bone = mask.__take(bone);
     }
     
+    if (bone === undefined) return;
     if (bone.val === undefined) { //When the server wants the client to ask for the value
       give({ path: bone.path }); //A bone without val is used to get the field value
     } else { //When we actually receive a value from the server

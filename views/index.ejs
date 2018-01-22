@@ -144,11 +144,11 @@
             </table>
             <p>Task length: <span dog-html="tasks" dog-take="length"></span></p>
             taskname: <input type="text" dog-value="newTaskName">
-            <a class="button" href="javascript:void(0);" dog-run="addTask">Add task</a>
+            <a class="button" href="javascript:void(0);" dog-click="addTask">Add task</a>
             <br/>
             
             apples: <input type="text" dog-value="appleQuantity">
-            <a class="button" href="javascript:void(0);" dog-run="increaseApples">Increase apples</a>
+            <a class="button" href="javascript:void(0);" dog-click="increaseApples">Increase apples</a>
           </div>
         </div>
         
@@ -182,6 +182,14 @@
         },
         company: {
           __give: function(bone) {
+            
+            return bone;
+          }
+        },
+        addTask: {
+          __give: function(bone) {
+            
+            console.log("click middleware trap")
             
             return bone;
           }
