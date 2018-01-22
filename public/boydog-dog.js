@@ -281,13 +281,13 @@ var dog = function(address) {
     return elem;
   }
   
-  //The dog-up quick function stack
-  var upStack = {
+  //The dog-give quick function stack
+  var giveStak = {
     //TODO
   };
   
-  //The dog-down quick function stack
-  var downStack = {
+  //The dog-take quick function stack
+  var takeStack = {
     stringify: function(data) {
       
       return JSON.stringify(data);
@@ -300,15 +300,15 @@ var dog = function(address) {
   }
   
   //Will read and run up stack
-  var processUpStack = function(stack, msg) {
+  var processGiveStack = function(stack, msg) {
     //TODO
   }
   
-  //Will read and run down stack
-  var thruDownStack = function(stack, msg) {
+  //Will read and run take stack
+  var thruTakeStack = function(stack, msg) {
     if (stack) {
       _.each(stack, function(item) {
-        if (downStack[item]) msg = downStack[item](msg);
+        if (takeStack[item]) msg = takeStack[item](msg);
       })
     }
     
@@ -412,14 +412,14 @@ var dog = function(address) {
       getDogAttr("html", bone.path).each(function(k, el) {
         el = $(el);
         var msg = bone.val;
-        var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+        var dogTake = (el.attr('dog-take') || '').split(',').map(function(item) { return item.trim() });
         //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
         
-        //BuiltIn dog-down stack functions
-        msg = thruDownStack(dogDown, msg);
+        //BuiltIn dog-take stack functions
+        msg = thruTakeStack(dogTake, msg);
         
-        //Additional mixin dog-down stack functions
-        //msg = {}(dogDown, msg);
+        //Additional mixin dog-take stack functions
+        //msg = {}(dogTake, msg);
         
         //Process
         if (!msg) msg = "";
@@ -430,14 +430,14 @@ var dog = function(address) {
       getDogAttr("class", bone.path).each(function(k, el) {
         el = $(el);
         var msg = bone.val;
-        var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+        var dogTake = (el.attr('dog-take') || '').split(',').map(function(item) { return item.trim() });
         //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
         
-        //BuiltIn dog-down stack functions
-        msg = thruDownStack(dogDown, msg);
+        //BuiltIn dog-take stack functions
+        msg = thruTakeStack(dogTake, msg);
         
-        //Additional mixin dog-down stack functions
-        //msg = {}(dogDown, msg);
+        //Additional mixin dog-take stack functions
+        //msg = {}(dogTake, msg);
         
         //Process
         var _dogClassLog;
@@ -463,14 +463,14 @@ var dog = function(address) {
       getDogAttr("repeat", bone.path).each(function(k, el) {
         el = $(el);
         var msg = bone.val;
-        var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+        var dogTake = (el.attr('dog-take') || '').split(',').map(function(item) { return item.trim() });
         var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
         
-        //BuiltIn dog-down stack functions
-        msg = thruDownStack(dogDown, msg);
+        //BuiltIn dog-take stack functions
+        msg = thruTakeStack(dogTake, msg);
         
-        //Additional mixin dog-down stack functions
-        //msg = {}(dogDown, msg);
+        //Additional mixin dog-take stack functions
+        //msg = {}(dogTake, msg);
         
         //Process
         var parent = el.parent();
@@ -483,7 +483,7 @@ var dog = function(address) {
           updateRequired = true;
           
           var newEl = el.clone();
-          newEl.removeAttr('dog-repeat').removeAttr('dog-down').removeAttr('dog-up').show();
+          newEl.removeAttr('dog-repeat').removeAttr('dog-take').removeAttr('dog-give').show();
           newEl.attr('_dog-repeat-key', k);
           
           $(newEl).html($(newEl).html().replace(/@@@/g, k).replace(/\$\$\$/g, v));
@@ -506,14 +506,14 @@ var dog = function(address) {
         el = $(el);
         
         var msg = bone.val;
-        var dogDown = (el.attr('dog-down') || '').split(',').map(function(item) { return item.trim() });
+        var dogTake = (el.attr('dog-take') || '').split(',').map(function(item) { return item.trim() });
         //var dogOpt = (el.attr('dog-opt') || '').split(',').map(function(item) { return item.trim() });
         
-        //BuiltIn dog-down stack functions
-        msg = thruDownStack(dogDown, msg);
+        //BuiltIn dog-take stack functions
+        msg = thruTakeStack(dogTake, msg);
         
-        //Additional mixin dog-down stack functions
-        //msg = {}(dogDown, msg);
+        //Additional mixin dog-take stack functions
+        //msg = {}(dogTake, msg);
         
         //Process
         if (el[0] === document.activeElement) { //If two or more people are editing the same element
