@@ -100,8 +100,8 @@ var scope = {
   "address": "462 Llama Court, Sattley, American Samoa, 8570",
   "about": "Exercitation enim elit incididunt exercitation velit veniam aliqua ullamco sit est. In incididunt ad esse officia aliqua. Non cupidatat voluptate amet nostrud incididunt aliqua non sint id reprehenderit amet cillum sit. Cupidatat exercitation laborum commodo elit duis irure irure occaecat sit cillum voluptate nostrud. Laboris adipisicing exercitation dolore adipisicing. Adipisicing aliquip mollit Lorem aute amet aute magna id consequat nulla Lorem. Reprehenderit consectetur labore velit magna.\r\nLabore nostrud cupidatat Lorem elit non commodo eu. Occaecat nulla elit consequat culpa ea dolor culpa anim minim consectetur officia non. Ea ullamco sunt labore minim sint excepteur qui id excepteur officia sunt elit ad Lorem.\r\nOccaecat excepteur ipsum deserunt ut cupidatat reprehenderit aute et voluptate tempor. Anim labore consequat aliquip commodo mollit aliqua mollit ullamco duis est aute occaecat. Ut sit est officia consectetur pariatur qui ut officia pariatur in cupidatat et aliquip. Amet reprehenderit anim duis nostrud culpa tempor in enim id ex quis quis cupidatat non. Qui ea commodo ut aliquip proident id fugiat pariatur sit.\r\n",
   "registered": "2017-02-12T02:41:43 +06:00",
-  "counter": 1,
-  "counterClass": "odd",
+  counter: 1,
+  counterClass: "odd",
   "latitude": 52.830264,
   "longitude": 130.016097,
   "colors": {
@@ -266,10 +266,10 @@ var logic = {
   }
 }*/
 
-/*setInterval(function() {
-  scope.counter++;
-  boy.refresh();
-}, 1000);*/
+setInterval(function() {
+  scope.counter = scope.counter + 1;
+  boy.refresh(["counter"]);
+}, 1000);
 
 boy.assign(scope, logic);
 

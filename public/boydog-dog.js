@@ -156,13 +156,11 @@ var dog = function(address) {
     });
   }
   
-  //Refresh values
-  var refresh = function(element) {
-    if (!element) element = scope;
-    
-    //Fetch first values
+  //Refresh all values
+  var refresh = function() {
+    //Fetch all values from all paths
     ["html", "class", "repeat", "value"].forEach(function(tag) {
-      $(element).find('[dog-' + tag + ']').each(function(i, el) {
+      $(scope).find('[dog-' + tag + ']').each(function(i, el) {
         var path = parseAttrValue(el, 'dog-' + tag);
         if ((path.indexOf("@@@") >= 0) || (path.indexOf("$$$") >= 0)) return; //Ignore dog-repeat templates
         give({ path: path }); //A bone without val is used to get the field value
@@ -592,7 +590,7 @@ var dog = function(address) {
   
   //To force a full refresh from server
   socket.on('refresh', function() {
-    refresh();
+    refresh(); //Full value refresh
   })
   
   socket.on('give', function(bone) {
@@ -601,6 +599,8 @@ var dog = function(address) {
   
   return {
     assign: assign,
+    give: give,
+    take: take,
     refresh: refresh,
     rebind: rebind
   };
