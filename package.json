@@ -1,6 +1,6 @@
 {
   "name": "boydog",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Framework for Real Time Collaborative (RTC) web apps",
   "main": "boydog.js",
   "scripts": {
