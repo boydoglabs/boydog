@@ -2,9 +2,8 @@
   "name": "boydog",
   "version": "1.0.6",
   "description": "Framework for Real Time Collaborative (RTC) web apps",
-  "main": "index.js",
+  "main": "boydog.js",
   "scripts": {
-    "start": "forever --verbose --uid \"framews\" -w -c \"node --inspect\" ./server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,17 +23,10 @@
     "real time collaborative"
   ],
   "dependencies": {
-    "body-parser": "^1.18.2",
     "boydog-boy": "^1.0.3",
-    "cookie-parser": "^1.4.3",
-    "dotenv": "^4.0.0",
-    "ejs": "^2.5.7",
-    "express": "^4.16.1",
-    "express-session": "^1.15.6",
     "json2fson": "^1.0.8",
     "lodash": "^4.17.4",
-    "socket.io": "^2.0.4",
-    "validator": "^9.1.1"
+    "socket.io": "^2.0.4"
   },
   "author": "boy.dog (www.boy.dog)",
   "license": "MIT",
