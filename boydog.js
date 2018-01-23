@@ -1,4 +1,4 @@
-//BoyDog boy (server) module
+//BoyDog server module
 
 'use strict';
 
@@ -7,6 +7,8 @@ module.exports = function(server) {
   var _ = require('lodash');
   var scope = {};
   var logic = {};
+  
+  //TODO: Add and browserify "boydog-client"
   
   //
   //Boy functions
