@@ -1,4 +1,4 @@
-//BoyDog server module
+//BoyDog server-side
 
 'use strict';
 
@@ -61,7 +61,6 @@ module.exports = function(server) {
     
     walkKeys(sp, undefined, []);
   }*/
-
   
   var give = function(bone) {
     var mask;
@@ -112,8 +111,6 @@ module.exports = function(server) {
     var mask;
     var tmpPath;
     
-    console.log("bone so far", _.omit(bone, 'socket'))
-    
     //Execute logic top level middleware
     if (logic === null) return;
     if (logic !== undefined) {
@@ -122,8 +119,6 @@ module.exports = function(server) {
       if (logic.__take === null) return;
       if (logic.__take) bone = logic.__take(bone);
     }
-    
-    console.log("bone so far", _.omit(bone, 'socket'))
     
     //Execute path to the actual value middleware
     var fullPath = _.toPath(bone.path);
@@ -142,8 +137,6 @@ module.exports = function(server) {
       if (mask.__take) bone = mask.__take(bone);
     }
     
-    console.log("bone so far", _.omit(bone, 'socket'))
-    
     //Execute the last item __take
     mask = _.get(logic, bone.path);
     
@@ -153,8 +146,6 @@ module.exports = function(server) {
       if (mask.__take === null) return;
       if (mask.__take) bone = mask.__take(bone);
     }
-    
-    console.log("received bone", _.omit(bone, 'socket'))
     
     if (bone === undefined) return;
     if (bone.val === undefined) { //When only asking for a value
