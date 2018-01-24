@@ -1,7 +1,7 @@
 {
   "name": "boydog",
   "version": "1.0.8",
-  "description": "Framework for Real Time Collaborative (RTC) web apps",
+  "description": "Build ultra-fast, real-time collaborative webpages in Node.JS + Socket.IO. Server-side module.",
   "main": "boydog.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
