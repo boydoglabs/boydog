@@ -11,6 +11,30 @@ module.exports = function(server) {
   //TODO: Add and browserify "boydog-client"
   
   //
+  //Utility classes
+  //
+  
+  var canonicalizePath = function(str) {
+    var attr = _.toPath(str);
+    
+    if (attr.length > 1) {
+      attr = _.map(attr, function(item, i) {
+        if (i === 0) return item;
+        
+        if((item[0] === "#") || ((item[0] === "."))) return item;
+          
+        return "'" + item + "'";
+      })
+      
+      attr = attr.shift() + "[" + attr.join("][") + "]";
+    } else {
+      attr = attr.shift();
+    }
+    
+    return attr;
+  }
+  
+  //
   //Boy functions
   //
   
@@ -104,6 +128,13 @@ module.exports = function(server) {
     }
     
     if (bone === undefined) return;
+    
+    /*if (!bone.plays) {
+      bone.plays = 1;
+    } else {
+      bone.plays++;
+    }*/
+    
     bone.socket.emit('give', _.omit(bone, 'socket')); //Remove socket info and send bone to the client
   }
   
@@ -119,6 +150,8 @@ module.exports = function(server) {
       if (logic.__take === null) return;
       if (logic.__take) bone = logic.__take(bone);
     }
+    
+    if (bone === undefined) return;
     
     //Execute path to the actual value middleware
     var fullPath = _.toPath(bone.path);
@@ -137,6 +170,10 @@ module.exports = function(server) {
       if (mask.__take) bone = mask.__take(bone);
     }
     
+    if (bone === undefined) return;
+    
+    bone.final = true;
+    
     //Execute the last item __take
     mask = _.get(logic, bone.path);
     
@@ -148,6 +185,7 @@ module.exports = function(server) {
     }
     
     if (bone === undefined) return;
+    
     if (bone.val === undefined) { //When only asking for a value
       bone.val = _.get(scope, bone.path); //Get value from scope
       if (bone.val !== undefined) give(_.pick(bone, ['path', 'val', 'socket'])); //Give the bone only if it has a value
@@ -167,14 +205,14 @@ module.exports = function(server) {
   var refresh = function(paths) {
     if (_.isString(paths)) { //If paths is in fact only a single path
       //give({ path: paths }); //A bone without val is used to get the field value
-      io.emit('give', { path: paths }); //Refresh the specific route
+      
+      io.emit('give', { path: canonicalizePath(paths) }); //Refresh the specific route
     } else if (_.isArray(paths)) {
       _.each(paths, function(path) { //For each route
-        //give({ path: paths }); //A bone without val is used to get the field value
-        io.emit('give', { path: path }); //Refresh the specific route
+        io.emit('give', { path: canonicalizePath(path) }); //Refresh the specific route
       })
     } else {
-      io.emit('refresh', paths); //Refresh a specific route
+      io.emit('refresh'); //Refresh all routes (careful, this is expensive)
     }
   }
   
