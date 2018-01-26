@@ -100,6 +100,8 @@ module.exports = function(server) {
       if (mask.__give) bone = mask.__give(bone);
     }
     
+    if (bone === undefined) return;
+    
     //Execute middleware functions to the actual value
     var fullPath = _.toPath(bone.path);
     for (var i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
@@ -117,6 +119,8 @@ module.exports = function(server) {
       if (mask.__give) bone = mask.__give(bone);
     }
     
+    if (bone === undefined) return;
+    
     //Execute logic top level middleware
     if (logic === null) return;
     
@@ -127,13 +131,14 @@ module.exports = function(server) {
       if (logic.__give) bone = logic.__give(bone);
     }
     
-    if (bone === undefined) return;
     
     /*if (!bone.plays) {
       bone.plays = 1;
     } else {
       bone.plays++;
     }*/
+    
+    if (bone === undefined) return;
     
     bone.socket.emit('give', _.omit(bone, 'socket')); //Remove socket info and send bone to the client
   }
