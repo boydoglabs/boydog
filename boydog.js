@@ -1,4 +1,4 @@
-//BoyDog server-side
+//BoyDog server-side module
 
 'use strict';
 
