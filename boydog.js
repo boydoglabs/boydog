@@ -214,7 +214,7 @@ module.exports = function(server) {
       wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //io.emit('give', { path: canonicalizePath(paths) }); //Refresh the specific route
     } else if (_.isArray(paths)) {
       _.each(paths, function(path) { //For each route
-        wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //io.emit('give', { path: canonicalizePath(path) }); //Refresh the specific route
+        wss.broadcast(JSON.stringify({ path: canonicalizePath(path) })); //io.emit('give', { path: canonicalizePath(path) }); //Refresh the specific route
       })
     } else {
       //TODO //io.emit('refresh'); //Refresh all routes (careful, this is expensive)
@@ -258,14 +258,11 @@ module.exports = function(server) {
     
     socket.on('error', function (err) {
       if (err.code !== 'ECONNRESET') {
-          //Ignore ECONNRESET, throw all else
-          throw err;
+        //Ignore ECONNRESET, throw all else
+        throw err;
       }
     })
-    
   });
-  
-  console.log("end")
   
   //Module exposed functions
   return {
