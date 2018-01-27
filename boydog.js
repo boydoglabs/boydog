@@ -3,12 +3,12 @@
 'use strict';
 
 module.exports = function(server) {
-  var io = require('socket.io')(server);
+  //var io = require('socket.io')(server);
+  const WebSocket = require('ws');
+  const wss = new WebSocket.Server({ server });
   var _ = require('lodash');
   var scope = {};
   var logic = {};
-  
-  //TODO: Add and browserify "boydog-client"
   
   //
   //Utility classes
@@ -139,7 +139,7 @@ module.exports = function(server) {
     
     if (bone === undefined) return;
     
-    bone.socket.emit('give', _.omit(bone, 'socket')); //Remove socket info and send bone to the client
+    bone.socket.send(JSON.stringify(_.omit(bone, 'socket'))); //Remove socket info and send bone to the client
   }
   
   var take = function(bone) {
@@ -198,9 +198,10 @@ module.exports = function(server) {
       
       if (bone.socket) { //If the call comes from a user client
         give({ path: bone.path, socket: bone.socket }) //A bone without val is used to get the field value
-        bone.socket.broadcast.emit('give', { path: bone.path }); //Inform all users that they need to update this value (a bone without val indicates the client should ask for a val)
+        
+        wss.broadcast(JSON.stringify({ path: bone.path }), bone.socket); //bone.socket.broadcast.emit('give', { path: bone.path }); //Inform all users that they need to update this value (a bone without val indicates the client should ask for a val)
       } else { //Else, the call does not come from a user client
-        io.emit('give', { path: bone.path }); //Refresh the specific route
+        wss.broadcast(JSON.stringify({ path: bone.path })); //io.emit('give', { path: bone.path }); //Refresh the specific route
       }
     }
   }
@@ -210,21 +211,21 @@ module.exports = function(server) {
     if (_.isString(paths)) { //If paths is in fact only a single path
       //give({ path: paths }); //A bone without val is used to get the field value
       
-      io.emit('give', { path: canonicalizePath(paths) }); //Refresh the specific route
+      wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //io.emit('give', { path: canonicalizePath(paths) }); //Refresh the specific route
     } else if (_.isArray(paths)) {
       _.each(paths, function(path) { //For each route
-        io.emit('give', { path: canonicalizePath(path) }); //Refresh the specific route
+        wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //io.emit('give', { path: canonicalizePath(path) }); //Refresh the specific route
       })
     } else {
-      io.emit('refresh'); //Refresh all routes (careful, this is expensive)
+      //TODO //io.emit('refresh'); //Refresh all routes (careful, this is expensive)
     }
   }
   
   //
-  //Socket.io events
+  //WebSocket events and functions
   //
   
-  //On new connection
+  /*//On new connection
   io.on('connection', function(socket) {
     console.log("New client connected. Assigned id:", socket.id)
     
@@ -232,7 +233,39 @@ module.exports = function(server) {
       bone.socket = socket;
       take(bone);
     });
+  });*/
+  
+  //Broadcast to all or to all except a specific client
+  wss.broadcast = function broadcast(data, except) {
+    wss.clients.forEach(function each(client) {
+      if (client !== except && client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
+    });
+  };
+  
+  wss.on('connection', function connection(socket) {
+    //const location = url.parse(req.url, true);
+    //You might use location.query.access_token to authenticate or share sessions or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
+   
+    socket.on('message', function incoming(bone) {
+      var bone = JSON.parse(bone);
+      console.log(bone, typeof bone);
+      
+      bone.socket = socket;
+      take(bone);
+    });
+    
+    socket.on('error', function (err) {
+      if (err.code !== 'ECONNRESET') {
+          //Ignore ECONNRESET, throw all else
+          throw err;
+      }
+    })
+    
   });
+  
+  console.log("end")
   
   //Module exposed functions
   return {

@@ -23,9 +23,10 @@
     "real time collaborative"
   ],
   "dependencies": {
+    "json2fson": "^1.0.8",
     "lodash": "^4.17.4",
     "socket.io": "^2.0.4",
-    "json2fson": "^1.0.8"
+    "ws": "^4.0.0"
   },
   "author": "boy.dog (www.boy.dog)",
   "license": "MIT",
