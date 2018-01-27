@@ -3,7 +3,6 @@
 'use strict';
 
 module.exports = function(server) {
-  //var io = require('socket.io')(server);
   const WebSocket = require('ws');
   const wss = new WebSocket.Server({ server });
   var _ = require('lodash');
@@ -199,9 +198,9 @@ module.exports = function(server) {
       if (bone.socket) { //If the call comes from a user client
         give({ path: bone.path, socket: bone.socket }) //A bone without val is used to get the field value
         
-        wss.broadcast(JSON.stringify({ path: bone.path }), bone.socket); //bone.socket.broadcast.emit('give', { path: bone.path }); //Inform all users that they need to update this value (a bone without val indicates the client should ask for a val)
+        wss.broadcast(JSON.stringify({ path: bone.path }), bone.socket); //Inform all users that they need to update this value (a bone without val indicates the client should ask for a val)
       } else { //Else, the call does not come from a user client
-        wss.broadcast(JSON.stringify({ path: bone.path })); //io.emit('give', { path: bone.path }); //Refresh the specific route
+        wss.broadcast(JSON.stringify({ path: bone.path })); //Refresh the specific route
       }
     }
   }
@@ -209,12 +208,10 @@ module.exports = function(server) {
   //Will give a bone without val to all connected users so that they request an update on that path (or on all paths)
   var refresh = function(paths) {
     if (_.isString(paths)) { //If paths is in fact only a single path
-      //give({ path: paths }); //A bone without val is used to get the field value
-      
-      wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //io.emit('give', { path: canonicalizePath(paths) }); //Refresh the specific route
+      wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //Refresh the specific route
     } else if (_.isArray(paths)) {
       _.each(paths, function(path) { //For each route
-        wss.broadcast(JSON.stringify({ path: canonicalizePath(path) })); //io.emit('give', { path: canonicalizePath(path) }); //Refresh the specific route
+        wss.broadcast(JSON.stringify({ path: canonicalizePath(path) })); //Refresh the specific route
       })
     } else {
       //TODO //io.emit('refresh'); //Refresh all routes (careful, this is expensive)
@@ -224,16 +221,6 @@ module.exports = function(server) {
   //
   //WebSocket events and functions
   //
-  
-  /*//On new connection
-  io.on('connection', function(socket) {
-    console.log("New client connected. Assigned id:", socket.id)
-    
-    socket.on('give', function(bone) {
-      bone.socket = socket;
-      take(bone);
-    });
-  });*/
   
   //Broadcast to all or to all except a specific client
   wss.broadcast = function broadcast(data, except) {
