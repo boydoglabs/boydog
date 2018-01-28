@@ -7,6 +7,23 @@ module.exports = function(server) {
   const wss = new WebSocket.Server({ server });
   var _ = require('lodash');
   
+  
+  
+  var word = "initial word";
+  var text = "initial text";
+  
+  var wordLogic = {
+    
+  }
+  var textLogic = {
+    
+  }
+  
+  var wordRev = 1;
+  var textRev = 1;
+  
+  
+  
   wss.on('connection', function connection(socket) {
     
     //Socket events
