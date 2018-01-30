@@ -45,8 +45,7 @@ module.exports = function(server) {
       bone = JSON.parse(bone);
       console.log("message RX", bone)
       
-      //Revision check
-      if (bone.__rev !== wordRev) {
+      if (bone.__rev !== wordRev) { //Incorrect revision
         bone = { path: bone.path, val: word, __rev: wordRev };
         
         //Middleware
@@ -56,15 +55,18 @@ module.exports = function(server) {
         socket.send(bone);
         
         return;
-      } else {
+      } else { //Correct revision
+        word = bone.val;
         wordRev = bone.__nextrev;
-        
         
         //Middleware
         
+        
         bone = JSON.stringify(bone);
-        wss.broadcast(bone);
-        console.log("sent", bone, "except self")
+        socket.send(bone);
+        wss.broadcast(JSON.stringify(["word"]), socket); //Ask
+        
+        console.log("broadcast ask")
       }
     })
     
