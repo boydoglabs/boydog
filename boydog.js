@@ -236,6 +236,7 @@ module.exports = function(server) {
     //You might use location.query.access_token to authenticate or share sessions or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
    
     socket.on('message', function incoming(bone) {
+      (function sleep(delay) { var start = new Date().getTime(); while (new Date().getTime() < start + delay);})(1000)
       var bone = JSON.parse(bone);
       console.log(bone, typeof bone);
       
@@ -244,6 +245,7 @@ module.exports = function(server) {
     });
     
     socket.on('error', function (err) {
+      (function sleep(delay) { var start = new Date().getTime(); while (new Date().getTime() < start + delay);})(1000)
       if (err.code !== 'ECONNRESET') {
         //Ignore ECONNRESET, throw all else
         throw err;
