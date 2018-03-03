@@ -5,13 +5,32 @@
 module.exports = function(server) {
   const WebSocket = require('ws');
   const wss = new WebSocket.Server({ server });
-  var _ = require('lodash');
+  const diff = require('fast-diff');
+  const Changeset = require('changesets').Changeset;
+  const _ = require('lodash');
   var scope = {};
   var logic = {};
   
   //
-  //Utility classes
+  //Utilities
   //
+  
+  //Send patch with latency (for debugging only, chrome throttle does not work for WebSockets)
+  function socketSendWithLatency(bone, socket, latency) {
+    (function(data, socket, latency) {
+      setTimeout(function() {
+        
+        console.log("sending with latency")
+        
+        socket.send(bone);
+      }, latency) //Client latency
+    })(bone, socket, latency);
+  }
+  
+  //TODO: Broadcast patch with latency (for debugging only, chrome throttle does not work for WebSockets)
+  
+  //Changeset shorthand
+  function cset(parent, val) { return Changeset.fromDiff(diff(parent, val)) }
   
   var canonicalizePath = function(str) {
     var attr = _.toPath(str);
@@ -85,123 +104,81 @@ module.exports = function(server) {
     walkKeys(sp, undefined, []);
   }*/
   
+  var word = ""; //TEMP DEBUG
+  let revs = [];
+  
   var give = function(bone) {
-    var mask;
-    var tmpPath;
+    console.log("give", _.omit(bone, "socket"));
     
-    //Execute the last item __give
-    mask = _.get(logic, bone.path);
-    
-    if (mask === null) return;
-    
-    if (mask !== undefined) {
-      if (mask.__give === null) return;
-      if (mask.__give) bone = mask.__give(bone);
-    }
-    
-    if (bone === undefined) return;
-    
-    //Execute middleware functions to the actual value
-    var fullPath = _.toPath(bone.path);
-    for (var i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
-      //tmpPath = _.take(fullPath, i); //Verse
-      tmpPath = _.take(fullPath, (fullPath.length - i)); //Inverse
-      
-      mask = _.get(logic, tmpPath);
-      
-      if (mask === null) return;
-      if (mask === undefined) continue;
-      
-      //TODO: Implement __givetake middleware
-      
-      if (logic.__give === null) return;
-      if (mask.__give) bone = mask.__give(bone);
-    }
-    
-    if (bone === undefined) return;
-    
-    //Execute logic top level middleware
-    if (logic === null) return;
-    
-    if (logic !== undefined) {
-      //TODO: Implement __givetake middleware
-      
-      if (logic.__give === null) return;
-      if (logic.__give) bone = logic.__give(bone);
-    }
-    
-    /*if (!bone.plays) {
-      bone.plays = 1;
-    } else {
-      bone.plays++;
-    }*/
-    
-    if (bone === undefined) return;
-    
-    bone.socket.send(JSON.stringify(_.omit(bone, 'socket'))); //Remove socket info and send bone to the client
   }
   
   var take = function(bone) {
-    var mask;
-    var tmpPath;
+    console.log("take", _.omit(bone, "socket"));
     
-    //Execute logic top level middleware
-    if (logic === null) return;
-    if (logic !== undefined) {
-      //TODO: Implement __givetake middleware
+    if (bone.rev >= revs.length) {
+      console.log("new rev, current word", word);
+      revs.push(_.omit(bone, 'socket'));
       
-      if (logic.__take === null) return;
-      if (logic.__take) bone = logic.__take(bone);
-    }
-    
-    if (bone === undefined) return;
-    
-    //Execute path to the actual value middleware
-    var fullPath = _.toPath(bone.path);
-    for (var i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
-      tmpPath = _.take(fullPath, i); //Verse
-      //tmpPath = _.take(fullPath, (fullPath.length - i)); //Inverse
+      const cs = cset(bone.parent, bone.val);
+      word = cs.apply(word);
       
-      mask = _.get(logic, tmpPath);
+      console.log("generated word", word);
       
-      if (mask === null) return;
-      if (mask === undefined) continue;
+      bone.socket.send(JSON.stringify(_.omit(bone, "socket")));
+    } else {
+      console.log("rev recalculation needed");
       
-      //TODO: Implement __givetake middleware
+      const x = cset(bone.parent, bone.val);
       
-      if (mask.__take === null) return;
-      if (mask.__take) bone = mask.__take(bone);
-    }
-    
-    if (bone === undefined) return;
-    
-    bone.final = true;
-    
-    //Execute the last item __take
-    mask = _.get(logic, bone.path);
-    
-    if (mask === null) return;
-    
-    if (mask !== undefined) {
-      if (mask.__take === null) return;
-      if (mask.__take) bone = mask.__take(bone);
-    }
-    
-    if (bone === undefined) return;
-    
-    if (bone.val === undefined) { //When only asking for a value
-      bone.val = _.get(scope, bone.path); //Get value from scope
-      if (bone.val !== undefined) give(_.pick(bone, ['path', 'val', 'socket'])); //Give the bone only if it has a value
-    } else { //When writing a value
-      _.set(scope, bone.path, bone.val); //Set the value
+      console.log("DEBUG pre", bone.rev, bone.parent, bone.val, revs[bone.rev].parent, revs[bone.rev].val)
       
-      if (bone.socket) { //If the call comes from a user client
-        give({ path: bone.path, socket: bone.socket }) //A bone without val is used to get the field value
-        
-        wss.broadcast(JSON.stringify({ path: bone.path }), bone.socket); //Inform all users that they need to update this value (a bone without val indicates the client should ask for a val)
-      } else { //Else, the call does not come from a user client
-        wss.broadcast(JSON.stringify({ path: bone.path })); //Refresh the specific route
+      let found = false;
+      do {
+        if (revs[bone.rev].parent !== bone.parent) {
+          bone.rev++;
+        } else {
+          found = true;
+        }
+      } while(!found && (revs[bone.rev] !== undefined));
+      
+      let m;
+      if (found) {
+        m = cset(revs[bone.rev].parent, revs[bone.rev].val);
+      } else {
+        bone.rev = revs.length - 1;
+        m = cset(bone.parent, revs[bone.rev].val);
       }
+      
+      for (let i = bone.rev + 1; i < revs.length; i++) {
+        console.log(revs[i]);
+        const csTemp = cset(revs[i].parent, revs[i].val);
+        m = m.merge(csTemp);
+      }
+      
+      console.log("DEBUG post", bone.rev, bone.parent, bone.val, revs[bone.rev].parent, revs[bone.rev].val)
+      
+      try {
+        const newVal = m.transformAgainst(x).apply(bone.val);
+        
+        if (newVal === undefined) throw new Error("Can't transform changeset");
+        
+        console.log("m", m, "newVal", newVal);
+        
+        const newRev = { rev: revs.length, parent: revs[revs.length - 1].val, val: newVal };
+        revs.push(newRev);
+        word = newVal;
+        
+        bone.socket.send(JSON.stringify(newRev));
+      } catch (e) {
+        console.log("err", e);
+        
+        //TODO: Implement a fallback just in case?
+        //serverToClient({ sync: true }, $("#" + who + "latency").val(), who); //Not working
+      }
+    }
+    
+    if (bone.val !== bone.parent) {
+      wss.broadcast(JSON.stringify(['word']), bone.socket); //Inform all users that they need to update this value
     }
   }
   
@@ -214,7 +191,7 @@ module.exports = function(server) {
         wss.broadcast(JSON.stringify({ path: canonicalizePath(path) })); //Refresh the specific route
       })
     } else {
-      //TODO //io.emit('refresh'); //Refresh all routes (careful, this is expensive)
+      //TODO: Implement something like `io.emit('refresh');` //Refresh all routes (careful, this is expensive)
     }
   }
   
@@ -222,7 +199,7 @@ module.exports = function(server) {
   //WebSocket events and functions
   //
   
-  //Broadcast to all or to all except a specific client
+  //Broadcast to all except a specific client
   wss.broadcast = function broadcast(data, except) {
     wss.clients.forEach(function each(client) {
       if (client !== except && client.readyState === WebSocket.OPEN) {
@@ -236,16 +213,14 @@ module.exports = function(server) {
     //You might use location.query.access_token to authenticate or share sessions or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
    
     socket.on('message', function incoming(bone) {
-      (function sleep(delay) { var start = new Date().getTime(); while (new Date().getTime() < start + delay);})(1000)
+      //(function sleep(delay) { var start = new Date().getTime(); while (new Date().getTime() < start + delay);})(1000); //Debug delay
       var bone = JSON.parse(bone);
-      console.log(bone, typeof bone);
       
       bone.socket = socket;
       take(bone);
     });
     
     socket.on('error', function (err) {
-      (function sleep(delay) { var start = new Date().getTime(); while (new Date().getTime() < start + delay);})(1000)
       if (err.code !== 'ECONNRESET') {
         //Ignore ECONNRESET, throw all else
         throw err;
@@ -260,4 +235,4 @@ module.exports = function(server) {
     take: take,
     refresh: refresh
   }
-};
+}
