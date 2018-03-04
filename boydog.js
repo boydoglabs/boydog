@@ -10,6 +10,7 @@ module.exports = function(server) {
   const _ = require('lodash');
   var scope = {};
   var logic = {};
+  var __revs = {};
   
   //
   //Utilities
@@ -104,8 +105,8 @@ module.exports = function(server) {
     walkKeys(sp, undefined, []);
   }*/
   
-  var word = ""; //TEMP DEBUG
-  let revs = [];
+  //var word = ""; //TEMP DEBUG
+  //let revs = [];
   
   var give = function(bone) {
     console.log("give", _.omit(bone, "socket"));
@@ -115,14 +116,17 @@ module.exports = function(server) {
   var take = function(bone) {
     console.log("take", _.omit(bone, "socket"));
     
-    if (bone.rev >= revs.length) {
-      console.log("new rev, current word", word);
-      revs.push(_.omit(bone, 'socket'));
+    let mask = _.get(logic, bone.path);
+    if (__revs[bone.path] === undefined) __revs[bone.path] = []; //Create a revision array if it does not exists
+    
+    if (bone.rev >= __revs[bone.path].length) {
+      console.log("new rev, current scope value", _.get(scope, bone.path));
+      __revs[bone.path].push(_.omit(bone, 'socket'));
       
       const cs = cset(bone.parent, bone.val);
-      word = cs.apply(word);
+      _.set(scope, bone.path, cs.apply(_.get(scope, bone.path)));
       
-      console.log("generated word", word);
+      console.log("generated scope field", _.get(scope, bone.path));
       
       bone.socket.send(JSON.stringify(_.omit(bone, "socket")));
     } else {
@@ -130,32 +134,32 @@ module.exports = function(server) {
       
       const x = cset(bone.parent, bone.val);
       
-      console.log("DEBUG pre", bone.rev, bone.parent, bone.val, revs[bone.rev].parent, revs[bone.rev].val)
+      console.log("DEBUG pre", bone.rev, bone.parent, bone.val, __revs[bone.path][bone.rev].parent, __revs[bone.path][bone.rev].val)
       
       let found = false;
       do {
-        if (revs[bone.rev].parent !== bone.parent) {
+        if (__revs[bone.path][bone.rev].parent !== bone.parent) {
           bone.rev++;
         } else {
           found = true;
         }
-      } while(!found && (revs[bone.rev] !== undefined));
+      } while(!found && (__revs[bone.path][bone.rev] !== undefined));
       
       let m;
       if (found) {
-        m = cset(revs[bone.rev].parent, revs[bone.rev].val);
+        m = cset(__revs[bone.path][bone.rev].parent, __revs[bone.path][bone.rev].val);
       } else {
-        bone.rev = revs.length - 1;
-        m = cset(bone.parent, revs[bone.rev].val);
+        bone.rev = __revs[bone.path].length - 1;
+        m = cset(bone.parent, __revs[bone.path][bone.rev].val);
       }
       
-      for (let i = bone.rev + 1; i < revs.length; i++) {
-        console.log(revs[i]);
-        const csTemp = cset(revs[i].parent, revs[i].val);
+      for (let i = bone.rev + 1; i < __revs[bone.path].length; i++) {
+        console.log(__revs[bone.path][i]);
+        const csTemp = cset(__revs[bone.path][i].parent, __revs[bone.path][i].val);
         m = m.merge(csTemp);
       }
       
-      console.log("DEBUG post", bone.rev, bone.parent, bone.val, revs[bone.rev].parent, revs[bone.rev].val)
+      console.log("DEBUG post", bone.rev, bone.parent, bone.val, __revs[bone.path][bone.rev].parent, __revs[bone.path][bone.rev].val)
       
       try {
         const newVal = m.transformAgainst(x).apply(bone.val);
@@ -164,9 +168,9 @@ module.exports = function(server) {
         
         console.log("m", m, "newVal", newVal);
         
-        const newRev = { rev: revs.length, parent: revs[revs.length - 1].val, val: newVal };
-        revs.push(newRev);
-        word = newVal;
+        const newRev = { path: bone.path, rev: __revs[bone.path].length, parent: __revs[bone.path][__revs[bone.path].length - 1].val, val: newVal };
+        __revs[bone.path].push(newRev);
+        _.set(scope, bone.path, newVal);
         
         bone.socket.send(JSON.stringify(newRev));
       } catch (e) {
@@ -178,8 +182,10 @@ module.exports = function(server) {
     }
     
     if (bone.val !== bone.parent) {
-      wss.broadcast(JSON.stringify(['word']), bone.socket); //Inform all users that they need to update this value
+      wss.broadcast(JSON.stringify([bone.path]), bone.socket); //Inform all users that they need to update this value
     }
+    
+    console.log("__revs", __revs)
   }
   
   //Will give a bone without val to all connected users so that they request an update on that path (or on all paths)
