@@ -106,52 +106,39 @@ module.exports = function(server) {
     walkKeys(sp, undefined, []);
   }*/
   
-  //var word = ""; //TEMP DEBUG
-  //let revs = [];
-  
   var give = function(bone) {
     console.log("give", _.omit(bone, "socket"));
     
+    //TODO
   }
   
   var take = function(bone) {
-    console.log("take", _.omit(bone, "socket"));
-    
     let mask = _.get(logic, bone.path);
     
     //TODO: Process mask
     
     if (__revs[bone.path] === undefined) __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
     
+    //Generate OT revision if needed and add changeset
     let lastRev = __revs[bone.path].get(0);
-    
     if (bone.rev > lastRev.rev || lastRev.length === 0) {
-      console.log("new rev, current scope value", _.get(scope, bone.path));
       __revs[bone.path].enq(_.omit(bone, 'socket'));
       
       const cs = cset(bone.parent, bone.val);
       _.set(scope, bone.path, cs.apply(_.get(scope, bone.path)));
       
-      console.log("generated scope field", _.get(scope, bone.path));
-      
       bone.socket.send(JSON.stringify(_.omit(bone, "socket")));
     } else {
-      console.log("rev recalculation needed");
-      
       const x = cset(bone.parent, bone.val);
       
       let searchRev = __revs[bone.path].get(0).rev - bone.rev;
       if (searchRev > __revs[bone.path]._capacity) {
         //If the client is too out-of-date
-        console.log("out-of-date update for");
         const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev, parent: __revs[bone.path].get(0).parent, val: __revs[bone.path].get(0).val };
         bone.socket.send(JSON.stringify(newRev));
         
         return;
       }
-      
-      //console.log("DEBUG pre", bone.rev, bone.parent, bone.val, __revs[bone.path][bone.rev].parent, __revs[bone.path][bone.rev].val);
-      console.log("DEBUG pre", searchRev, bone.parent, bone.val, __revs[bone.path].get(searchRev));
       
       let found = false;
       do {
@@ -166,31 +153,19 @@ module.exports = function(server) {
       if (found) {
         m = cset(__revs[bone.path].get(searchRev).parent, __revs[bone.path].get(searchRev).val); //Set first m
         
-        /*for (let i = bone.rev + 1; i < __revs[bone.path].length; i++) {
-          console.log(__revs[bone.path][i]);
-          const csTemp = cset(__revs[bone.path][i].parent, __revs[bone.path][i].val);
-          m = m.merge(csTemp);
-        }*/
         for (let i = searchRev - 1; i >= 0; i--) {
           const csTemp = cset(__revs[bone.path].get(i).parent, __revs[bone.path].get(i).val);
           m = m.merge(csTemp);
         }
       } else {
-        /*bone.rev = __revs[bone.path].length - 1;
-        m = cset(bone.parent, __revs[bone.path][bone.rev].val);*/
         searchRev = 0;
         m = cset(bone.parent, __revs[bone.path].get(searchRev).val);
       }
-      
-      //console.log("DEBUG post", bone.rev, bone.parent, bone.val, __revs[bone.path][bone.rev].parent, __revs[bone.path][bone.rev].val)
-      console.log("DEBUG post", searchRev, bone.parent, bone.val, __revs[bone.path].get(searchRev));
       
       try {
         const newVal = m.transformAgainst(x).apply(bone.val);
         
         if (newVal === undefined) throw new Error("Can't transform changeset");
-        
-        console.log("m", m, "newVal", newVal);
         
         const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev + 1, parent: __revs[bone.path].get(0).val, val: newVal };
         __revs[bone.path].enq(newRev);
@@ -198,23 +173,19 @@ module.exports = function(server) {
         
         bone.socket.send(JSON.stringify(newRev));
       } catch (e) {
-        console.log("err", e);
-        
         //TODO: Implement a fallback just in case?
-        //serverToClient({ sync: true }, $("#" + who + "latency").val(), who); //Not working
+        console.log("OT error", e);
       }
     }
     
     if (bone.val !== bone.parent) {
       wss.broadcast(JSON.stringify([bone.path]), bone.socket); //Inform all users that they need to update this value
     }
-    
-    console.log("__revs", __revs)
   }
   
   //Will give a bone without val to all connected users so that they request an update on that path (or on all paths)
   var refresh = function(paths) {
-    if (_.isString(paths)) { //If paths is in fact only a single path
+    if (_.isString(paths)) { //If paths is only a single path string
       wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //Refresh the specific route
     } else if (_.isArray(paths)) {
       _.each(paths, function(path) { //For each route
