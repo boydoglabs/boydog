@@ -7,6 +7,7 @@ module.exports = function(server) {
   const wss = new WebSocket.Server({ server });
   const diff = require('fast-diff');
   const Changeset = require('changesets').Changeset;
+  const CircularBuffer = require('circular-buffer');
   const _ = require('lodash');
   var scope = {};
   var logic = {};
@@ -117,11 +118,16 @@ module.exports = function(server) {
     console.log("take", _.omit(bone, "socket"));
     
     let mask = _.get(logic, bone.path);
-    if (__revs[bone.path] === undefined) __revs[bone.path] = []; //Create a revision array if it does not exists
     
-    if (bone.rev >= __revs[bone.path].length) {
+    //TODO: Process mask
+    
+    if (__revs[bone.path] === undefined) __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
+    
+    let lastRev = __revs[bone.path].get(0);
+    
+    if (bone.rev > lastRev.rev || lastRev.length === 0) {
       console.log("new rev, current scope value", _.get(scope, bone.path));
-      __revs[bone.path].push(_.omit(bone, 'socket'));
+      __revs[bone.path].enq(_.omit(bone, 'socket'));
       
       const cs = cset(bone.parent, bone.val);
       _.set(scope, bone.path, cs.apply(_.get(scope, bone.path)));
@@ -134,32 +140,50 @@ module.exports = function(server) {
       
       const x = cset(bone.parent, bone.val);
       
-      console.log("DEBUG pre", bone.rev, bone.parent, bone.val, __revs[bone.path][bone.rev].parent, __revs[bone.path][bone.rev].val)
+      let searchRev = __revs[bone.path].get(0).rev - bone.rev;
+      if (searchRev > __revs[bone.path]._capacity) {
+        //If the client is too out-of-date
+        console.log("out-of-date update for");
+        const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev, parent: __revs[bone.path].get(0).parent, val: __revs[bone.path].get(0).val };
+        bone.socket.send(JSON.stringify(newRev));
+        
+        return;
+      }
+      
+      //console.log("DEBUG pre", bone.rev, bone.parent, bone.val, __revs[bone.path][bone.rev].parent, __revs[bone.path][bone.rev].val);
+      console.log("DEBUG pre", searchRev, bone.parent, bone.val, __revs[bone.path].get(searchRev));
       
       let found = false;
       do {
-        if (__revs[bone.path][bone.rev].parent !== bone.parent) {
-          bone.rev++;
+        if (__revs[bone.path].get(searchRev).parent !== bone.parent) {
+          searchRev--;
         } else {
           found = true;
         }
-      } while(!found && (__revs[bone.path][bone.rev] !== undefined));
+      } while(!found && (searchRev >= 0));
       
-      let m;
+      let m; //Let m be merge changeset
       if (found) {
-        m = cset(__revs[bone.path][bone.rev].parent, __revs[bone.path][bone.rev].val);
+        m = cset(__revs[bone.path].get(searchRev).parent, __revs[bone.path].get(searchRev).val); //Set first m
+        
+        /*for (let i = bone.rev + 1; i < __revs[bone.path].length; i++) {
+          console.log(__revs[bone.path][i]);
+          const csTemp = cset(__revs[bone.path][i].parent, __revs[bone.path][i].val);
+          m = m.merge(csTemp);
+        }*/
+        for (let i = searchRev - 1; i >= 0; i--) {
+          const csTemp = cset(__revs[bone.path].get(i).parent, __revs[bone.path].get(i).val);
+          m = m.merge(csTemp);
+        }
       } else {
-        bone.rev = __revs[bone.path].length - 1;
-        m = cset(bone.parent, __revs[bone.path][bone.rev].val);
+        /*bone.rev = __revs[bone.path].length - 1;
+        m = cset(bone.parent, __revs[bone.path][bone.rev].val);*/
+        searchRev = 0;
+        m = cset(bone.parent, __revs[bone.path].get(searchRev).val);
       }
       
-      for (let i = bone.rev + 1; i < __revs[bone.path].length; i++) {
-        console.log(__revs[bone.path][i]);
-        const csTemp = cset(__revs[bone.path][i].parent, __revs[bone.path][i].val);
-        m = m.merge(csTemp);
-      }
-      
-      console.log("DEBUG post", bone.rev, bone.parent, bone.val, __revs[bone.path][bone.rev].parent, __revs[bone.path][bone.rev].val)
+      //console.log("DEBUG post", bone.rev, bone.parent, bone.val, __revs[bone.path][bone.rev].parent, __revs[bone.path][bone.rev].val)
+      console.log("DEBUG post", searchRev, bone.parent, bone.val, __revs[bone.path].get(searchRev));
       
       try {
         const newVal = m.transformAgainst(x).apply(bone.val);
@@ -168,8 +192,8 @@ module.exports = function(server) {
         
         console.log("m", m, "newVal", newVal);
         
-        const newRev = { path: bone.path, rev: __revs[bone.path].length, parent: __revs[bone.path][__revs[bone.path].length - 1].val, val: newVal };
-        __revs[bone.path].push(newRev);
+        const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev + 1, parent: __revs[bone.path].get(0).val, val: newVal };
+        __revs[bone.path].enq(newRev);
         _.set(scope, bone.path, newVal);
         
         bone.socket.send(JSON.stringify(newRev));
