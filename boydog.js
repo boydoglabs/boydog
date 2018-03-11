@@ -107,16 +107,41 @@ module.exports = function(server) {
   }*/
   
   var give = function(bone) {
-    console.log("give", _.omit(bone, "socket"));
+    console.log("give bone", _.omit(bone, "socket"));
     
-    //TODO
+    let mask = _.get(logic, bone.path); //TODO: Other middlewares
+    
+    //Execute logic top level middleware
+    if (logic === null) return;
+    
+    if (logic !== undefined) {
+      //TODO: Implement __givetake middleware
+      
+      if (logic.__giveAll === null) return;
+      if (logic.__giveAll) bone = logic.__giveAll(bone);
+    }
+    
+    if (bone === undefined) return;
+    
+    if (bone === undefined) return;
+    bone.socket.send(JSON.stringify(_.omit(bone, "socket")));
   }
   
   var take = function(bone) {
-    let mask = _.get(logic, bone.path);
+    //Execute logic top level middleware
+    if (logic === null) return;
+    if (logic !== undefined) {
+      //TODO: Implement __givetake middleware
+      
+      if (logic.__takeAll === null) return;
+      if (logic.__takeAll) bone = logic.__takeAll(bone);
+    }
     
-    //TODO: Process mask
+    if (bone === undefined) return;
     
+    let mask = _.get(logic, bone.path); //TODO: Other middlewares
+    
+    //Begin value commit
     if (__revs[bone.path] === undefined) __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
     
     //Generate OT revision if needed and add changeset
@@ -127,15 +152,15 @@ module.exports = function(server) {
       const cs = cset(bone.parent, bone.val);
       _.set(scope, bone.path, cs.apply(_.get(scope, bone.path)));
       
-      bone.socket.send(JSON.stringify(_.omit(bone, "socket")));
+      give(bone);
     } else {
       const x = cset(bone.parent, bone.val);
       
       let searchRev = __revs[bone.path].get(0).rev - bone.rev;
       if (searchRev > __revs[bone.path]._capacity) {
         //If the client is too out-of-date
-        const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev, parent: __revs[bone.path].get(0).parent, val: __revs[bone.path].get(0).val };
-        bone.socket.send(JSON.stringify(newRev));
+        const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev, parent: __revs[bone.path].get(0).parent, val: __revs[bone.path].get(0).val, socket: bone.socket };
+        give(newRev);
         
         return;
       }
@@ -167,11 +192,11 @@ module.exports = function(server) {
         
         if (newVal === undefined) throw new Error("Can't transform changeset");
         
-        const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev + 1, parent: __revs[bone.path].get(0).val, val: newVal };
+        const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev + 1, parent: __revs[bone.path].get(0).val, val: newVal, socket: bone.socket };
         __revs[bone.path].enq(newRev);
         _.set(scope, bone.path, newVal);
-        
-        bone.socket.send(JSON.stringify(newRev));
+
+        give(newRev);
       } catch (e) {
         //TODO: Implement a fallback just in case?
         console.log("OT error", e);
