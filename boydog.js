@@ -107,8 +107,6 @@ module.exports = function(server) {
   }*/
   
   var give = function(bone) {
-    console.log("give bone", _.omit(bone, "socket"));
-    
     //Execute the last item __giveBone
     let mask = _.get(logic, bone.path);
     if (mask === null) return;
