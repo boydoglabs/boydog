@@ -109,21 +109,40 @@ module.exports = function(server) {
   var give = function(bone) {
     console.log("give bone", _.omit(bone, "socket"));
     
-    let mask = _.get(logic, bone.path); //TODO: Other middlewares
+    //Execute the last item __giveBone
+    let mask = _.get(logic, bone.path);
+    if (mask === null) return;
+    if (mask !== undefined) {
+      if (mask.__giveBone === null) return;
+      if (mask.__giveBone) bone = mask.__giveBone(bone);
+    }
+    if (bone === undefined) return;
+    
+    //Execute middleware functions to the actual value
+    let fullPath = _.toPath(bone.path);
+    let tmpPath;
+    for (let i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
+      //tmpPath = _.take(fullPath, i); //Verse
+      tmpPath = _.take(fullPath, (fullPath.length - i)); //Inverse
+      mask = _.get(logic, tmpPath);
+      if (mask === null) return;
+      if (mask === undefined) continue;
+      //TODO: Implement __givetake middleware
+      if (logic.__giveBone === null) return;
+      if (mask.__giveBone) bone = mask.__giveBone(bone);
+    }
+    if (bone === undefined) return;
     
     //Execute logic top level middleware
     if (logic === null) return;
-    
     if (logic !== undefined) {
       //TODO: Implement __givetake middleware
-      
       if (logic.__giveBone === null) return;
       if (logic.__giveBone) bone = logic.__giveBone(bone);
     }
-    
     if (bone === undefined) return;
     
-    if (bone === undefined) return;
+    //Send bone
     bone.socket.send(JSON.stringify(_.omit(bone, "socket")));
   }
   
@@ -132,14 +151,34 @@ module.exports = function(server) {
     if (logic === null) return;
     if (logic !== undefined) {
       //TODO: Implement __givetake middleware
-      
       if (logic.__takeBone === null) return;
       if (logic.__takeBone) bone = logic.__takeBone(bone);
     }
-    
     if (bone === undefined) return;
     
-    let mask = _.get(logic, bone.path); //TODO: Other middlewares
+    //Execute path to the actual value middleware
+    let fullPath = _.toPath(bone.path);
+    let tmpPath;
+    for (var i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
+      tmpPath = _.take(fullPath, i); //Verse
+      //tmpPath = _.take(fullPath, (fullPath.length - i)); //Inverse
+      mask = _.get(logic, tmpPath);
+      if (mask === null) return;
+      if (mask === undefined) continue;
+      //TODO: Implement __givetake middleware
+      if (mask.__takeBone === null) return;
+      if (mask.__takeBone) bone = mask.__takeBone(bone);
+    }
+    if (bone === undefined) return;
+    
+    //Execute the last item __takeBone
+    let mask = _.get(logic, bone.path);
+    if (mask === null) return;
+    if (mask !== undefined) {
+      if (mask.__takeBone === null) return;
+      if (mask.__takeBone) bone = mask.__takeBone(bone);
+    }
+    if (bone === undefined) return;
     
     //Begin value commit
     if (__revs[bone.path] === undefined) __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
@@ -195,7 +234,7 @@ module.exports = function(server) {
         const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev + 1, parent: __revs[bone.path].get(0).val, val: newVal, socket: bone.socket };
         __revs[bone.path].enq(newRev);
         _.set(scope, bone.path, newVal);
-
+        
         give(newRev);
       } catch (e) {
         //TODO: Implement a fallback just in case?
