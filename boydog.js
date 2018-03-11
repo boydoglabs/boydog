@@ -117,8 +117,8 @@ module.exports = function(server) {
     if (logic !== undefined) {
       //TODO: Implement __givetake middleware
       
-      if (logic.__giveAll === null) return;
-      if (logic.__giveAll) bone = logic.__giveAll(bone);
+      if (logic.__giveBone === null) return;
+      if (logic.__giveBone) bone = logic.__giveBone(bone);
     }
     
     if (bone === undefined) return;
@@ -133,8 +133,8 @@ module.exports = function(server) {
     if (logic !== undefined) {
       //TODO: Implement __givetake middleware
       
-      if (logic.__takeAll === null) return;
-      if (logic.__takeAll) bone = logic.__takeAll(bone);
+      if (logic.__takeBone === null) return;
+      if (logic.__takeBone) bone = logic.__takeBone(bone);
     }
     
     if (bone === undefined) return;
