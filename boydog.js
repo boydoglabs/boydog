@@ -107,8 +107,10 @@ module.exports = function(server) {
   }*/
   
   var give = function(bone) {
+    let mask;
+    
     //Execute the last item __giveBone
-    let mask = _.get(logic, bone.path);
+    mask = _.get(logic, bone.path);
     if (mask === null) return;
     if (mask !== undefined) {
       if (mask.__giveBone === null) return;
@@ -145,6 +147,8 @@ module.exports = function(server) {
   }
   
   var take = function(bone) {
+    let mask;
+    
     //Execute logic top level middleware
     if (logic === null) return;
     if (logic !== undefined) {
@@ -170,7 +174,7 @@ module.exports = function(server) {
     if (bone === undefined) return;
     
     //Execute the last item __takeBone
-    let mask = _.get(logic, bone.path);
+    mask = _.get(logic, bone.path);
     if (mask === null) return;
     if (mask !== undefined) {
       if (mask.__takeBone === null) return;
@@ -179,18 +183,29 @@ module.exports = function(server) {
     if (bone === undefined) return;
     
     //Begin value commit
-    if (__revs[bone.path] === undefined) __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
+    let currentValue = _.get(scope, bone.path);
+    if (!isNaN(currentValue)) currentValue = currentValue.toString();
+    
+    if (__revs[bone.path] === undefined) {
+      console.log("definint bone.path");
+      __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
+      
+      const newRev = { path: bone.path, rev: 0, parent: "", val: currentValue };
+      __revs[bone.path].enq(newRev);
+    }
     
     //Generate OT revision if needed and add changeset
     let lastRev = __revs[bone.path].get(0);
-    if (bone.rev > lastRev.rev || lastRev.length === 0) {
+    
+    if (bone.rev > lastRev.rev) {
       __revs[bone.path].enq(_.omit(bone, 'socket'));
       
       const cs = cset(bone.parent, bone.val);
-      _.set(scope, bone.path, cs.apply(_.get(scope, bone.path)));
+      _.set(scope, bone.path, cs.apply(currentValue));
       
       give(bone);
     } else {
+      //When OT is needed or client is too out of date
       const x = cset(bone.parent, bone.val);
       
       let searchRev = __revs[bone.path].get(0).rev - bone.rev;
@@ -247,6 +262,8 @@ module.exports = function(server) {
   
   //Will give a bone without val to all connected users so that they request an update on that path (or on all paths)
   var refresh = function(paths) {
+    console.log("refresh", paths);
+    
     if (_.isString(paths)) { //If paths is only a single path string
       wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //Refresh the specific route
     } else if (_.isArray(paths)) {
@@ -276,7 +293,6 @@ module.exports = function(server) {
     //You might use location.query.access_token to authenticate or share sessions or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
    
     socket.on('message', function incoming(bone) {
-      //(function sleep(delay) { var start = new Date().getTime(); while (new Date().getTime() < start + delay);})(1000); //Debug delay
       var bone = JSON.parse(bone);
       
       bone.socket = socket;
