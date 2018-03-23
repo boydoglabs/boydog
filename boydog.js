@@ -149,10 +149,28 @@ module.exports = function(server) {
   var take = function(bone) {
     let mask;
     
+    //Deal with an uninitialized scope field
+    let currentValue = _.get(scope, bone.path);
+    if (!isNaN(currentValue)) currentValue = currentValue.toString();
+    
+    if (__revs[bone.path] === undefined) {
+      console.log("definint bone.path");
+      __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
+      
+      const newRev = { path: bone.path, rev: 0, parent: "", val: currentValue };
+      __revs[bone.path].enq(newRev);
+    }
+    
+    //Deal with bone that only ask for `bone.path` update
     if (bone.val === undefined) {
       console.log("RXXXX with no val", _.omit(bone, "socket"));
-      asdfsaf.asdfsadf++;
+      //asdfsaf.asdfsadf++;
       //refresh(bone.path);
+      
+      console.log("____REVS:", __revs[bone.path].get(0).rev);
+      
+      const latest = { path: bone.path, val: currentValue, socket: bone.socket };
+      give(latest);
       
       return;
     }
@@ -189,18 +207,6 @@ module.exports = function(server) {
       if (mask.__takeBone) bone = mask.__takeBone(bone);
     }
     if (bone === undefined) return;
-    
-    //Begin value commit
-    let currentValue = _.get(scope, bone.path);
-    if (!isNaN(currentValue)) currentValue = currentValue.toString();
-    
-    if (__revs[bone.path] === undefined) {
-      console.log("definint bone.path");
-      __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
-      
-      const newRev = { path: bone.path, rev: 0, parent: "", val: currentValue };
-      __revs[bone.path].enq(newRev);
-    }
     
     //Generate OT revision if needed and add changeset
     let lastRev = __revs[bone.path].get(0);
