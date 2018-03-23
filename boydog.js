@@ -149,6 +149,14 @@ module.exports = function(server) {
   var take = function(bone) {
     let mask;
     
+    if (bone.val === undefined) {
+      console.log("RXXXX with no val", _.omit(bone, "socket"));
+      asdfsaf.asdfsadf++;
+      //refresh(bone.path);
+      
+      return;
+    }
+    
     //Execute logic top level middleware
     if (logic === null) return;
     if (logic !== undefined) {
