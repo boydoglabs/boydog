@@ -256,7 +256,9 @@ module.exports = function(server) {
     }
     
     if (bone.val !== bone.parent) {
-      wss.broadcast(JSON.stringify([bone.path]), bone.socket); //Inform all users that they need to update this value
+      //wss.broadcast(JSON.stringify([bone.path]), bone.socket); //Inform all users that they need to update this value
+      console.log("TRY REFRESH---");
+      refresh(bone.path);
     }
   }
   
