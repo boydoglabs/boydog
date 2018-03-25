@@ -154,7 +154,6 @@ module.exports = function(server) {
     if (!isNaN(currentValue)) currentValue = currentValue.toString();
     
     if (__revs[bone.path] === undefined) {
-      console.log("definint bone.path");
       __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
       
       const newRev = { path: bone.path, rev: 0, parent: "", val: currentValue };
@@ -163,14 +162,7 @@ module.exports = function(server) {
     
     //Deal with bone that only ask for `bone.path` update
     if (bone.val === undefined) {
-      console.log("RXXXX with no val", _.omit(bone, "socket"));
-      //asdfsaf.asdfsadf++;
-      //refresh(bone.path);
-      
-      console.log("____REVS:", __revs[bone.path].get(0).rev);
-      
-      const latest = { path: bone.path, val: currentValue, socket: bone.socket };
-      give(latest);
+      give({ path: bone.path, val: currentValue, socket: bone.socket }); //Send the latest version
       
       return;
     }
@@ -269,11 +261,7 @@ module.exports = function(server) {
       }
     }
     
-    if (bone.val !== bone.parent) {
-      //wss.broadcast(JSON.stringify([bone.path]), bone.socket); //Inform all users that they need to update this value
-      console.log("TRY REFRESH---");
-      refresh(bone.path);
-    }
+    if (bone.val !== bone.parent) refresh(bone.path);
   }
   
   //Will give a bone without val to all connected users so that they request an update on that path (or on all paths)
