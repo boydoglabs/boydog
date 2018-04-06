@@ -266,7 +266,7 @@ module.exports = function(server) {
   
   //Will give a bone without val to all connected users so that they request an update on that path (or on all paths)
   var refresh = function(paths) {
-    console.log("refresh", paths);
+    //console.log("refresh", paths);
     
     if (_.isString(paths)) { //If paths is only a single path string
       wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //Refresh the specific route
@@ -298,6 +298,8 @@ module.exports = function(server) {
    
     socket.on('message', function incoming(bone) {
       var bone = JSON.parse(bone);
+      
+      //console.log("message", bone)
       
       bone.socket = socket;
       take(bone);
