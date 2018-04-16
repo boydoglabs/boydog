@@ -217,7 +217,7 @@ module.exports = function(server) {
       let searchRev = __revs[bone.path].get(0).rev - bone.rev;
       if (searchRev > __revs[bone.path]._capacity) {
         //If the client is too out-of-date
-        const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev, parent: __revs[bone.path].get(0).parent, val: __revs[bone.path].get(0).val, socket: bone.socket };
+        const newRev = { path: bone.path, rev: +__revs[bone.path].get(0).rev, parent: __revs[bone.path].get(0).parent, val: __revs[bone.path].get(0).val, socket: bone.socket };
         give(newRev);
         
         return;
@@ -250,7 +250,7 @@ module.exports = function(server) {
         
         if (newVal === undefined) throw new Error("Can't transform changeset");
         
-        const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev + 1, parent: __revs[bone.path].get(0).val, val: newVal, socket: bone.socket };
+        const newRev = { path: bone.path, rev: +__revs[bone.path].get(0).rev + 1, parent: __revs[bone.path].get(0).val, val: newVal, socket: bone.socket };
         __revs[bone.path].enq(newRev);
         _.set(scope, bone.path, newVal);
         
