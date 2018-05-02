@@ -295,6 +295,14 @@ module.exports = function(server) {
     //You might use location.query.access_token to authenticate or share sessions or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
    
     socket.on('message', function incoming(bone) {
+      //Deal with ping messages
+      if (bone === ">") {
+        socket.send("<");
+        
+        return;
+      }
+      
+      //Deal with bone messages
       var bone = JSON.parse(bone);
       
       bone.socket = socket;
