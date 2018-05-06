@@ -29,8 +29,6 @@ module.exports = function(server) {
     })(bone, socket, latency);
   }
   
-  //TODO: Broadcast patch with latency (for debugging only, chrome throttle does not work for WebSockets)
-  
   //Changeset shorthand
   function cset(parent, val) { return Changeset.fromDiff(diff(parent, val)) }
   
