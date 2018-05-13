@@ -291,7 +291,7 @@ module.exports = function(server) {
   wss.on('connection', function connection(socket) {
     //const location = url.parse(req.url, true);
     //You might use location.query.access_token to authenticate or share sessions or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
-   
+    
     socket.on('message', function incoming(bone) {
       //Deal with ping messages
       if (bone === ">") {
