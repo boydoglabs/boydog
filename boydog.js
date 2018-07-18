@@ -107,7 +107,7 @@ module.exports = function(server) {
   var give = function(bone) {
     let mask;
     
-    //Execute the last item __giveBone
+    /*//Execute the last item __giveBone
     mask = _.get(logic, bone.path);
     if (mask === null) return;
     if (mask !== undefined) {
@@ -138,7 +138,7 @@ module.exports = function(server) {
       if (logic.__giveBone === null) return;
       if (logic.__giveBone) bone = logic.__giveBone(bone);
     }
-    if (bone === undefined) return;
+    if (bone === undefined) return;*/
     
     //Send bone
     bone.socket.send(JSON.stringify(_.omit(bone, "socket")));
@@ -165,7 +165,7 @@ module.exports = function(server) {
       return;
     }
     
-    //Execute logic top level middleware
+    /*//Execute logic top level middleware
     if (logic === null) return;
     if (logic !== undefined) {
       //TODO: Implement __givetake middleware
@@ -196,7 +196,7 @@ module.exports = function(server) {
       if (mask.__takeBone === null) return;
       if (mask.__takeBone) bone = mask.__takeBone(bone);
     }
-    if (bone === undefined) return;
+    if (bone === undefined) return;*/
     
     //Generate OT revision if needed and add changeset
     let lastRev = __revs[bone.path].get(0);
