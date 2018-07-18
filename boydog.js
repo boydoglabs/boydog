@@ -264,8 +264,6 @@ module.exports = function(server) {
   
   //Will give a bone without val to all connected users so that they request an update on that path (or on all paths)
   var refresh = function(paths) {
-    console.log("refreshing paths", paths);
-    
     if (_.isString(paths)) { //If paths is only a single path string
       wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //Refresh the specific route
     } else if (_.isArray(paths)) {
