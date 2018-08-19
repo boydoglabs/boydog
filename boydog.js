@@ -207,6 +207,7 @@ module.exports = function(server) {
       const cs = cset(bone.parent, bone.val);
       _.set(scope, bone.path, cs.apply(currentValue));
       
+      console.log("OT case next revision");
       give(bone);
     } else {
       //When OT is needed or client is too out of date
@@ -216,6 +217,7 @@ module.exports = function(server) {
       if (searchRev > __revs[bone.path]._capacity) {
         //If the client is too out-of-date
         const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev, parent: __revs[bone.path].get(0).parent, val: __revs[bone.path].get(0).val, socket: bone.socket };
+        console.log("OT case too out of date");
         give(newRev);
         
         return;
@@ -252,6 +254,7 @@ module.exports = function(server) {
         __revs[bone.path].enq(newRev);
         _.set(scope, bone.path, newVal);
         
+        console.log("OT case transformAgainst");
         give(newRev);
       } catch (e) {
         //TODO: Implement a fallback just in case?
