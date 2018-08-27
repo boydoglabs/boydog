@@ -12,6 +12,7 @@ module.exports = function(server) {
   var scope = {};
   var logic = {};
   var __revs = {};
+  var shareType = "fifo"
   
   //
   //Utilities
@@ -151,13 +152,6 @@ module.exports = function(server) {
     let currentValue = _.get(scope, bone.path);
     if (!isNaN(currentValue)) currentValue = currentValue.toString();
     
-    if (__revs[bone.path] === undefined) {
-      __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
-      
-      const newRev = { path: bone.path, rev: 0, parent: "", val: currentValue };
-      __revs[bone.path].enq(newRev);
-    }
-    
     //Deal with bone that only ask for `bone.path` update
     if (bone.val === undefined) {
       give({ path: bone.path, val: currentValue, socket: bone.socket }); //Send the latest version
@@ -198,67 +192,85 @@ module.exports = function(server) {
     }
     if (bone === undefined) return;*/
     
-    //Generate OT revision if needed and add changeset
-    let lastRev = __revs[bone.path].get(0);
-    
-    if (bone.rev > lastRev.rev) {
-      __revs[bone.path].enq(_.omit(bone, 'socket'));
+    if (!shareType || shareType === "fifo") {
+      _.set(scope, bone.path, bone.val);
       
-      const cs = cset(bone.parent, bone.val);
-      _.set(scope, bone.path, cs.apply(currentValue));
-      
-      console.log("OT case next revision");
+      //const newRev = { path: bone.path, parent: bone.val, val: bone.val, socket: bone.socket };
       give(bone);
-    } else {
-      //When OT is needed or client is too out of date
-      const x = cset(bone.parent, bone.val);
+    } else if (shareType === "fifo-hardlock") {
+            
+    } else if (shareType === "fifo-softlock") {
       
-      let searchRev = __revs[bone.path].get(0).rev - bone.rev;
-      if (searchRev > __revs[bone.path]._capacity) {
-        //If the client is too out-of-date
-        const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev, parent: __revs[bone.path].get(0).parent, val: __revs[bone.path].get(0).val, socket: bone.socket };
-        console.log("OT case too out of date");
-        give(newRev);
+    } else if (shareType === "ot") {
+      //Deal with an uninitialized revision history
+      if (__revs[bone.path] === undefined) {
+        __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
         
-        return;
-      }
-      
-      let found = false;
-      do {
-        if (__revs[bone.path].get(searchRev).parent !== bone.parent) {
-          searchRev--;
-        } else {
-          found = true;
-        }
-      } while(!found && (searchRev >= 0));
-      
-      let m; //Let m be merge changeset
-      if (found) {
-        m = cset(__revs[bone.path].get(searchRev).parent, __revs[bone.path].get(searchRev).val); //Set first m
-        
-        for (let i = searchRev - 1; i >= 0; i--) {
-          const csTemp = cset(__revs[bone.path].get(i).parent, __revs[bone.path].get(i).val);
-          m = m.merge(csTemp);
-        }
-      } else {
-        searchRev = 0;
-        m = cset(bone.parent, __revs[bone.path].get(searchRev).val);
-      }
-      
-      try {
-        const newVal = m.transformAgainst(x).apply(bone.val);
-        
-        if (newVal === undefined) throw new Error("Can't transform changeset");
-        
-        const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev + 1, parent: __revs[bone.path].get(0).val, val: newVal, socket: bone.socket };
+        const newRev = { path: bone.path, rev: 0, parent: "", val: currentValue };
         __revs[bone.path].enq(newRev);
-        _.set(scope, bone.path, newVal);
+      }
+      
+      //Generate OT revision if needed and add changeset
+      let lastRev = __revs[bone.path].get(0);
+      
+      if (bone.rev > lastRev.rev) {
+        __revs[bone.path].enq(_.omit(bone, 'socket'));
         
-        console.log("OT case transformAgainst");
-        give(newRev);
-      } catch (e) {
-        //TODO: Implement a fallback just in case?
-        console.log("OT error", e);
+        const cs = cset(bone.parent, bone.val);
+        _.set(scope, bone.path, cs.apply(currentValue));
+        
+        give(bone);
+      } else {
+        //When OT is needed or client is too out of date
+        const x = cset(bone.parent, bone.val);
+        
+        let searchRev = __revs[bone.path].get(0).rev - bone.rev;
+        if (searchRev > __revs[bone.path]._capacity) {
+          //If the client is too out-of-date
+          const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev, parent: __revs[bone.path].get(0).parent, val: __revs[bone.path].get(0).val, socket: bone.socket };
+          console.log("OT case too out of date");
+          give(newRev);
+          
+          return;
+        }
+        
+        let found = false;
+        do {
+          if (__revs[bone.path].get(searchRev).parent !== bone.parent) {
+            searchRev--;
+          } else {
+            found = true;
+          }
+        } while(!found && (searchRev >= 0));
+        
+        let m; //Let m be merge changeset
+        if (found) {
+          m = cset(__revs[bone.path].get(searchRev).parent, __revs[bone.path].get(searchRev).val); //Set first m
+          
+          for (let i = searchRev - 1; i >= 0; i--) {
+            const csTemp = cset(__revs[bone.path].get(i).parent, __revs[bone.path].get(i).val);
+            m = m.merge(csTemp);
+          }
+        } else {
+          searchRev = 0;
+          m = cset(bone.parent, __revs[bone.path].get(searchRev).val);
+        }
+        
+        try {
+          const newVal = m.transformAgainst(x).apply(bone.val);
+          
+          if (newVal === undefined) throw new Error("Can't transform changeset");
+          
+          const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev + 1, parent: __revs[bone.path].get(0).val, val: newVal, socket: bone.socket };
+          __revs[bone.path].enq(newRev);
+          _.set(scope, bone.path, newVal);
+          
+          console.log("OT case transformAgainst");
+          give(newRev);
+        } catch (e) {
+          //TODO: Implement a fallback just in case?
+          console.log("OT error", e);
+        }
       }
     }
     
@@ -267,6 +279,7 @@ module.exports = function(server) {
   
   //Will give a bone without val to all connected users so that they request an update on that path (or on all paths)
   var refresh = function(paths) {
+    console.log('refreshing')
     if (_.isString(paths)) { //If paths is only a single path string
       wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) })); //Refresh the specific route
     } else if (_.isArray(paths)) {
