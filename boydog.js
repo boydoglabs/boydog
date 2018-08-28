@@ -154,7 +154,6 @@ module.exports = function(server) {
     
     //Deal with bone that only ask for `bone.path` update
     if (bone.val === undefined) {
-      console.log("no bone.val, asking for update")
       give({ path: bone.path, val: currentValue, socket: bone.socket }); //Send the latest version
       
       return;
@@ -198,8 +197,6 @@ module.exports = function(server) {
       
       _.set(scope, bone.path, bone.val);
       refresh(bone.path, bone.socket);
-      
-      console.log("shareType fifo", _.omit(bone, 'socket'))
       
       //const newRev = { path: bone.path, parent: bone.val, val: bone.val, socket: bone.socket };
       give(bone);
@@ -283,7 +280,6 @@ module.exports = function(server) {
   //Will give a bone without val to all connected users so that they request an update on that path (or on all paths)
   var refresh = function(paths, except) {
     if (_.isString(paths)) { //If paths is only a single path string
-      console.log('bcasting', paths)
       wss.broadcast(JSON.stringify({ path: canonicalizePath(paths) }), except); //Refresh the specific route
     } else if (_.isArray(paths)) {
       _.each(paths, function(path) { //For each route
