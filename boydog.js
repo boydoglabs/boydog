@@ -147,8 +147,6 @@ module.exports = function(server) {
   var take = function(bone) {
     let mask;
     
-    console.log("SSERVER TAKEKE bone", _.omit(bone, 'socket'));
-    
     //Deal with an uninitialized scope field
     let currentValue = _.get(scope, bone.path);
     if (!isNaN(currentValue)) currentValue = currentValue.toString();
