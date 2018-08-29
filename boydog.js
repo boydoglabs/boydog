@@ -12,7 +12,6 @@ module.exports = function(server) {
   var scope = {};
   var logic = {};
   var __revs = {};
-  var shareType = "fifo"
   
   //
   //Utilities
@@ -148,6 +147,8 @@ module.exports = function(server) {
   var take = function(bone) {
     let mask;
     
+    console.log("SSERVER TAKEKE bone", _.omit(bone, 'socket'));
+    
     //Deal with an uninitialized scope field
     let currentValue = _.get(scope, bone.path);
     if (!isNaN(currentValue)) currentValue = currentValue.toString();
@@ -192,7 +193,7 @@ module.exports = function(server) {
     }
     if (bone === undefined) return;*/
     
-    if (!shareType || shareType === "fifo") {
+    if (!bone.kind || bone.kind === "fifo") {
       if (bone.val === bone.parent) return;
       
       _.set(scope, bone.path, bone.val);
@@ -200,11 +201,11 @@ module.exports = function(server) {
       
       //const newRev = { path: bone.path, parent: bone.val, val: bone.val, socket: bone.socket };
       give(bone);
-    } else if (shareType === "fifo-hardlock") {
+    } else if (bone.kind === "fifo-hardlock") {
             
-    } else if (shareType === "fifo-softlock") {
+    } else if (bone.kind === "fifo-softlock") {
       
-    } else if (shareType === "ot") {
+    } else if (bone.kind === "ot") {
       //Deal with an uninitialized revision history
       if (__revs[bone.path] === undefined) {
         __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
