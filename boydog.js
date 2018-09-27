@@ -119,7 +119,7 @@ module.exports = function(server) {
     //Execute middleware functions to the actual value
     let fullPath = _.toPath(bone.path);
     let tmpPath;
-    for (let i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
+    for (let i = 1; i < fullPath.length; i++) { //Note: Last item is not part of the middleware
       //tmpPath = _.take(fullPath, i); //Verse
       tmpPath = _.take(fullPath, (fullPath.length - i)); //Inverse
       mask = _.get(logic, tmpPath);
@@ -170,7 +170,7 @@ module.exports = function(server) {
     //Execute path to the actual value middleware
     let fullPath = _.toPath(bone.path);
     let tmpPath;
-    for (var i = 1; i < fullPath.length; i++) { //Note that we *don't* take the very last item, as this item is not part of the middleware
+    for (var i = 1; i < fullPath.length; i++) { //Note: Last item is not part of the middleware
       tmpPath = _.take(fullPath, i); //Verse
       //tmpPath = _.take(fullPath, (fullPath.length - i)); //Inverse
       mask = _.get(logic, tmpPath);
