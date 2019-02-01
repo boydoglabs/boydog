@@ -5,10 +5,7 @@
 module.exports = function(server) {
   const WebSocket = require('ws');
   const wss = new WebSocket.Server({ server });
-  const diff = require('fast-diff');
   const _ = require('lodash');
-  const Changeset = require('changesets').Changeset;
-  const CircularBuffer = require('circular-buffer');
   var scope = {};
   var logic = {};
   var __revs = {};
@@ -17,20 +14,15 @@ module.exports = function(server) {
   //Utilities
   //
   
-  //Send patch with latency (for debugging only, chrome throttle does not work for WebSockets)
+  //Send patch with latency (for debugging only, note that Chrome's throttle does not work for WebSockets)
   function socketSendWithLatency(bone, socket, latency) {
     (function(data, socket, latency) {
       setTimeout(function() {
-        
-        console.log("sending with latency")
-        
+        console.log("DEBUG: Sending packets with latency, remember to remove latency before publishing");
         socket.send(bone);
-      }, latency) //Client latency
+      }, latency)
     })(bone, socket, latency);
   }
-  
-  //Changeset shorthand
-  function cset(parent, val) { return Changeset.fromDiff(diff(parent, val)) }
   
   var canonicalizePath = function(str) {
     var attr = _.toPath(str);
@@ -61,48 +53,6 @@ module.exports = function(server) {
     if (_scope) scope = _scope;
     if (_logic) logic = _logic;
   }
-  
-  /*//dog-run currently disabled
-  var run = function(data) {
-    var mask = _.get(logic, data.path);
-      
-    if (mask === null) return;
-    
-    if (mask !== undefined) {
-      if (mask.__run) return mask.__run(data);
-    }
-  }*/
-  
-  /*//Not used (may be included in newer versions)
-  var forwardPropagate = function(startPoint) {
-    var sp;
-    var keysArray = [];
-    
-    if (!startPoint || (startPoint === ".")) {
-      sp = scope;
-    } else {
-      sp = _.get(scope, startPoint);
-    }
-    
-    function walkKeys(val, key, subPath) {
-      var tmpArr = subPath.slice();
-      if (key) tmpArr.push(key);
-      
-      //if (!_.isArray(keysArray[tmpArr.length])) keysArray[tmpArr.length] = [];
-      //keysArray[tmpArr.length].push(tmpArr);
-      
-      _.each(val, function(v, k) {
-        if (_.isObject(v) || _.isArray(v)) {
-          return walkKeys(v, k, tmpArr);
-        }
-        
-        //if (!_.isArray(keysArray[tmpArr.length + 1])) keysArray[tmpArr.length + 1] = [];
-        //keysArray[tmpArr.length + 1].push(tmpArr);
-      })
-    }
-    
-    walkKeys(sp, undefined, []);
-  }*/
   
   var give = function(bone) {
     let mask;
@@ -197,82 +147,13 @@ module.exports = function(server) {
       _.set(scope, bone.path, bone.val);
       refresh(bone.path, bone.socket);
       
-      //const newRev = { path: bone.path, parent: bone.val, val: bone.val, socket: bone.socket };
       give(bone);
     } else if (bone.kind === "fifo-hardlock") {
-            
+      //Not yet implemented
     } else if (bone.kind === "fifo-softlock") {
-      
+      //Not yet implemented
     } else if (bone.kind === "ot") {
-      //Deal with an uninitialized revision history
-      if (__revs[bone.path] === undefined) {
-        __revs[bone.path] = new CircularBuffer(100); //Create a revision circular buffer if it doesn't exists
-        
-        const newRev = { path: bone.path, rev: 0, parent: "", val: currentValue };
-        __revs[bone.path].enq(newRev);
-      }
-      
-      //Generate OT revision if needed and add changeset
-      let lastRev = __revs[bone.path].get(0);
-      
-      if (bone.rev > lastRev.rev) {
-        __revs[bone.path].enq(_.omit(bone, 'socket'));
-        
-        const cs = cset(bone.parent, bone.val);
-        _.set(scope, bone.path, cs.apply(currentValue));
-        
-        give(bone);
-      } else {
-        //When OT is needed or client is too out of date
-        const x = cset(bone.parent, bone.val);
-        
-        let searchRev = __revs[bone.path].get(0).rev - bone.rev;
-        if (searchRev > __revs[bone.path]._capacity) {
-          //If the client is too out-of-date
-          const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev, parent: __revs[bone.path].get(0).parent, val: __revs[bone.path].get(0).val, socket: bone.socket };
-          
-          give(newRev);
-          
-          return;
-        }
-        
-        let found = false;
-        do {
-          if (__revs[bone.path].get(searchRev).parent !== bone.parent) {
-            searchRev--;
-          } else {
-            found = true;
-          }
-        } while(!found && (searchRev >= 0));
-        
-        let m; //Let m be merge changeset
-        if (found) {
-          m = cset(__revs[bone.path].get(searchRev).parent, __revs[bone.path].get(searchRev).val); //Set first m
-          
-          for (let i = searchRev - 1; i >= 0; i--) {
-            const csTemp = cset(__revs[bone.path].get(i).parent, __revs[bone.path].get(i).val);
-            m = m.merge(csTemp);
-          }
-        } else {
-          searchRev = 0;
-          m = cset(bone.parent, __revs[bone.path].get(searchRev).val);
-        }
-        
-        try {
-          const newVal = m.transformAgainst(x).apply(bone.val);
-          
-          if (newVal === undefined) throw new Error("Can't transform changeset");
-          
-          const newRev = { path: bone.path, rev: __revs[bone.path].get(0).rev + 1, parent: __revs[bone.path].get(0).val, val: newVal, socket: bone.socket };
-          __revs[bone.path].enq(newRev);
-          _.set(scope, bone.path, newVal);
-          
-          give(newRev);
-        } catch (e) {
-          //TODO: Implement a fallback just in case?
-          console.log("OT error", e);
-        }
-      }
+      //Not yet implemented
     }
   }
   
