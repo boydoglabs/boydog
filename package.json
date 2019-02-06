@@ -34,5 +34,8 @@
   "bugs": {
     "url": "https://github.com/boydoglabs/boydog/issues"
   },
-  "homepage": "https://github.com/boydoglabs/boydog#readme"
+  "homepage": "https://github.com/boydoglabs/boydog#readme",
+  "devDependencies": {
+    "prettier": "1.16.4"
+  }
 }
