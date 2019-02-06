@@ -4,7 +4,8 @@
   "description": "Build ultra-fast, real-time collaborative webpages in Node.JS + Socket.IO. Server-side module.",
   "main": "boydog.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write \"boydog.js\""
   },
   "repository": {
     "type": "git",
