@@ -6,12 +6,11 @@ module.exports = function(server) {
   var ShareDB = require('sharedb');
   var WebSocket = require('ws');
   var WebSocketJSONStream = require('websocket-json-stream');
-  
-  var scope = {};
-
   var backend = new ShareDB();
   var connection = backend.connect();
-
+  
+  var scope;
+  
   var doc = connection.get('examples', 'randomABC');
   doc.fetch(function(err) {
     if (err) throw err;
