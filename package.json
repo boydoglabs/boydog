@@ -35,6 +35,6 @@
   },
   "homepage": "https://github.com/boydoglabs/boydog#readme",
   "devDependencies": {
-    "prettier": "1.16.4"
+    "prettier": "^1.16.4"
   }
 }
