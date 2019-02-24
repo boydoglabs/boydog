@@ -6,12 +6,17 @@ module.exports = function(server) {
   var ShareDB = require("sharedb");
   var WebSocket = require("ws");
   var WebSocketJSONStream = require("websocket-json-stream");
+  const puppeteer = require('puppeteer');
   var backend = new ShareDB();
   var connection = backend.connect();
   
-  const puppeteer = require('puppeteer');
-  var page;
+  //Add "/boydog-client" as an express Express route
+  server._events.request.get("/boydog-client", function(req, res) {
+    return res.sendFile('./node_modules/boydog-client/build/boydog-client.js', { root: __dirname });
+  })
   
+  //Boydog variables
+  var page;
   var _mirror = {};
   var test = 50;
   var scope;
