@@ -3,9 +3,12 @@
 "use strict";
 
 module.exports = function(server) {
+  const fs = require("fs");
+  var path = require("path");
   var ShareDB = require("sharedb");
   var WebSocket = require("ws");
   var WebSocketJSONStream = require("websocket-json-stream");
+  const ejs = require('ejs');
   const puppeteer = require('puppeteer');
   var backend = new ShareDB();
   var connection = backend.connect();
@@ -13,6 +16,15 @@ module.exports = function(server) {
   //Add "/boydog-client" as an express Express route
   server._events.request.get("/boydog-client", function(req, res) {
     return res.sendFile('./node_modules/boydog-client/build/boydog-client.js', { root: __dirname });
+  })
+  
+  //Add "/boydog-monitor" as an express Express route
+  server._events.request.get("/boydog-monitor", function(req, res) {
+    fs.readFile(path.join(__dirname, "/monitor/default-monitor.ejs"), 'utf8', (err, contents) => {
+      if (err || !contents) return res.status(500).send("Error. Monitor file not found.");
+      console.log("scope", scope)
+      return res.send(ejs.render(contents, { scopeArray: Object.keys(scope) }));
+    })
   })
   
   //Boydog variables
@@ -48,9 +60,9 @@ module.exports = function(server) {
       Object.keys(scope).forEach((path) => {
         let value = scope[path];
         
-        console.log("EACH scope", path, value)
-        documentScope[path] = connection.get("default", path);
-        
+        //Populate document scope
+        documentScope[path] = connection.get("default", path); //Create document connection
+        //Try to fetch the document, otherwise create it
         documentScope[path].fetch(function(err) {
           if (err) throw err;
           if (documentScope[path].type === null) {
@@ -59,10 +71,11 @@ module.exports = function(server) {
             });
             return;
           }
-        });
+        })
+        
+        //Populate monitor
+        
       })
-      
-      //TODO: Populate monitor
       
       /*//Working writing sample
       await monitor.focus('#test');
@@ -78,7 +91,7 @@ module.exports = function(server) {
     (async() => {
       const browser = await puppeteer.launch({ headless: false });
       monitor = await browser.newPage();
-      await monitor.goto(`localhost:${ server._connectionKey.split("::::")[1] }`); //Note: This way of getting the server's port may not be very reliable...
+      await monitor.goto(`localhost:${ server._connectionKey.split("::::")[1] }/boydog-monitor`); //Note: This way of getting the server's port may not be very reliable...
       restart();
     })();
   };
