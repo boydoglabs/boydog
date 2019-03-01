@@ -51,56 +51,54 @@ module.exports = function(server) {
     backend.listen(stream);
   });
 
-  var restart = function() {
+  var restart = async function() {
     console.log("restarting boy with scope", scope);
+    
+    let hasTitle = await monitor.title();
+    if (!hasTitle) return;
 
-    (async () => {
-      let hasTitle = await monitor.title();
-      if (!hasTitle) return;
+    Object.keys(scope).forEach(path => {
+      let value = scope[path];
 
-      Object.keys(scope).forEach(path => {
-        let value = scope[path];
-
-        //Populate document scope
-        documentScope[path] = connection.get("default", path); //Create document connection
-        //Try to fetch the document, otherwise create it
-        documentScope[path].fetch(err => {
-          if (err) throw err;
-          if (documentScope[path].type === null) {
-            documentScope[path].create({ content: value }, () => {
-              //Subscribe to operation events and update "scope" accordingly
-              documentScope[path].subscribe(err => {
-                documentScope[path].on("op", (op, source) => {
-                  //Get latest value
-                  documentScope[path].fetch(err => {
-                    if (err) throw err;
-                    _scope[path] = documentScope[path].data.content; //Update _scope which has the actual values
-                  })
+      //Populate document scope
+      documentScope[path] = connection.get("default", path); //Create document connection
+      //Try to fetch the document, otherwise create it
+      documentScope[path].fetch(err => {
+        if (err) throw err;
+        if (documentScope[path].type === null) {
+          documentScope[path].create({ content: value }, () => {
+            //Subscribe to operation events and update "scope" accordingly
+            documentScope[path].subscribe(err => {
+              documentScope[path].on("op", (op, source) => {
+                console.log("op", op);
+                //Get latest value
+                documentScope[path].fetch(err => {
+                  if (err) throw err;
+                  _scope[path] = documentScope[path].data.content; //Update _scope which has the actual values
                 })
               })
-              
-              //Define scope getters & setters
-              Object.defineProperty(scope, path, {
-                set: function(v) {
-                  _scope[path] = v;
-                  
-                  //TODO: Write the new value to the documentScope
-                },
-                get: function(v) {
-                  return _scope[path];
-                }
-              });
-            });
+            })
             
-            return;
-          }
-        });
+            //Define scope getters & setters
+            Object.defineProperty(scope, path, {
+              set: v => {
+                monitor.evaluate((path, v) => {
+                  console.log("path", path);
+                  let el = document.querySelector(`[dog-value=${ path }]`);
+                  el.value = v;
+                  el.dispatchEvent(new Event('input')); //Trigger a change
+                }, path, v);
+              },
+              get: v => {
+                return _scope[path];
+              }
+            });
+          });
+          
+          return;
+        }
       });
-
-      /*//Working writing sample
-      await monitor.focus('#test');
-      await monitor.keyboard.type('server connected');*/
-    })();
+    });
   };
 
   var attach = function(_scope) {
