@@ -37,20 +37,12 @@ module.exports = function(server) {
   });
 
   //Boydog variables
+  
   var monitor;
   var documentScope = {};
+  //Scope vars
   var scope;
-
-  /*var doc = connection.get("default", "randomABC");
-  doc.fetch(function(err) {
-    if (err) throw err;
-    if (doc.type === null) {
-      doc.create({ content: "abc123" }, () => {
-        console.log("created");
-      });
-      return;
-    }
-  });*/
+  var _scope = {}; //The scope mirror that retains actual values
 
   //Connect any incoming WebSocket connection to ShareDB
   var wss = new WebSocket.Server({ server });
@@ -72,17 +64,37 @@ module.exports = function(server) {
         //Populate document scope
         documentScope[path] = connection.get("default", path); //Create document connection
         //Try to fetch the document, otherwise create it
-        documentScope[path].fetch(function(err) {
+        documentScope[path].fetch(err => {
           if (err) throw err;
           if (documentScope[path].type === null) {
             documentScope[path].create({ content: value }, () => {
-              console.log("created", path, "with", value);
+              //Subscribe to operation events and update "scope" accordingly
+              documentScope[path].subscribe(err => {
+                documentScope[path].on("op", (op, source) => {
+                  //Get latest value
+                  documentScope[path].fetch(err => {
+                    if (err) throw err;
+                    _scope[path] = documentScope[path].data.content; //Update _scope which has the actual values
+                  })
+                })
+              })
+              
+              //Define scope getters & setters
+              Object.defineProperty(scope, path, {
+                set: function(v) {
+                  _scope[path] = v;
+                  
+                  //TODO: Write the new value to the documentScope
+                },
+                get: function(v) {
+                  return _scope[path];
+                }
+              });
             });
+            
             return;
           }
         });
-
-        //Populate monitor
       });
 
       /*//Working writing sample
