@@ -51,7 +51,7 @@ module.exports = function(server) {
   });
 
   var restart = async function() {
-    console.warn("Restarting boy with scope", scope);
+    console.warn("Restarting boy");
 
     let hasTitle = await monitor.title();
     if (!hasTitle) return;
