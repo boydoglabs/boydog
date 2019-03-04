@@ -10,8 +10,19 @@ module.exports = function(server) {
   var WebSocketJSONStream = require("websocket-json-stream");
   const ejs = require("ejs");
   const puppeteer = require("puppeteer");
+  const createHash = require("hash-generator");
   var backend = new ShareDB();
   var connection = backend.connect();
+
+  //Boydog variables
+  var monitor;
+  var documentScope = {};
+  var options = {
+    monitorBasicAuth: createHash(32) //Set a hard to guess hash
+  };
+  //Scope vars
+  var scope;
+  var _scope = {}; //The scope mirror that retains actual values
 
   //Add "/boydog-client" as an express Express route
   server._events.request.get("/boydog-client", function(req, res) {
@@ -20,8 +31,14 @@ module.exports = function(server) {
     });
   });
 
-  //Add "/boydog-monitor" as an express Express route
-  server._events.request.get("/boydog-monitor", function(req, res) {
+  //Add "/boydog-monitor/..." as an express Express route
+  server._events.request.get("/boydog-monitor/:monitorBasicAuth", function(
+    req,
+    res
+  ) {
+    if (req.params.monitorBasicAuth !== options.monitorBasicAuth)
+      return res.redirect("/");
+
     fs.readFile(
       path.join(__dirname, "/monitor/default-monitor.ejs"),
       "utf8",
@@ -34,14 +51,6 @@ module.exports = function(server) {
       }
     );
   });
-
-  //Boydog variables
-
-  var monitor;
-  var documentScope = {};
-  //Scope vars
-  var scope;
-  var _scope = {}; //The scope mirror that retains actual values
 
   //Connect any incoming WebSocket connection to ShareDB
   var wss = new WebSocket.Server({ server });
@@ -104,6 +113,11 @@ module.exports = function(server) {
 
   var attach = function(_scope) {
     if (!_scope) return;
+    console.info(
+      `Restarting boy, monitor is available at /boydog-monitor/${
+        options.monitorBasicAuth
+      }`
+    );
 
     scope = _scope;
 
@@ -111,7 +125,9 @@ module.exports = function(server) {
       const browser = await puppeteer.launch({ headless: false });
       monitor = await browser.newPage();
       await monitor.goto(
-        `localhost:${server._connectionKey.split("::::")[1]}/boydog-monitor`
+        `localhost:${server._connectionKey.split("::::")[1]}/boydog-monitor/${
+          options.monitorBasicAuth
+        }`
       ); //Note: This way of getting the server's port may not be very reliable...
       restart();
     })();
