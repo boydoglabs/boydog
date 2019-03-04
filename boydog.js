@@ -124,8 +124,9 @@ module.exports = function(server) {
     (async () => {
       const browser = await puppeteer.launch({ headless: true });
       monitor = await browser.newPage();
+      //await monitor.setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"); //Note: Sending this header may be needed in the future
       await monitor.goto(
-        `localhost:${server._connectionKey.split("::::")[1]}/boydog-monitor/${
+        `http://localhost:${server._connectionKey.split("::::")[1]}/boydog-monitor/${
           options.monitorBasicAuth
         }`
       ); //Note: This way of getting the server's port may not be very reliable...
