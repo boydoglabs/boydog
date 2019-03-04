@@ -122,7 +122,7 @@ module.exports = function(server) {
     scope = _scope;
 
     (async () => {
-      const browser = await puppeteer.launch({ headless: false });
+      const browser = await puppeteer.launch({ headless: true });
       monitor = await browser.newPage();
       await monitor.goto(
         `localhost:${server._connectionKey.split("::::")[1]}/boydog-monitor/${
