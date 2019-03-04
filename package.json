@@ -22,7 +22,7 @@
     "websocket"
   ],
   "dependencies": {
-    "boydog-client": "^1.1.1",
+    "boydog-client": "^1.1.2",
     "ejs": "^2.6.1",
     "reconnecting-websocket": "^3.0.3",
     "sharedb": "^1.0.0-beta",
