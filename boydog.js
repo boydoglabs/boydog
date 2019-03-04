@@ -26,8 +26,8 @@ module.exports = function(server) {
 
   //Add "/boydog-client" as an express Express route
   server._events.request.get("/boydog-client", function(req, res) {
-    return res.sendFile("./node_modules/boydog-client/build/boydog-client.js", {
-      root: __dirname
+    return res.sendFile("/boydog-client/build/boydog-client.js", {
+      root: __dirname + "/.." //Get to "node_modules" folder
     });
   });
 
