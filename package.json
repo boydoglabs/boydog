@@ -4,8 +4,7 @@
   "description": "Build real-time collaborative webpages in Node.JS. Server-side module.",
   "main": "boydog.js",
   "scripts": {
-    "format": "prettier --write \"boydog.js\"",
-    "dev": "npm install --no-save ./dev_modules/boydog-client/"
+    "format": "prettier --write \"./boydog.js\""
   },
   "repository": {
     "type": "git",
