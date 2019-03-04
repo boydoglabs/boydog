@@ -28,7 +28,6 @@ module.exports = function(server) {
       (err, contents) => {
         if (err || !contents)
           return res.status(500).send("Error. Monitor file not found.");
-        console.log("scope", scope);
         return res.send(
           ejs.render(contents, { scopeArray: Object.keys(scope) })
         );
@@ -52,7 +51,7 @@ module.exports = function(server) {
   });
 
   var restart = async function() {
-    console.log("restarting boy with scope", scope);
+    console.warn("Restarting boy with scope", scope);
     
     let hasTitle = await monitor.title();
     if (!hasTitle) return;
@@ -70,7 +69,6 @@ module.exports = function(server) {
             //Subscribe to operation events and update "scope" accordingly
             documentScope[path].subscribe(err => {
               documentScope[path].on("op", (op, source) => {
-                console.log("op", op);
                 //Get latest value
                 documentScope[path].fetch(err => {
                   if (err) throw err;
@@ -83,7 +81,6 @@ module.exports = function(server) {
             Object.defineProperty(scope, path, {
               set: v => {
                 monitor.evaluate((path, v) => {
-                  console.log("path", path);
                   let el = document.querySelector(`[dog-value=${ path }]`);
                   el.value = v;
                   el.dispatchEvent(new Event('input')); //Trigger a change
