@@ -36,7 +36,7 @@ module.exports = function(server) {
   });
 
   //Boydog variables
-  
+
   var monitor;
   var documentScope = {};
   //Scope vars
@@ -52,7 +52,7 @@ module.exports = function(server) {
 
   var restart = async function() {
     console.warn("Restarting boy with scope", scope);
-    
+
     let hasTitle = await monitor.title();
     if (!hasTitle) return;
 
@@ -73,25 +73,29 @@ module.exports = function(server) {
                 documentScope[path].fetch(err => {
                   if (err) throw err;
                   _scope[path] = documentScope[path].data.content; //Update _scope which has the actual values
-                })
-              })
-            })
-            
+                });
+              });
+            });
+
             //Define scope getters & setters
             Object.defineProperty(scope, path, {
               set: v => {
-                monitor.evaluate((path, v) => {
-                  let el = document.querySelector(`[dog-value=${ path }]`);
-                  el.value = v;
-                  el.dispatchEvent(new Event('input')); //Trigger a change
-                }, path, v);
+                monitor.evaluate(
+                  (path, v) => {
+                    let el = document.querySelector(`[dog-value=${path}]`);
+                    el.value = v;
+                    el.dispatchEvent(new Event("input")); //Trigger a change
+                  },
+                  path,
+                  v
+                );
               },
               get: v => {
                 return _scope[path];
               }
             });
           });
-          
+
           return;
         }
       });
