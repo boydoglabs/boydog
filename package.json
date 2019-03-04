@@ -1,6 +1,6 @@
 {
   "name": "boydog",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Build real-time collaborative webpages in Node.JS. Server-side module.",
   "main": "boydog.js",
   "scripts": {
