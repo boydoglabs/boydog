@@ -40,20 +40,20 @@ module.exports = function(server) {
     if (req.params.monitorBasicAuth !== options.monitorBasicAuth)
       return res.redirect("/");
 
-    let ff = (root, pre) => {
+    let getFieldsArray = (root, pre) => {
       if (!pre) {
         pre = "";
       }
       return _.flattenDeep(
         _.map(root, (v, k) => {
           if (_.isObjectLike(v)) {
-            return [pre + k].concat(ff(v, pre + k + ">"));
+            return [pre + k].concat(getFieldsArray(v, pre + k + ">"));
           }
           return pre + k;
         })
       );
     };
-    let scopeArray = ff(scope);
+    let scopeArray = getFieldsArray(scope);
 
     fs.readFile(
       path.join(__dirname, "/monitor/default-monitor.ejs"),
