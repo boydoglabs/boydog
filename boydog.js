@@ -40,20 +40,20 @@ module.exports = function(server) {
     if (req.params.monitorBasicAuth !== options.monitorBasicAuth)
       return res.redirect("/");
 
-    var ff = (cc, pre) => {
-      if (!pre) pre = "";
+    let ff = (root, pre) => {
+      if (!pre) {
+        pre = "";
+      }
       return _.flattenDeep(
-        _.map(cc, (v, k) => {
-          if (!_.isObjectLike(v)) {
-            return pre + "." + k;
+        _.map(root, (v, k) => {
+          if (_.isObjectLike(v)) {
+            return [pre + k].concat(ff(v, pre + k + ">"));
           }
-          return ff(v, pre + "." + k);
+          return pre + k;
         })
       );
     };
-    let scopeArray = ff(scope).map(el => {
-      return el.substr(1);
-    });
+    let scopeArray = ff(scope);
 
     fs.readFile(
       path.join(__dirname, "/monitor/default-monitor.ejs"),
@@ -61,9 +61,7 @@ module.exports = function(server) {
       (err, contents) => {
         if (err || !contents)
           return res.status(500).send("Error. Monitor file not found.");
-        return res.send(
-          ejs.render(contents, { scopeArray })
-        );
+        return res.send(ejs.render(contents, { scopeArray }));
       }
     );
   });
@@ -88,39 +86,80 @@ module.exports = function(server) {
       if (!prePath) prePath = [];
 
       _.each(root, (value, path) => {
-        let fullPath = prePath.concat([path]).join(".");
-        //console.log("flulPath", fullPath);
+        let fullPath = prePath.concat([path]).join(">");
 
         if (_.isPlainObject(root[path])) {
           //If current field is {} or []
-          console.log("is {} or []", fullPath);
-          prePath.push(path);
-          iterateScope(root[path], prePath);
-        } else if (_.isString(root[path])) {
-          //If current field is ""
-          console.log("is string, fullpath", fullPath);
-          //Populate document scope
           documentScope[fullPath] = connection.get("default", fullPath); //Create document connection
           //Try to fetch the document, otherwise create it
           documentScope[fullPath].fetch(err => {
             if (err) throw err;
+
+            if (documentScope[fullPath].type === null) {
+              documentScope[fullPath].create(
+                { content: JSON.stringify(value) },
+                err => {
+                  if (err) throw err;
+
+                  _scope[fullPath] = JSON.stringify(value);
+                }
+              );
+
+              return;
+            }
+          });
+
+          prePath.push(path);
+          iterateScope(root[path], prePath);
+        } else if (_.isString(root[path])) {
+          //If current field is "" or ''
+          documentScope[fullPath] = connection.get("default", fullPath); //Create document connection
+          //Try to fetch the document, otherwise create it
+          documentScope[fullPath].fetch(err => {
+            if (err) throw err;
+
             if (documentScope[fullPath].type === null) {
               documentScope[fullPath].create({ content: value }, err => {
                 if (err) throw err;
+
                 _scope[fullPath] = value;
                 //Subscribe to operation events and update "scope" accordingly
                 documentScope[fullPath].subscribe(err => {
                   if (err) throw err;
+
                   documentScope[fullPath].on("op", (op, source) => {
                     //Get latest value
                     documentScope[fullPath].fetch(err => {
                       if (err) throw err;
-                      _scope[fullPath] = documentScope[fullPath].data.content; //Update _scope which has the actual values
+
+                      //Update _scope for the field itself
+                      _scope[fullPath] = documentScope[fullPath].data.content;
+
+                      //Check if it is a child of a parent and then update parent
+                      let parents = fullPath.split(">");
+                      parents.pop(); //Take out the current field (it has been already updated above)
+                      if (parents.length > 0) {
+                        //Has parents that need an update
+
+                        let parentPath = parents.join(">");
+                        _scope[parentPath] = JSON.stringify(scope[parentPath]);
+                        let jsonV = _scope[parentPath];
+
+                        monitor.evaluate(
+                          (parentPath, jsonV) => {
+                            let el = document.querySelector(
+                              `[dog-value=${parentPath}]`
+                            );
+                            el.value = jsonV;
+                            el.dispatchEvent(new Event("input")); //Trigger a change
+                          },
+                          parentPath,
+                          jsonV
+                        );
+                      }
                     });
                   });
                 });
-
-                //console.log("about to define prop for", root, " at ", fullPath);
 
                 //Define scope getters & setters
                 Object.defineProperty(root, path, {
@@ -164,14 +203,13 @@ module.exports = function(server) {
     scope = _scope;
 
     (async () => {
-      const browser = await puppeteer.launch({ headless: true });
+      const browser = await puppeteer.launch({ headless: false });
       monitor = await browser.newPage();
-      //await monitor.setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1"); //Note: Sending this header may be needed in the future
       await monitor.goto(
         `http://localhost:${
           server._connectionKey.split("::::")[1]
         }/boydog-monitor/${options.monitorBasicAuth}`
-      ); //Note: This way of getting the server's port may not be very reliable...
+      );
       restart();
     })();
   };
