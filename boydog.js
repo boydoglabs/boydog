@@ -3,6 +3,8 @@
 "use strict";
 
 module.exports = function(server) {
+  require('dotenv').config()
+  
   const fs = require("fs");
   var path = require("path");
   var ShareDB = require("sharedb");
@@ -175,6 +177,8 @@ module.exports = function(server) {
                       fullPath,
                       v
                     );
+
+                    return v;
                   },
                   get: v => {
                     return _scope[fullPath];
@@ -203,7 +207,10 @@ module.exports = function(server) {
     scope = _scope;
 
     (async () => {
-      const browser = await puppeteer.launch({ headless: false });
+      const browser = await puppeteer.launch({
+        args: ["--no-sandbox"],
+        headless: !+process.env.SHOW_MONITOR
+      });
       monitor = await browser.newPage();
       await monitor.goto(
         `http://localhost:${
