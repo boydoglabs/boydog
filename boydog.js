@@ -3,8 +3,8 @@
 "use strict";
 
 module.exports = function(server) {
-  require('dotenv').config()
-  
+  require("dotenv").config();
+
   const fs = require("fs");
   var path = require("path");
   var ShareDB = require("sharedb");
