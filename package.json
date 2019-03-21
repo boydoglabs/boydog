@@ -21,7 +21,7 @@
     "websocket"
   ],
   "dependencies": {
-    "boydog-client": "^1.1.8",
+    "boydog-client": "^1.1.9",
     "dotenv": "^7.0.0",
     "ejs": "^2.6.1",
     "hash-generator": "^0.1.0",
