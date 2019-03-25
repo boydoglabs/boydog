@@ -97,18 +97,16 @@ module.exports = function(server) {
           documentScope[fullPath].fetch(err => {
             if (err) throw err;
 
-            if (documentScope[fullPath].type === null) {
-              documentScope[fullPath].create(
-                { content: JSON.stringify(value) },
-                err => {
-                  if (err) throw err;
+            if (documentScope[fullPath].type !== null) return;
 
-                  _scope[fullPath] = JSON.stringify(value);
-                }
-              );
+            documentScope[fullPath].create(
+              { content: JSON.stringify(value) },
+              err => {
+                if (err) throw err;
 
-              return;
-            }
+                _scope[fullPath] = JSON.stringify(value);
+              }
+            );
           });
 
           prePath.push(path);
@@ -120,74 +118,71 @@ module.exports = function(server) {
           documentScope[fullPath].fetch(err => {
             if (err) throw err;
 
-            if (documentScope[fullPath].type === null) {
-              documentScope[fullPath].create({ content: value }, err => {
+            if (documentScope[fullPath].type !== null) return;
+
+            documentScope[fullPath].create({ content: value }, err => {
+              if (err) throw err;
+
+              _scope[fullPath] = value;
+              //Subscribe to operation events and update "scope" accordingly
+              documentScope[fullPath].subscribe(err => {
                 if (err) throw err;
 
-                _scope[fullPath] = value;
-                //Subscribe to operation events and update "scope" accordingly
-                documentScope[fullPath].subscribe(err => {
-                  if (err) throw err;
+                documentScope[fullPath].on("op", (op, source) => {
+                  //Get latest value
+                  documentScope[fullPath].fetch(err => {
+                    if (err) throw err;
 
-                  documentScope[fullPath].on("op", (op, source) => {
-                    //Get latest value
-                    documentScope[fullPath].fetch(err => {
-                      if (err) throw err;
+                    //Update _scope for the field itself
+                    _scope[fullPath] = documentScope[fullPath].data.content;
 
-                      //Update _scope for the field itself
-                      _scope[fullPath] = documentScope[fullPath].data.content;
+                    //Check if it is a child of a parent and then update parent
+                    let parents = fullPath.split(">");
+                    parents.pop(); //Take out the current field (it has been already updated above)
+                    if (parents.length === 0) return;
+                    
+                    let parentPath = parents.join(">");
+                    _scope[parentPath] = JSON.stringify(scope[parentPath]);
+                    let jsonV = _scope[parentPath];
 
-                      //Check if it is a child of a parent and then update parent
-                      let parents = fullPath.split(">");
-                      parents.pop(); //Take out the current field (it has been already updated above)
-                      if (parents.length > 0) {
-                        //Has parents that need an update
-
-                        let parentPath = parents.join(">");
-                        _scope[parentPath] = JSON.stringify(scope[parentPath]);
-                        let jsonV = _scope[parentPath];
-
-                        monitor.evaluate(
-                          (parentPath, jsonV) => {
-                            let el = document.querySelector(
-                              `[dog-value=${parentPath}]`
-                            );
-                            el.value = jsonV;
-                            el.dispatchEvent(new Event("input")); //Trigger a change
-                          },
-                          parentPath,
-                          jsonV
-                        );
-                      }
-                    });
-                  });
-                });
-
-                //Define scope getters & setters
-                Object.defineProperty(root, path, {
-                  set: v => {
                     monitor.evaluate(
-                      (fullPath, v) => {
+                      (parentPath, jsonV) => {
                         let el = document.querySelector(
-                          `[dog-value=${fullPath}]`
+                          `[dog-value=${parentPath}]`
                         );
-                        el.value = v;
+                        el.value = jsonV;
                         el.dispatchEvent(new Event("input")); //Trigger a change
                       },
-                      fullPath,
-                      v
+                      parentPath,
+                      jsonV
                     );
-
-                    return v;
-                  },
-                  get: v => {
-                    return _scope[fullPath];
-                  }
+                    
+                  });
                 });
               });
 
-              return;
-            }
+              //Define scope getters & setters
+              Object.defineProperty(root, path, {
+                set: v => {
+                  monitor.evaluate(
+                    (fullPath, v) => {
+                      let el = document.querySelector(
+                        `[dog-value=${fullPath}]`
+                      );
+                      el.value = v;
+                      el.dispatchEvent(new Event("input")); //Trigger a change
+                    },
+                    fullPath,
+                    v
+                  );
+
+                  return v;
+                },
+                get: v => {
+                  return _scope[fullPath];
+                }
+              });
+            });
           });
         }
       });
