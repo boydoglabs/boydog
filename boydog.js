@@ -140,7 +140,7 @@ module.exports = function(server) {
                     let parents = fullPath.split(">");
                     parents.pop(); //Take out the current field (it has been already updated above)
                     if (parents.length === 0) return;
-                    
+
                     let parentPath = parents.join(">");
                     _scope[parentPath] = JSON.stringify(scope[parentPath]);
                     let jsonV = _scope[parentPath];
@@ -156,7 +156,6 @@ module.exports = function(server) {
                       parentPath,
                       jsonV
                     );
-                    
                   });
                 });
               });
