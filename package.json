@@ -21,16 +21,16 @@
     "websocket"
   ],
   "dependencies": {
-    "boydog-client": "^1.1.13",
+    "boydog-client": "^1.1.14",
     "dotenv": "^7.0.0",
     "ejs": "^2.6.1",
     "hash-generator": "^0.1.0",
     "lodash": "^4.17.11",
     "puppeteer": "^1.13.0",
-    "reconnecting-websocket": "^3.0.3",
+    "reconnecting-websocket": "^4.1.10",
     "sharedb": "^1.0.0-beta",
-    "websocket-json-stream": "^0.0.1",
-    "ws": "^1.1.0"
+    "websocket-json-stream": "^0.0.3",
+    "ws": "^6.2.0"
   },
   "author": "boy.dog (www.boy.dog)",
   "license": "MIT",
