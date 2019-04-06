@@ -14,6 +14,7 @@ module.exports = function(server) {
   const ejs = require("ejs");
   const puppeteer = require("puppeteer");
   const createHash = require("hash-generator");
+  const shareDbAccess = require('sharedb-access');
   var backend = new ShareDB();
   var connection = backend.connect();
 
@@ -25,7 +26,30 @@ module.exports = function(server) {
   };
   //Scope vars
   var scope;
-  var _scope = {}; //The scope mirror that retains actual values as a flat object
+  var logic;
+  var _getScope = {}; //The scope mirror that retains actual values as a flat object, only because "get" ObjectProperty does not accepts async functions
+  
+  //ShareDb Session middleware
+  backend.use('connect', (request, next) => {
+    if (!_.isUndefined(request.req))
+      request.agent.connectSession = { userId: request.req.userId };
+    
+    next();
+  });
+
+  //ShareDb Access module
+  shareDbAccess(backend);
+
+  backend.allowRead('default', async (docId, doc, session) => {
+    //Triggered when reading. Note that "reading" happens only once when a client is connected, after that, only updates are issued, even other clients will not trigger a "read" again
+    //TODO: Implement auth middleware here
+    return true;
+  })
+  
+  backend.allowUpdate('default', async (docId, oldDoc, newDoc, ops, session) => {
+    //TODO: Implement auth middleware here
+    return true;
+  });
 
   //Add "/boydog-client" as an express Express route
   server._events.request.get("/boydog-client", function(req, res) {
@@ -71,12 +95,29 @@ module.exports = function(server) {
   //Connect any incoming WebSocket connection to ShareDB
   var wss = new WebSocket.Server({ server });
   wss.on("connection", function(ws, req) {
-    var stream = new WebSocketJSONStream(ws);
-    backend.listen(stream);
+    let stream = new WebSocketJSONStream(ws);
+    let userId = req.url.split("?userId=")[1];
+
+    backend.listen(stream, { userId });
   });
 
+  var writeThroughMonitor = (dogPath, dogValue) => {
+    _getScope[dogPath] = dogValue;
+    monitor.evaluate(
+      (_dogPath, _dogValue) => {
+        let el = document.querySelector(
+          `[dog-value=${_dogPath}]`
+        );
+        el.value = _dogValue;
+        el.dispatchEvent(new Event("input")); //Trigger a change, hence a send operation. Note that if the old and new content is the same no operation will *not* be send anyway
+      },
+      dogPath,
+      dogValue
+    );
+  }
+
   var restart = async function() {
-    console.warn("Restarting boy");
+    console.info("Restarting boy");
 
     let hasTitle = await monitor.title();
     if (!hasTitle) return;
@@ -93,6 +134,7 @@ module.exports = function(server) {
         if (_.isPlainObject(root[path])) {
           //If current field is {} or []
           documentScope[fullPath] = connection.get("default", fullPath); //Create document connection
+
           //Try to fetch the document, otherwise create it
           documentScope[fullPath].fetch(err => {
             if (err) throw err;
@@ -104,7 +146,7 @@ module.exports = function(server) {
               err => {
                 if (err) throw err;
 
-                _scope[fullPath] = JSON.stringify(value);
+                _getScope[fullPath] = JSON.stringify(value);
               }
             );
           });
@@ -123,62 +165,44 @@ module.exports = function(server) {
             documentScope[fullPath].create({ content: value }, err => {
               if (err) throw err;
 
-              _scope[fullPath] = value;
+              _getScope[fullPath] = value;
               //Subscribe to operation events and update "scope" accordingly
               documentScope[fullPath].subscribe(err => {
                 if (err) throw err;
 
+                //Note: The "on before" is not exactly a "before" operation event, and operations are already applied when the event is triggered. Changing the op inside this event is not useful.
+                //A "op" event is triggered "after" the operation has been applied
                 documentScope[fullPath].on("op", (op, source) => {
                   //Get latest value
                   documentScope[fullPath].fetch(err => {
                     if (err) throw err;
 
                     //Update _scope for the field itself
-                    _scope[fullPath] = documentScope[fullPath].data.content;
+                    _getScope[fullPath] = documentScope[fullPath].data.content;
 
+                    if (fullPath.indexOf(">") < 0) return;
                     //Check if it is a child of a parent and then update parent
                     let parents = fullPath.split(">");
-                    parents.pop(); //Take out the current field (it has been already updated above)
-                    if (parents.length === 0) return;
+                    parents.pop(); //Take out the current field as it has been already updated above
 
                     let parentPath = parents.join(">");
-                    _scope[parentPath] = JSON.stringify(scope[parentPath]);
-                    let jsonV = _scope[parentPath];
+                    _getScope[parentPath] = JSON.stringify(scope[parentPath]);
+                    let jsonV = _getScope[parentPath];
 
-                    monitor.evaluate(
-                      (parentPath, jsonV) => {
-                        let el = document.querySelector(
-                          `[dog-value=${parentPath}]`
-                        );
-                        el.value = jsonV;
-                        el.dispatchEvent(new Event("input")); //Trigger a change
-                      },
-                      parentPath,
-                      jsonV
-                    );
+                    writeThroughMonitor(parentPath, jsonV);
                   });
                 });
               });
 
-              //Define scope getters & setters
+              //Define scope getters & setters when setting scope from the boy
               Object.defineProperty(root, path, {
                 set: v => {
-                  monitor.evaluate(
-                    (fullPath, v) => {
-                      let el = document.querySelector(
-                        `[dog-value=${fullPath}]`
-                      );
-                      el.value = v;
-                      el.dispatchEvent(new Event("input")); //Trigger a change
-                    },
-                    fullPath,
-                    v
-                  );
+                  writeThroughMonitor(`[dog-value=${fullPath}]`, v);
 
                   return v;
                 },
                 get: v => {
-                  return _scope[fullPath];
+                  return _getScope[fullPath];
                 }
               });
             });
@@ -190,16 +214,19 @@ module.exports = function(server) {
     iterateScope(scope);
   };
 
-  var attach = function(_scope) {
+  var attach = function(_scope, _logic) {
     if (!_scope) return;
+
     console.info(
-      `Restarting boy, monitor is available at /boydog-monitor/${
+      `Attaching boy. Monitor will be available at /boydog-monitor/${
         options.monitorBasicAuth
       }`
     );
 
     scope = _scope;
+    logic = _logic || {};
 
+    //Start Puppeteer monitor
     (async () => {
       const browser = await puppeteer.launch({
         args: ["--no-sandbox"],
