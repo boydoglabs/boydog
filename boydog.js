@@ -112,7 +112,7 @@ module.exports = function(server) {
         el.value = _dogValue;
         el.dispatchEvent(new Event("input")); //Trigger a change, hence a send operation. Note that if the old and new content is the same no operation will *not* be send anyway
       },
-      dogPath,
+      `[dog-value=${dogPath}]`,
       dogValue
     );
   };
@@ -171,8 +171,7 @@ module.exports = function(server) {
               //Define scope getters & setters when setting scope from the boy
               Object.defineProperty(root, path, {
                 set: v => {
-                  console.log("fullPath", fullPath);
-                  writeThroughMonitor(`[dog-value=${fullPath}]`, v);
+                  writeThroughMonitor(fullPath, v);
 
                   return v;
                 },
