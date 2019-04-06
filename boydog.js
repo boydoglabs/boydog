@@ -105,9 +105,7 @@ module.exports = function(server) {
     _getScope[dogPath] = dogValue;
     monitor.evaluate(
       (_dogPath, _dogValue) => {
-        let el = document.querySelector(
-          `[dog-value=${_dogPath}]`
-        );
+        let el = document.querySelector(_dogPath);
         el.value = _dogValue;
         el.dispatchEvent(new Event("input")); //Trigger a change, hence a send operation. Note that if the old and new content is the same no operation will *not* be send anyway
       },
@@ -165,7 +163,21 @@ module.exports = function(server) {
             documentScope[fullPath].create({ content: value }, err => {
               if (err) throw err;
 
-              _getScope[fullPath] = value;
+              _getScope[fullPath] = value; //Set initial value just after creation
+
+              //Define scope getters & setters when setting scope from the boy
+              Object.defineProperty(root, path, {
+                set: v => {
+                  console.log("fullPath", fullPath);
+                  writeThroughMonitor(`[dog-value=${fullPath}]`, v);
+
+                  return v;
+                },
+                get: v => {
+                  return _getScope[fullPath];
+                }
+              });
+
               //Subscribe to operation events and update "scope" accordingly
               documentScope[fullPath].subscribe(err => {
                 if (err) throw err;
@@ -192,18 +204,6 @@ module.exports = function(server) {
                     writeThroughMonitor(parentPath, jsonV);
                   });
                 });
-              });
-
-              //Define scope getters & setters when setting scope from the boy
-              Object.defineProperty(root, path, {
-                set: v => {
-                  writeThroughMonitor(`[dog-value=${fullPath}]`, v);
-
-                  return v;
-                },
-                get: v => {
-                  return _getScope[fullPath];
-                }
               });
             });
           });
