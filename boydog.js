@@ -14,7 +14,7 @@ module.exports = function(server) {
   const ejs = require("ejs");
   const puppeteer = require("puppeteer");
   const createHash = require("hash-generator");
-  const shareDbAccess = require('sharedb-access');
+  const shareDbAccess = require("sharedb-access");
   var backend = new ShareDB();
   var connection = backend.connect();
 
@@ -28,28 +28,31 @@ module.exports = function(server) {
   var scope;
   var logic;
   var _getScope = {}; //The scope mirror that retains actual values as a flat object, only because "get" ObjectProperty does not accepts async functions
-  
+
   //ShareDb Session middleware
-  backend.use('connect', (request, next) => {
+  backend.use("connect", (request, next) => {
     if (!_.isUndefined(request.req))
       request.agent.connectSession = { userId: request.req.userId };
-    
+
     next();
   });
 
   //ShareDb Access module
   shareDbAccess(backend);
 
-  backend.allowRead('default', async (docId, doc, session) => {
+  backend.allowRead("default", async (docId, doc, session) => {
     //Triggered when reading. Note that "reading" happens only once when a client is connected, after that, only updates are issued, even other clients will not trigger a "read" again
     //TODO: Implement auth middleware here
     return true;
-  })
-  
-  backend.allowUpdate('default', async (docId, oldDoc, newDoc, ops, session) => {
-    //TODO: Implement auth middleware here
-    return true;
   });
+
+  backend.allowUpdate(
+    "default",
+    async (docId, oldDoc, newDoc, ops, session) => {
+      //TODO: Implement auth middleware here
+      return true;
+    }
+  );
 
   //Add "/boydog-client" as an express Express route
   server._events.request.get("/boydog-client", function(req, res) {
@@ -112,7 +115,7 @@ module.exports = function(server) {
       dogPath,
       dogValue
     );
-  }
+  };
 
   var restart = async function() {
     console.info("Restarting boy");
