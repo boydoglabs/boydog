@@ -6,17 +6,17 @@ module.exports = function(server) {
   require("dotenv").config();
 
   const fs = require("fs");
-  var path = require("path");
-  var ShareDB = require("sharedb");
-  var WebSocket = require("ws");
-  var WebSocketJSONStream = require("websocket-json-stream");
+  const path = require("path");
+  const ShareDB = require("sharedb");
+  const WebSocket = require("ws");
+  const WebSocketJSONStream = require("websocket-json-stream");
   const _ = require("lodash");
   const ejs = require("ejs");
   const puppeteer = require("puppeteer");
   const createHash = require("hash-generator");
   const shareDbAccess = require("sharedb-access");
-  var backend = new ShareDB();
-  var connection = backend.connect();
+  const backend = new ShareDB();
+  const connection = backend.connect();
 
   //Boydog variables
   var monitor;
@@ -96,7 +96,7 @@ module.exports = function(server) {
   });
 
   //Connect any incoming WebSocket connection to ShareDB
-  var wss = new WebSocket.Server({ server });
+  const wss = new WebSocket.Server({ server });
   wss.on("connection", function(ws, req) {
     let stream = new WebSocketJSONStream(ws);
     let userId = req.url.split("?userId=")[1];
@@ -104,7 +104,7 @@ module.exports = function(server) {
     backend.listen(stream, { userId });
   });
 
-  var writeThroughMonitor = (dogPath, dogValue) => {
+  const writeThroughMonitor = (dogPath, dogValue) => {
     _getScope[dogPath] = dogValue;
     monitor.evaluate(
       (_dogPath, _dogValue) => {
@@ -117,7 +117,7 @@ module.exports = function(server) {
     );
   };
 
-  var restart = async function() {
+  const restart = async function() {
     console.info("Restarting boy");
 
     let hasTitle = await monitor.title();
@@ -216,7 +216,7 @@ module.exports = function(server) {
     iterateScope(scope);
   };
 
-  var attach = function(_scope, _logic) {
+  const attach = function(_scope, _logic) {
     if (!_scope) return;
 
     console.info(
