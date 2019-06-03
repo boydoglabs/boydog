@@ -17,6 +17,7 @@ module.exports = function(server) {
   const shareDbAccess = require("sharedb-access");
   const backend = new ShareDB();
   const connection = backend.connect();
+  const assert = require("chai").assert;
 
   //Boydog variables
   var monitor;
@@ -106,13 +107,14 @@ module.exports = function(server) {
 
   const writeThroughMonitor = (dogPath, dogValue) => {
     _getScope[dogPath] = dogValue;
+
     monitor.evaluate(
       (_dogPath, _dogValue) => {
         let el = document.querySelector(_dogPath);
         el.value = _dogValue;
         el.dispatchEvent(new Event("input")); //Trigger a change, hence a send operation. Note that if the old and new content is the same no operation will *not* be send anyway
       },
-      `[dog-value=${dogPath}]`,
+      `[dog-value='${dogPath}']`,
       dogValue
     );
   };
@@ -182,17 +184,31 @@ module.exports = function(server) {
 
               //Subscribe to operation events and update "scope" accordingly
               documentScope[fullPath].subscribe(err => {
-                if (err) throw err;
+                assert.notExists(err);
 
                 //Note: The "on before" is not exactly a "before" operation event, and operations are already applied when the event is triggered. Changing the op inside this event is not useful.
                 //A "op" event is triggered "after" the operation has been applied
                 documentScope[fullPath].on("op", (op, source) => {
                   //Get latest value
                   documentScope[fullPath].fetch(err => {
-                    if (err) throw err;
+                    assert.notExists(err);
 
-                    //Update _scope for the field itself
-                    _getScope[fullPath] = documentScope[fullPath].data.content;
+                    let initialValue = documentScope[fullPath].data.content;
+                    
+                    //Process middleware
+                    let finalValue = ((value) => {
+                      //Process top level middleware
+                      if (logic === null) return value;
+                      if (logic !== undefined) {
+                        if (logic._write === null) return value;
+                        if (typeof logic._write === "function") value = logic._write(value);
+                      }
+
+                      return value;
+                    })(initialValue);
+
+                    _getScope[fullPath] = finalValue; //Although `_getScope` is updated inside `writeThroughMonitor`, it is still needed to update it here
+                    if (initialValue !== finalValue) writeThroughMonitor(fullPath, finalValue);
 
                     if (fullPath.indexOf(">") < 0) return;
                     //Check if it is a child of a parent and then update parent
@@ -200,10 +216,9 @@ module.exports = function(server) {
                     parents.pop(); //Take out the current field as it has been already updated above
 
                     let parentPath = parents.join(">");
-                    _getScope[parentPath] = JSON.stringify(scope[parentPath]);
-                    let jsonV = _getScope[parentPath];
+                    let finalParentValue = JSON.stringify(scope[parentPath]);
 
-                    writeThroughMonitor(parentPath, jsonV);
+                    writeThroughMonitor(parentPath, finalParentValue);
                   });
                 });
               });

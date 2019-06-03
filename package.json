@@ -22,6 +22,7 @@
   ],
   "dependencies": {
     "boydog-client": "^1.1.16",
+    "chai": "^4.2.0",
     "dotenv": "^7.0.0",
     "ejs": "^2.6.1",
     "hash-generator": "^0.1.0",
