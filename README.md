@@ -8,7 +8,7 @@ Status: Working beta
 
 ## Getting started
 
-See *Getting started* section at [boy.dog](www.boy.dog).
+See *Getting started* section at [boy.dog](http://www.boy.dog).
 
 ## License
 
