@@ -23,7 +23,7 @@ module.exports = function(server) {
   var monitor;
   var documentScope = {};
   var options = {
-    monitorBasicAuth: createHash(32) //Set a hard to guess hash
+    monitorBasicAuth: createHash(32), //Set a hard to guess hash
   };
   //Scope vars
   var scope;
@@ -58,7 +58,7 @@ module.exports = function(server) {
   //Add "/boydog-client" as an express Express route
   server._events.request.get("/boydog-client", function(req, res) {
     return res.sendFile("/boydog-client/build/boydog-client.js", {
-      root: __dirname + "/.." //Get to "node_modules" folder
+      root: __dirname + "/..", //Get to "node_modules" folder
     });
   });
 
@@ -139,14 +139,14 @@ module.exports = function(server) {
           documentScope[fullPath] = connection.get("default", fullPath); //Create document connection
 
           //Try to fetch the document, otherwise create it
-          documentScope[fullPath].fetch(err => {
+          documentScope[fullPath].fetch((err) => {
             if (err) throw err;
 
             if (documentScope[fullPath].type !== null) return;
 
             documentScope[fullPath].create(
               { content: JSON.stringify(value) },
-              err => {
+              (err) => {
                 if (err) throw err;
 
                 _getScope[fullPath] = JSON.stringify(value);
@@ -160,55 +160,57 @@ module.exports = function(server) {
           //If current field is "" or ''
           documentScope[fullPath] = connection.get("default", fullPath); //Create document connection
           //Try to fetch the document, otherwise create it
-          documentScope[fullPath].fetch(err => {
+          documentScope[fullPath].fetch((err) => {
             if (err) throw err;
 
             if (documentScope[fullPath].type !== null) return;
 
-            documentScope[fullPath].create({ content: value }, err => {
+            documentScope[fullPath].create({ content: value }, (err) => {
               if (err) throw err;
 
               _getScope[fullPath] = value; //Set initial value just after creation
 
               //Define scope getters & setters when setting scope from the boy
               Object.defineProperty(root, path, {
-                set: v => {
+                set: (v) => {
                   writeThroughMonitor(fullPath, v);
 
                   return v;
                 },
-                get: v => {
+                get: (v) => {
                   return _getScope[fullPath];
-                }
+                },
               });
 
               //Subscribe to operation events and update "scope" accordingly
-              documentScope[fullPath].subscribe(err => {
+              documentScope[fullPath].subscribe((err) => {
                 assert.notExists(err);
 
                 //Note: The "on before" is not exactly a "before" operation event, and operations are already applied when the event is triggered. Changing the op inside this event is not useful.
                 //A "op" event is triggered "after" the operation has been applied
                 documentScope[fullPath].on("op", (op, source) => {
                   //Get latest value
-                  documentScope[fullPath].fetch(err => {
+                  documentScope[fullPath].fetch((err) => {
                     assert.notExists(err);
 
                     let initialValue = documentScope[fullPath].data.content;
-                    
+
                     //Process middleware
                     let finalValue = ((value) => {
                       //Process top level middleware
                       if (logic === null) return value;
                       if (logic !== undefined) {
                         if (logic._write === null) return value;
-                        if (typeof logic._write === "function") value = logic._write(value);
+                        if (typeof logic._write === "function")
+                          value = logic._write(value);
                       }
 
                       return value;
                     })(initialValue);
 
                     _getScope[fullPath] = finalValue; //Although `_getScope` is updated inside `writeThroughMonitor`, it is still needed to update it here
-                    if (initialValue !== finalValue) writeThroughMonitor(fullPath, finalValue);
+                    if (initialValue !== finalValue)
+                      writeThroughMonitor(fullPath, finalValue);
 
                     if (fullPath.indexOf(">") < 0) return;
                     //Check if it is a child of a parent and then update parent
@@ -235,9 +237,7 @@ module.exports = function(server) {
     if (!_scope) return;
 
     console.info(
-      `Attaching boy. Monitor will be available at /boydog-monitor/${
-        options.monitorBasicAuth
-      }`
+      `Attaching boy. Monitor will be available at /boydog-monitor/${options.monitorBasicAuth}`
     );
 
     scope = _scope;
@@ -247,7 +247,7 @@ module.exports = function(server) {
     (async () => {
       const browser = await puppeteer.launch({
         args: ["--no-sandbox"],
-        headless: !+process.env.SHOW_MONITOR
+        headless: !+process.env.SHOW_MONITOR,
       });
       monitor = await browser.newPage();
       await monitor.goto(
