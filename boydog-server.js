@@ -14,7 +14,7 @@ const init = (scope, server) => {
   //Add "/boydog-client" as an express Express route
   server._events.request.get("/boydog-client", function (req, res) {
     return res.sendFile(
-      path.join(__dirname, "static", "dist", "boydog-client.bundle.js")
+      path.join(__dirname, "boydog-client.bundle.js")
     )
   })
 
