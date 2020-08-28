@@ -3,6 +3,9 @@
   "version": "2.0.0",
   "description": "Build real-time collaborative webpages in Node.JS. Server-side module.",
   "main": "boydog-server.js",
+  "scripts": {
+    "build:client": "browserify ./boydog-client.js -o ./boydog-client.bundle.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/boydoglabs/boydog.git"
@@ -32,5 +35,8 @@
   "bugs": {
     "url": "https://github.com/boydoglabs/boydog/issues"
   },
-  "homepage": "https://github.com/boydoglabs/boydog#readme"
+  "homepage": "https://github.com/boydoglabs/boydog#readme",
+  "devDependencies": {
+    "browserify": "^16.5.2"
+  }
 }
