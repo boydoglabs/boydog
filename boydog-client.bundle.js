@@ -36,7 +36,7 @@ socket.addEventListener("close", function () {
 
 socket.addEventListener("error", function () {
   Swal.fire({
-    text: "⠀Boydog connected",
+    text: "⠀Boydog disconnected",
     icon: "error",
     toast: true,
     timer: 3000,
@@ -63,7 +63,7 @@ const init = (root = "html") => {
         if (err) throw err
 
         doc.on("op", (op) => {
-          console.log("op on path", path, op)
+          console.log("Boydog operation on:", path, op)
         })
 
         try {
@@ -87,6 +87,8 @@ const init = (root = "html") => {
     })
   })
 }
+
+init()
 
 window.boydog = { init }
 
