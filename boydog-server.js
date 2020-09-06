@@ -9,13 +9,9 @@ const connection = backend.connect()
 let docScope = {}
 
 const init = (scope, server) => {
-  docScope = scope
-
   //Add "/boydog-client" as an express Express route
   server._events.request.get("/boydog-client", function (req, res) {
-    return res.sendFile(
-      path.join(__dirname, "boydog-client.bundle.js")
-    )
+    return res.sendFile(path.join(__dirname, "boydog-client.bundle.js"))
   })
 
   // Connect any incoming WebSocket connection to ShareDB
@@ -32,20 +28,46 @@ const init = (scope, server) => {
       } else if (Object.prototype.toString.call(e[1]) === "[object Array]") {
         iterate({ ...e[1] }, `${path}>${e[0]}`)
       } else {
+        // This is a leaf and needs a shareDB document
         const fullPath = `${path}>${e[0]}`.substr(1)
         docScope[fullPath] = ((selector) => {
           // Get document or create it if needed
           const doc = connection.get("boydog", selector)
           doc.fetch(function (err) {
             if (err) throw err
-            if (doc.type === null) return doc.create({ content: String(e[1]) }) // If document doesn't exists then create it
+            if (doc.type === null) {
+              docScope[fullPath]._latestValue = String(e[1])
+              return doc.create({ content: String(e[1]) }) // If document doesn't exists then create it
+            }
           })
           return doc
         })(fullPath)
+
+        // Subscribe after an OP so that we know the latest value
+        docScope[fullPath].subscribe((err) => {
+          if (err) throw err
+          docScope[fullPath].on("op", () => {
+            docScope[fullPath].fetch((err) => {
+              if (err) throw err
+              docScope[fullPath]._latestValue = docScope[fullPath].data.content // The latest value is saved inside docScope too
+            })
+          })
+        })
+
+        // Define getter so that the latest value can be obtained from the server
+        Object.defineProperty(root, e[0], {
+          // TODO: Define set function, currently the user is not able to set a new scope value from the server
+          /*set: (v) => {
+            console.log("setting", v)
+          },*/
+          get: () => {
+            return docScope[fullPath]._latestValue
+          },
+        })
       }
     })
   }
-  iterate(docScope)
+  iterate(scope)
 
   console.log("New boydog documents created:", Object.keys(docScope))
 }
