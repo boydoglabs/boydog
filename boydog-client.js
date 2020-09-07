@@ -66,12 +66,7 @@ const init = (root = "html") => {
         })
 
         try {
-          new Binding(
-            dom,
-            doc,
-            ["content"],
-            attr.slice(attr.indexOf("-") + 1)
-          ).setup()
+          new Binding(dom, doc, ["content"], attr.slice(attr.indexOf("-") + 1)).setup()
         } catch (err) {
           if (err.message === "Cannot read property 'content' of undefined") {
             console.log(
