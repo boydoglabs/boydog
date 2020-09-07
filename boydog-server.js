@@ -46,7 +46,7 @@ const init = (scope, server) => {
         // Subscribe after an OP so that we know the latest value
         docScope[fullPath].subscribe((err) => {
           if (err) throw err
-          docScope[fullPath].on("op", () => {
+          docScope[fullPath].on("op", (op, source) => {
             docScope[fullPath].fetch((err) => {
               if (err) throw err
               docScope[fullPath]._latestValue = docScope[fullPath].data.content // The latest value is saved inside docScope too
@@ -57,9 +57,24 @@ const init = (scope, server) => {
         // Define getter so that the latest value can be obtained from the server
         Object.defineProperty(root, e[0], {
           // TODO: Define set function, currently the user is not able to set a new scope value from the server
-          /*set: (v) => {
-            console.log("setting", v)
-          },*/
+          set: (v) => {
+            v = String(v)
+            if (v === docScope[fullPath]._latestValue) return
+
+            // TODO: Submit only needed changes. This code works but briefly erases the content from all clients and submits the new content. This sometimes causes the user's caret going to the beginning of the input.
+            docScope[fullPath].submitOp(
+              [{ p: ["content", 0], sd: docScope[fullPath]._latestValue }], // Delete old content on its entirety
+              (err) => {
+                if (err) throw err
+                docScope[fullPath].submitOp(
+                  [{ p: ["content", 0], si: v }], // Add new value
+                  (err) => {
+                    if (err) throw err
+                  }
+                )
+              }
+            )
+          },
           get: () => {
             return docScope[fullPath]._latestValue
           },
