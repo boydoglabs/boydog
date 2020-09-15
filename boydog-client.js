@@ -6,48 +6,49 @@ const Swal = require("sweetalert2")
 const _toPath = require("lodash.topath")
 const bdAttributes = ["bd-id", "bd-class", "bd-value", "bd-html", "bd-click"]
 
-// Open WebSocket connection to ShareDB server
-const socket = new ReconnectingWebSocket("ws://" + window.location.host)
-const connection = new sharedb.Connection(socket)
-
-// Status messages // TODO: Move to a small status icon at the bottom-right part of the screen?
-socket.addEventListener("open", function () {
-  Swal.fire({
-    text: "⠀Boydog found",
-    icon: "info",
-    toast: true,
-    timer: 3000,
-    showConfirmButton: false,
-    position: "bottom-end",
-  })
-})
-
-socket.addEventListener("close", function () {
-  Swal.fire({
-    text: "⠀Boydog disconnected",
-    icon: "warning",
-    toast: true,
-    timer: 3000,
-    showConfirmButton: false,
-    position: "bottom-end",
-  })
-})
-
-socket.addEventListener("error", function () {
-  Swal.fire({
-    text: "⠀Boydog disconnected",
-    icon: "error",
-    toast: true,
-    timer: 3000,
-    showConfirmButton: false,
-    position: "bottom-end",
-  })
-})
-
 // Boydog front-end scope
 let domScope = []
 
-const init = (root = "html") => {
+const init = (root = "html", host = window.location.host) => {
+  // Open WebSocket connection to ShareDB server
+  const socket = new ReconnectingWebSocket("ws://" + host)
+  const connection = new sharedb.Connection(socket)
+
+  // Status messages // TODO: Move to a small status icon at the bottom-right part of the screen?
+  socket.addEventListener("open", function () {
+    Swal.fire({
+      text: "⠀Boydog found",
+      icon: "info",
+      toast: true,
+      timer: 3000,
+      showConfirmButton: false,
+      position: "bottom-end",
+    })
+  })
+
+  socket.addEventListener("close", function () {
+    Swal.fire({
+      text: "⠀Boydog disconnected",
+      icon: "warning",
+      toast: true,
+      timer: 3000,
+      showConfirmButton: false,
+      position: "bottom-end",
+    })
+  })
+
+  socket.addEventListener("error", function () {
+    Swal.fire({
+      text: "⠀Boydog disconnected",
+      icon: "error",
+      toast: true,
+      timer: 3000,
+      showConfirmButton: false,
+      position: "bottom-end",
+    })
+  })
+
+  // Search and bind attributes
   bdAttributes.forEach((attr) => {
     const els = $(`[${attr}]`)
     if (els.length === 0) return
@@ -80,8 +81,10 @@ const init = (root = "html") => {
       domScope.push({ dom, attr, path, doc })
     })
   })
+
+  console.log("Boydog client connected.")
 }
 
-init()
+console.log("Boydog client found. Now run `boydog.init(scope, host)` to begin sharing in real-time.")
 
 window.boydog = { init }

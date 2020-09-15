@@ -8,7 +8,9 @@ BoyDog is a framework for building ultra-fast, real-time collaborative web appli
 ![](https://raw.githubusercontent.com/boydoglabs/boydog-demo/master/sample.gif)
 Demo: [www.boy.dog](http://www.boy.dog/).
 
-*Status: Beta*
+## Getting started
+
+See instructions at [boydog demo](http://www.boy.dog/)
 
 ## Realtime directives
 
