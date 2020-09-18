@@ -53,6 +53,8 @@ const init = (root = "html", host = window.location.host) => {
     const els = $(`[${attr}]`)
     if (els.length === 0) return
     els.each((i, dom) => {
+      if (dom.getAttribute("bd_init") === "true") return
+
       // Normalize attr and update document
       dom.setAttribute(attr, _toPath(dom.getAttribute(attr)).join(">"))
       const path = dom.getAttribute(attr)
@@ -68,6 +70,7 @@ const init = (root = "html", host = window.location.host) => {
 
         try {
           new Binding(dom, doc, ["content"], attr.slice(attr.indexOf("-") + 1)).setup()
+          dom.setAttribute("bd_init", true)
         } catch (err) {
           if (err.message === "Cannot read property 'content' of undefined") {
             console.log(
