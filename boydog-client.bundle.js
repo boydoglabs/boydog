@@ -65,9 +65,11 @@ const init = (root = "html", host = window.location.host) => {
       doc.subscribe((err) => {
         if (err) throw err
 
-        doc.on("op", (op) => {
-          console.log("Boydog operation on:", path, op)
-        })
+        if (dom.getAttribute("bd-verbose")) {
+          doc.on("op", (op) => {
+            console.log("Boydog operation on:", path, op)
+          })
+        }
 
         try {
           new Binding(dom, doc, ["content"], attr.slice(attr.indexOf("-") + 1)).setup()

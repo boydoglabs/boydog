@@ -12,12 +12,16 @@ Demo: [www.boy.dog](http://www.boy.dog/).
 
 See instructions at [boydog demo](http://www.boy.dog/)
 
-## Realtime directives
+## Directives
 
- - bd-value: Binds `<input>` value.
+For real-time binding:
+ - bd-value: Binds element's value (i.e. bind `<input>` or `<textarea>` text).
  - bd-html: Bind element inner HTML.
  - bd-id: Bind tag id.
  - bd-class: Bind tag classes.
+
+Settings:
+ - bd-verbose: Output the payload upon receiving a message.
 
 Examples:
  - `<input bd-value="editor">`
