@@ -62,14 +62,19 @@ const init = (root = "html", host = window.location.host) => {
 
       // Create shareDB document
       const doc = connection.get("boydog", path)
-      doc.subscribe((err) => {
-        if (err) throw err
 
-        if (dom.getAttribute("bd-verbose")) {
+      if (dom.getAttribute("bd-verbose")) {
+        doc.subscribe((err) => {
+          if (err) throw err
+
           doc.on("op", (op) => {
             console.log("Boydog operation on:", path, op)
           })
-        }
+        })
+      }
+
+      doc.fetch((err) => {
+        if (err) throw err
 
         try {
           new Binding(dom, doc, ["content"], attr.slice(attr.indexOf("-") + 1)).setup()
@@ -82,9 +87,9 @@ const init = (root = "html", host = window.location.host) => {
             )
           }
         }
-      })
 
-      domScope.push({ dom, attr, path, doc })
+        domScope.push({ dom, attr, path, doc })
+      })
     })
   })
 
