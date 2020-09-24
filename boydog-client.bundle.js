@@ -63,15 +63,14 @@ const init = (root = "html", host = window.location.host) => {
       // Create shareDB document
       const doc = connection.get("boydog", path)
 
-      if (dom.getAttribute("bd-verbose")) {
-        doc.subscribe((err) => {
-          if (err) throw err
-
+      doc.subscribe((err) => {
+        if (err) throw err
+        if (dom.getAttribute("bd-verbose")) {
           doc.on("op", (op) => {
             console.log("Boydog operation on:", path, op)
           })
-        })
-      }
+        }
+      })
 
       doc.fetch((err) => {
         if (err) throw err
