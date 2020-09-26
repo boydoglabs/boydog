@@ -26,7 +26,7 @@ Settings:
 Examples:
  - `<input bd-value="editor">`
  - `<p class="alert" bd-html="alertInfo"></p>`
- - `<p bd-class="alert.class" bd-html="alert.info"></p>`
+ - `<p bd-class="alert.class"></p>`
 
 ## Roadmap:
 
@@ -39,7 +39,8 @@ Examples:
 
 ## Changelog
 
- - 2.X.X: Removed Puppeteer. Huge space improvements over previous version. Module 'boydog-client' no longer needed. Client module automatically starts and now there is no need to initialize it manually.
+ - 2.0.18: Several code optimizations. Improved notifications. Minor fixes.
+ - 2.0.0: Removed Puppeteer. Huge space improvements over previous version. Module 'boydog-client' no longer needed. Client module automatically starts and now there is no need to initialize it manually.
  - 1.X.X: Initial alpha realease.
 
 ## License
