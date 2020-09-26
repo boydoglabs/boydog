@@ -17,10 +17,10 @@ const init = (root = "html", host = window.location.host) => {
   // Status messages // TODO: Move to a small status icon at the bottom-right part of the screen?
   socket.addEventListener("open", function () {
     Swal.fire({
-      text: "⠀Boydog found",
+      text: "⠀Boydog connected",
       icon: "info",
       toast: true,
-      timer: 3000,
+      timer: 5000,
       showConfirmButton: false,
       position: "bottom-end",
     })
@@ -31,18 +31,6 @@ const init = (root = "html", host = window.location.host) => {
       text: "⠀Boydog disconnected",
       icon: "warning",
       toast: true,
-      timer: 3000,
-      showConfirmButton: false,
-      position: "bottom-end",
-    })
-  })
-
-  socket.addEventListener("error", function () {
-    Swal.fire({
-      text: "⠀Boydog disconnected",
-      icon: "error",
-      toast: true,
-      timer: 3000,
       showConfirmButton: false,
       position: "bottom-end",
     })
