@@ -39,6 +39,7 @@ Examples:
 
 ## Changelog
 
+ - 2.0.19: SWAL2 update. Minor improvements.
  - 2.0.18: Several code optimizations. Improved notifications. Minor fixes.
  - 2.0.0: Removed Puppeteer. Huge space improvements over previous version. Module 'boydog-client' no longer needed. Client module automatically starts and now there is no need to initialize it manually.
  - 1.X.X: Initial alpha realease.
