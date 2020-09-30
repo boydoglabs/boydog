@@ -74,17 +74,6 @@ const _iterate = (root, path = "") => {
       })(fullPath)
     }
   })
-
-  /*// Catch adding new keys to scope // NOTE: This Proxy works only inside boydog-server.js, which is strange. Until we fix this we can use refresh() which is, in any case, faster than a Proxy.
-  scope = new Proxy(scope, {
-    defineProperty(target, key, descriptor) {
-      console.log("def property", key)
-      if (Object.prototype.hasOwnProperty.call(target, key))
-        return Reflect.defineProperty(target, key, descriptor)
-      console.log(`Property ${key} defined.`)
-      return Reflect.defineProperty(target, key, descriptor)
-    },
-  })*/
 }
 
 const init = (scope, server) => {
