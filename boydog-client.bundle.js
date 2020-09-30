@@ -42,7 +42,7 @@ const init = (root = "html", host = window.location.host) => {
     const els = $(`[${attr}]`)
     if (els.length === 0) return
     els.each((i, dom) => {
-      if (dom.getAttribute("bd_init") === "true") return
+      if (dom.getAttribute("bd-bind") === "true") return
 
       // Normalize attr and update document
       dom.setAttribute(attr, _toPath(dom.getAttribute(attr)).join(">"))
@@ -65,13 +65,10 @@ const init = (root = "html", host = window.location.host) => {
 
         try {
           new Binding(dom, doc, ["content"], attr.slice(attr.indexOf("-") + 1)).setup()
-          dom.setAttribute("bd_init", true)
+          dom.setAttribute("bd-bind", true)
         } catch (err) {
           if (err.message === "Cannot read property 'content' of undefined") {
-            console.log(
-              `Warning: Unrecognized '${path}' path. Either a typo or path is not a leaf.`
-              // TODO: Show element in red
-            )
+            console.log(`Warning: Unrecognized '${path}' path. Either a typo or path is not a leaf.`)
           }
         }
 
