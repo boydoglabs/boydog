@@ -7,7 +7,7 @@ const _toPath = require("lodash.topath")
 const bdAttributes = ["bd-id", "bd-class", "bd-value", "bd-html", "bd-click"]
 
 // Boydog front-end scope
-let domScope = []
+let valScope = {}
 
 const init = (root = "html", host = window.location.host) => {
   // Open WebSocket connection to ShareDB server
@@ -36,12 +36,19 @@ const init = (root = "html", host = window.location.host) => {
     })
   })
 
+  const updateLatestVal = (doc, path) => {
+    doc.fetch((err) => {
+      if (err) throw err
+      valScope[path] = doc.data.content
+    })
+  }
+
   // Search and bind attributes
   bdAttributes.forEach((attr) => {
     const els = $(`[${attr}]`)
     if (els.length === 0) return
     els.each((i, dom) => {
-      if (dom.getAttribute("bd-bind") === "true") return
+      if (dom.getAttribute("bd-bind")) return
 
       // Normalize attr and update document
       dom.setAttribute(attr, _toPath(dom.getAttribute(attr)).join(">"))
@@ -52,11 +59,12 @@ const init = (root = "html", host = window.location.host) => {
 
       doc.subscribe((err) => {
         if (err) throw err
-        if (dom.getAttribute("bd-verbose")) {
-          doc.on("op", (op) => {
-            console.log("Boydog operation on:", path, op)
-          })
-        }
+
+        doc.on("op", (op) => {
+          if (dom.getAttribute("bd-verbose")) console.log("Boydog operation on:", path, op)
+          updateLatestVal(doc, path)
+        })
+        updateLatestVal(doc, path)
       })
 
       doc.fetch((err) => {
@@ -70,8 +78,6 @@ const init = (root = "html", host = window.location.host) => {
             console.log(`Warning: Unrecognized '${path}' path. Either a typo or path is not a leaf.`)
           }
         }
-
-        domScope.push({ dom, attr, path, doc })
       })
     })
   })
