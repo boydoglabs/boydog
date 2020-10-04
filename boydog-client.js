@@ -4,10 +4,12 @@ const Binding = require("sharedb-attribute-binding")
 const $ = require("cash-dom")
 const Swal = require("sweetalert2")
 const _toPath = require("lodash.topath")
-const bdAttributes = ["bd-id", "bd-class", "bd-value", "bd-html", "bd-click"]
+const bdAttributes = ["bd-value", "bd-id", "bd-class", "bd-html", "bd-click"]
 
 // Boydog front-end scope
-let valScope = {}
+let valScope = {} // Always the latest value of the path
+let domScope = {} // All dom elements bound to a path
+let eventScope = {} // Post OP event of a path
 
 const init = (root = "html", host = window.location.host) => {
   // Open WebSocket connection to ShareDB server
@@ -46,26 +48,32 @@ const init = (root = "html", host = window.location.host) => {
   // Search and bind attributes
   bdAttributes.forEach((attr) => {
     const els = $(`[${attr}]`)
-    if (els.length === 0) return
+
     els.each((i, dom) => {
-      if (dom.getAttribute("bd-bind")) return
+      if (dom.getAttribute("bd-bind")) return // Return if already bound
 
       // Normalize attr and update document
       dom.setAttribute(attr, _toPath(dom.getAttribute(attr)).join(">"))
       const path = dom.getAttribute(attr)
 
-      // Create shareDB document
+      if (!Array.isArray(domScope[path])) domScope[path] = []
+      if (attr !== "bd-value") domScope[path].push(dom)
+
+      // Create ShareDB document
       const doc = connection.get("boydog", path)
+      if (!eventScope[path]) {
+        eventScope[path] = () => {} // Can be overriden to execute an event post OP
+        doc.subscribe((err) => {
+          if (err) throw err
 
-      doc.subscribe((err) => {
-        if (err) throw err
-
-        doc.on("op", (op) => {
-          if (dom.getAttribute("bd-verbose")) console.log("Boydog operation on:", path, op)
+          doc.on("op", (op) => {
+            if (dom.getAttribute("bd-verbose")) console.log("Boydog operation on:", path, op)
+            updateLatestVal(doc, path)
+            eventScope[path]() // Call post OP event, if any
+          })
           updateLatestVal(doc, path)
         })
-        updateLatestVal(doc, path)
-      })
+      }
 
       doc.fetch((err) => {
         if (err) throw err
