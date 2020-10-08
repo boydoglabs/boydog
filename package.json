@@ -27,6 +27,7 @@
     "reconnecting-websocket": "^4.4.0",
     "sharedb": "^1.4.1",
     "sharedb-attribute-binding": "^0.1.12",
+    "sharedb-string-binding": "^1.0.0",
     "sweetalert2": "^9.17.2",
     "ws": "^7.3.1"
   },

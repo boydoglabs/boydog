@@ -1,10 +1,10 @@
 const sharedb = require("sharedb/lib/client")
 const ReconnectingWebSocket = require("reconnecting-websocket")
-const Binding = require("sharedb-attribute-binding")
+const Binding = require("sharedb-string-binding")
 const $ = require("cash-dom")
 const Swal = require("sweetalert2")
 const _toPath = require("lodash.topath")
-const bdAttributes = ["bd-value", "bd-id", "bd-class", "bd-html", "bd-click"]
+const bdAttributes = ["bd-value", "bd-id", "bd-class", "bd-html"]
 
 // Boydog front-end scope
 let valScope = {} // Always the latest value of the path
@@ -41,7 +41,25 @@ const init = (root = "html", host = window.location.host) => {
   const updateLatestVal = (doc, path) => {
     doc.fetch((err) => {
       if (err) throw err
-      valScope[path] = doc.data.content
+
+      if (doc && doc.data) valScope[path] = doc.data.content
+
+      domScope[path].forEach((mod) => {
+        const domChange = (el, attr, val) => {
+          if (val === undefined) return
+          if (attr === "bd-id") {
+            el.id = val
+          } else if (attr === "bd-class") {
+            el.className = val
+          } else if (attr === "bd-html") {
+            el.innerHTML = val
+          } else if (attr === "bd-other") {
+            // Other
+          }
+        }
+
+        domChange(mod[0], mod[1], valScope[path])
+      })
     })
   }
 
@@ -57,7 +75,7 @@ const init = (root = "html", host = window.location.host) => {
       const path = dom.getAttribute(attr)
 
       if (!Array.isArray(domScope[path])) domScope[path] = []
-      if (attr !== "bd-value") domScope[path].push(dom)
+      if (attr !== "bd-value") domScope[path].push([dom, attr])
 
       // Create ShareDB document
       const doc = connection.get("boydog", path)
