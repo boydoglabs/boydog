@@ -4,12 +4,15 @@ const Binding = require("sharedb-string-binding")
 const $ = require("cash-dom")
 const Swal = require("sweetalert2")
 const _toPath = require("lodash.topath")
-const bdAttributes = ["bd-value", "bd-id", "bd-class", "bd-html"]
+const acorn = require("acorn")
+const acornWalk = require("acorn-walk")
+const astring = require("astring")
+const attrModel = "bd-value"
+const attrCalculables = ["bd-id", "bd-class", "bd-html"]
 
 // Boydog front-end scope
 let valScope = {} // Always the latest value of the path
-let domScope = {} // All dom elements bound to a path
-let eventScope = {} // Post OP event of a path
+let calcScope = {} // Post OP event of a path
 
 const init = (root = "html", host = window.location.host) => {
   // Open WebSocket connection to ShareDB server
@@ -38,73 +41,94 @@ const init = (root = "html", host = window.location.host) => {
     })
   })
 
+  const updateRelatedCalculables = (path) => {
+    const c = calcScope[path]
+    if (!c) return
+    c.forEach((e) => (e.el[e.prop] = e.fn(valScope))) // Perform calculable final string
+  }
+
   const updateLatestVal = (doc, path) => {
     doc.fetch((err) => {
       if (err) throw err
-
       if (doc && doc.data) valScope[path] = doc.data.content
-
-      domScope[path].forEach((mod) => {
-        const domChange = (el, attr, val) => {
-          if (val === undefined) return
-          if (attr === "bd-id") {
-            el.id = val
-          } else if (attr === "bd-class") {
-            el.className = val
-          } else if (attr === "bd-html") {
-            el.innerHTML = val
-          } else if (attr === "bd-other") {
-            // Other
-          }
-        }
-
-        domChange(mod[0], mod[1], valScope[path])
-      })
+      updateRelatedCalculables(path)
     })
   }
 
-  // Search and bind attributes
-  bdAttributes.forEach((attr) => {
-    const els = $(`[${attr}]`)
+  const subscribeDoc = (doc, path, el) => {
+    if (valScope[path] === undefined) {
+      // Reliable `doc.subscribed` alternative
+      valScope[path] = null // Null is a valid path t has not been assigned a value yet
 
-    els.each((i, dom) => {
-      if (dom.getAttribute("bd-bind")) return // Return if already bound
-
-      // Normalize attr and update document
-      dom.setAttribute(attr, _toPath(dom.getAttribute(attr)).join(">"))
-      const path = dom.getAttribute(attr)
-
-      if (!Array.isArray(domScope[path])) domScope[path] = []
-      if (attr !== "bd-value") domScope[path].push([dom, attr])
-
-      // Create ShareDB document
-      const doc = connection.get("boydog", path)
-      if (!eventScope[path]) {
-        eventScope[path] = () => {} // Can be overriden to execute an event post OP
-        doc.subscribe((err) => {
-          if (err) throw err
-
-          doc.on("op", (op) => {
-            if (dom.getAttribute("bd-verbose")) console.log("Boydog operation on:", path, op)
-            updateLatestVal(doc, path)
-            eventScope[path]() // Call post OP event, if any
-          })
-          updateLatestVal(doc, path)
-        })
-      }
-
-      doc.fetch((err) => {
+      doc.subscribe((err) => {
         if (err) throw err
 
-        try {
-          new Binding(dom, doc, ["content"], attr.slice(attr.indexOf("-") + 1)).setup()
-          dom.setAttribute("bd-bind", true)
-        } catch (err) {
-          if (err.message === "Cannot read property 'content' of undefined") {
-            console.log(`Warning: Unrecognized '${path}' path. Either a typo or path is not a leaf.`)
-          }
-        }
+        updateLatestVal(doc, path, () => {})
+
+        doc.on("op", (op) => {
+          updateLatestVal(doc, path)
+          if (el.getAttribute("bd-verbose")) console.log("Boydog operation on:", path, op)
+        })
       })
+    }
+  }
+
+  const processModel = (path, el) => {
+    path = _toPath(path).join(">")
+
+    const doc = connection.get("boydog", path)
+    subscribeDoc(doc, path, el)
+
+    doc.fetch((err) => {
+      if (err) throw err
+      try {
+        new Binding(el, doc, ["content"]).setup()
+      } catch (err) {
+        console.log(`Warning: Unrecognized '${path}' path. Either a typo or path is not a leaf.`)
+      }
+    })
+  }
+
+  const processCalculable = (path, attr, attrVal, el) => {
+    path = _toPath(path).join(">")
+
+    const fn = new Function("sandbox", `with (sandbox) {const r = ${attrVal}; return r;}`)
+    const eqs = {
+      "bd-html": "innerHTML",
+      "bd-class": "className",
+    }
+
+    if (!Array.isArray(calcScope[path])) calcScope[path] = []
+    calcScope[path].push({ prop: eqs[attr], fn, el })
+
+    const doc = connection.get("boydog", path)
+    subscribeDoc(doc, path, el)
+  }
+
+  ;[...attrCalculables, attrModel].forEach((attr) => {
+    $(`[${attr}]`).each((i, el) => {
+      const attrVal = el.getAttribute(attr)
+      const p = acorn.parse(attrVal)
+
+      if (attr === attrModel) {
+        if (p.body.length !== 1) return console.log("Error: Malformed bd-model. The bd-model attribute allows only one line expressions.")
+        if (p.body[0].expression.type !== "Identifier" && p.body[0].expression.type !== "MemberExpression")
+          return console.log("Error: Malformed bd-model. The bd-model attribute allows only expressions that don't require any calculations.")
+
+        const path = astring.generate(p.body[0]).slice(0, -1)
+        processModel(path, el)
+      } else {
+        acornWalk.simple(p, {
+          Identifier(node) {
+            const path = node.name
+            processCalculable(path, attr, attrVal, el)
+          },
+          MemberExpression(node) {
+            const path = astring.generate(node)
+            processCalculable(path, attr, attrVal, el)
+          },
+        })
+      }
     })
   })
 

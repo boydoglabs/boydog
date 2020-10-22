@@ -24,21 +24,21 @@ Settings:
  - bd-verbose: Output the payload upon receiving a message.
 
 Examples:
- - `<input bd-value="editor">`
- - `<p class="alert" bd-html="alertInfo"></p>`
- - `<p bd-class="alert.class"></p>`
+ - `<input bd-value="myRealtimeValue">`
+ - `<p bd-html="myRealtimeText"></p>`
+ - `<p bd-class="myRealtimeClass"></p>`
 
 ## Roadmap:
 
  - [x] Travis tests
  - [x] Alpha release
- - [ ] Implement server middleware
  - [ ] Allow users to see where other users are
  - [ ] Implement plug-in system for extensibility
  - [ ] Create `bd-for="n"` directive to create and bind `n` elements
 
 ## Changelog
 
+ - 2.0.22: Major changes in how data is handled. Now it is possible to bind elements such as `bd-html="abc + qwe"`.
  - 2.0.19: SWAL2 update. Minor improvements.
  - 2.0.18: Several code optimizations. Improved notifications. Minor fixes.
  - 2.0.0: Removed Puppeteer. Huge space improvements over previous version. Module 'boydog-client' no longer needed. Client module automatically starts and now there is no need to initialize it manually.
