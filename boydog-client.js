@@ -96,6 +96,7 @@ const init = (root = "html", host = window.location.host) => {
     const eqs = {
       "bd-html": "innerHTML",
       "bd-class": "className",
+      "bd-id": "id",
     }
 
     if (!Array.isArray(calcScope[path])) calcScope[path] = []
